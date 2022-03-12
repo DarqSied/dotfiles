@@ -1,0 +1,6 @@
+#!/bin/bash
+
+icon="  "
+time="$(date "+%d/%m/%y (%a)  %R")"
+
+printf " %s %s \\n" "$icon" "$time"

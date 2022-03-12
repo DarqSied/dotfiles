@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cp "$@" ~/dotfiles/dotfiles/.config/background.jpg
+feh --bg-fill --no-fehbg ~/.config/background.jpg
+betterlockscreen -u ~/.config/background.jpg
+

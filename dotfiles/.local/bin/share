@@ -1,0 +1,2 @@
+#!/bin/bash
+curl -F"file=@$(find /home/ -type f | rofi -dmenu -l 15 -p 'Choose')" 0x0.st | xclip -sel c

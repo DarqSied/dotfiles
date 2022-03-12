@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ $(pulsemixer --get-mute) = 1 ] ; then
+    vol="0"
+else
+    vol="$(pulsemixer --get-volume | awk '{print $1}')"
+fi
+
+if [ "$vol" -gt "75" ] && [ "$vol" -le "100" ] ; then
+	icon="  "
+elif [ "$vol" -gt "50" ] && [ "$vol" -le "75" ] ; then
+ 	icon="墳 "
+elif [ "$vol" -gt "25" ] && [ "$vol" -le "50" ] ; then
+	icon="  "
+elif [ "$vol" -gt "0" ] && [ "$vol" -le "25" ] ; then
+	icon="奄  "
+else
+    icon="ﱝ  "
+fi
+
+printf " %s %s \\n" "$icon" "$vol%"

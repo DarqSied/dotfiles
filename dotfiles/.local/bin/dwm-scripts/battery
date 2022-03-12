@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# Loop through all attached batteries and format the info
+for battery in /sys/class/power_supply/BAT?*; do
+	# If non-first battery, print a space separator.
+	[ -n "${capacity+x}" ] && printf " "
+    # Prints battery percentage
+	capacity="$(cat "$battery/capacity" 2>&1)"
+    # Animate battery status 
+    if [ "$capacity" -le 100 ] && [ "$capacity" -gt 95 ] ; then
+        var=" "
+    elif [ "$capacity" -le 95 ] && [ "$capacity" -gt 90 ] ; then
+        var=" "
+    elif [ "$capacity" -le 90 ] && [ "$capacity" -gt 80 ] ; then
+        var=" "
+    elif [ "$capacity" -le 80 ] && [ "$capacity" -gt 70 ] ; then
+        var=" "
+    elif [ "$capacity" -le 70 ] && [ "$capacity" -gt 60 ] ; then
+        var=" "
+    elif [ "$capacity" -le 60 ] && [ "$capacity" -gt 50 ] ; then
+        var=" "
+    elif [ "$capacity" -le 50 ] && [ "$capacity" -gt 40 ] ; then
+        var=" "
+    elif [ "$capacity" -le 40 ] && [ "$capacity" -gt 30 ] ; then
+        var=" "
+    elif [ "$capacity" -le 30 ] && [ "$capacity" -gt 20 ] ; then
+        var=" "
+    elif [ "$capacity" -le 20 ] && [ "$capacity" -gt 10 ] ; then
+        var=" "
+    else
+        var=" "
+    fi
+
+	# Sets up the status and capacity
+	case "$(cat "$battery/status" 2>&1)" in
+		"Full") status=" " ;;
+		"Discharging") status="$var" ;;
+		"Charging") status=" " ;;
+		"Not charging") status=" " ;;
+		"Unknown") status=" " ;;
+		*) exit 1 ;;
+	esac
+
+    printf " %s %s \\n" "$status" "$capacity%"
+	# Notify about the battery status
+	if [ "$status" = "$var" ] && [ "$capacity" -le 30 ] && [ "$capacity" -gt 15 ] ; then
+        if [ ! -f /tmp/bat-low ] ; then
+            notify-send -t 15000 "Battery Monitor" "Battery low, connect to power."
+        fi
+        touch /tmp/bat-low
+	elif [ "$status" = "$var" ] && [ "$capacity" -le 15 ] ; then
+        if [ ! -f /tmp/bat-crit ] ; then
+            notify-send -u critical "Battery Monitor" "Battery critically low, connect to power now."
+        fi
+        touch /tmp/bat-crit
+    elif [ "$status" = " " ] && [ "$capacity" -eq 100 ] ; then
+        if [ ! -f /tmp/bat-full ] ; then
+            notify-send "Battery Monitor" "Battery full, disconnect from power."
+        fi
+        touch /tmp/bat-full
+    elif [ "$status" = " " ] ; then
+        rm /tmp/bat-low /tmp/bat-crit
+    else 
+        rm /tmp/bat-full
+    fi
+	# Prints the info
+done && printf "\\n"

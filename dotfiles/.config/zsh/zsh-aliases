@@ -1,0 +1,119 @@
+#!/bin/sh
+alias j='z'
+alias f='zi'
+alias g='lazygit'
+alias plugup="find "$ZDOTDIR/plugins" -type d -exec test -e '{}/.git' ';' -print0 | xargs -I {} -0 git -C {} pull -q"
+
+# Use neovim for vim if present.
+[ -x "$(command -v nvim)" ] && alias vim="nvim" vimdiff="nvim -d"
+alias nano='nvim'
+
+# Use $XINITRC variable if file exists.
+[ -f "$XINITRC" ] && alias startx="startx $XINITRC"
+
+# get fastest mirrors
+alias mirror="sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist"
+alias mirrord="sudo reflector --latest 50 --number 20 --sort delay --save /etc/pacman.d/mirrorlist"
+alias mirrors="sudo reflector --latest 50 --number 20 --sort score --save /etc/pacman.d/mirrorlist"
+alias mirrora="sudo reflector --latest 50 --number 20 --sort age --save /etc/pacman.d/mirrorlist"
+
+# Colorize commands when possible
+alias \
+	grep="grep --color=auto" \
+	egrep='egrep --color=auto' \
+	fgrep='fgrep --color=auto' \
+	diff="diff --color=auto" \
+	ccat="highlight --out-format=ansi"
+
+# Verbosity and settings that you pretty much just always are going to want
+alias \
+	cp="cp -iv" \
+	mv="mv -iv" \
+	rm="trash -iv" \
+	rmp="rm -vI" \
+	bc="bc -ql" \
+	mkd="mkdir -pv" \
+	df="df -h" \
+	free="free -m" \
+	ffmpeg="ffmpeg -hide_banner" \
+    c="clear" \
+    x="exit"
+
+# easier to read disk
+alias df='df -h'     # human-readable sizes
+alias free='free -m' # show sizes in MB
+
+# sudo not required for some system commands
+for command in mount umount sv pacman updatedb su ; do
+	alias $command="sudo $command"
+done; unset command
+
+# pacman and aur
+alias \
+	unlock="sudo rm /var/lib/pacman/db.lck" \
+	cleanup="pacman -Qtdq | pacman -Rns -" \
+	pac="pacman" \
+    pu="paru -Syyu" \
+    p="paru -S" \
+    pi="paru -Si" \
+    pr="paru -Rns" \
+    pq="paru -Qe"
+
+# get error messages from journalctl
+alias jctl="journalctl -p 3 -xb"
+
+# get top process eating memory
+alias psmem='ps auxf | sort -nr -k 4 | head -5'
+# get top process eating cpu ##
+alias pscpu='ps auxf | sort -nr -k 3 | head -5'
+
+# gpg encryption
+# verify signature for isos
+alias gpg-check="gpg2 --keyserver-options auto-key-retrieve --verify"
+# receive the key of a developer
+alias gpg-retrieve="gpg2 --keyserver-options auto-key-retrieve --receive-keys"
+
+# For when keys break
+alias archlinux-fix-keys="sudo pacman-key --init && sudo pacman-key --populate archlinux && sudo pacman-key --refresh-keys"
+
+# systemd
+alias syslist="systemctl list-unit-files --state=enabled"
+
+# git
+alias \
+	addup="git add -u" \
+	addall="git add ." \
+	branch="git branch" \
+	checkout="git checkout" \
+	clone="git clone" \
+	commit="git commit -m" \
+	fetch="git fetch" \
+	pull="git pull origin" \
+	push="git push origin" \
+	stat="git status" \
+	tag="git tag" \
+	newtag="git tag -a" \
+	m="git checkout master" \
+	s="git checkout stable"
+
+
+# These common commands are just too long! Abbreviate them.
+alias \
+	ka="killall" \
+	sdn="sudo shutdown -h now" \
+	v="$EDITOR" \
+    dip="dunstctl is-paused" \
+    lf="lfrun" \
+    ani="ani-cli -q 1080"
+
+# switch between shells
+# I do not recommend switching default SHELL from bash.
+alias tobash="sudo chsh $USER -s /bin/bash && echo 'Now log out.'"
+alias tozsh="sudo chsh $USER -s /bin/zsh && echo 'Now log out.'"
+
+# Changing "ls" to "exa"
+alias ls='exa --icons --classify -al --color=always --group-directories-first' # my preferred listing
+alias la='exa --icons --classify -a --color=always --group-directories-first'  # all files and dirs
+alias ll='exa --icons --classify -l --color=always --group-directories-first'  # long format
+alias lt='exa --icons --classify -aT --color=always --group-directories-first' # tree listing
+alias l.='exa --icons --classify -a | egrep "^\."'
