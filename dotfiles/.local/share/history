@@ -647,3 +647,31 @@ stat
 addall
 commit "backing up"
 git push -u origin main
+cd ~/dotfiles
+stat
+addall
+commit "backing up"
+git push -u origin main
+cd ~/configs
+ls
+echo "# configs" >> README.md\
+git init\
+git add README.md\
+git commit -m "first commit"\
+git branch -M main\
+git remote add origin https://github.com/DarqSied/configs.git\
+git push -u origin main
+ls
+ls
+stow -vt ~ browser
+kkc
+c
+ls
+addall
+commit "private backup"
+git push -u origin main
+ls
+rm README.md
+addall
+commit "private backup"
+git push -u origin main
