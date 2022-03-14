@@ -36,7 +36,7 @@ grep -o '<a href="/torrent/.*</a>' $cachedir/tmp.html |
 
 result_count=$(wc -l $cachedir/titles.bw | awk '{print $1}')
 if [ "$result_count" -lt 1 ] && [ "$query" ] ; then
-    notify-send "Torrent" "No result found. Try again."
+    notify-send "Torrent" "No result found."
     exit 0
 elif [ "$query" == "" ] ; then
     exit 0
@@ -68,7 +68,7 @@ awk '{print "[S:"$1 ", L:"$2"]" }' $cachedir/seedleech.bw > $cachedir/tmp && mv 
 
 # Getting the line number
 LINE=$(paste -d\   $cachedir/size.bw $cachedir/seedleech.bw $cachedir/titles.bw |
-    rofi -dmenu -l 25 -p "Choose: " |
+    rofi -dmenu -l 25 -p "Choose" |
     cut -d\- -f1 |
     awk '{$1=$1; print}')
 

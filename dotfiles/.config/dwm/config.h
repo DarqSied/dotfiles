@@ -297,9 +297,10 @@ static Key keys[] = {
     /* Rofi */
     { MODKEY,                       XK_r,               spawn,                  SHCMD("rofi -show combi -combi-modi 'window,drun' -modi combi -show-icons") } ,
     { MODKEY|ShiftMask,             XK_r,               spawn,                  SHCMD("rofi -show run -modi 'run'") } ,
-    { MODKEY,                       XK_v,               spawn,                  SHCMD("rofi -modi 'clipboard:greenclip print' -show clipboard -run-command '{SHCMD}'") } ,
+    { MODKEY,                       XK_v,               spawn,                  SHCMD("rofi -modi 'clipboard:greenclip print' -show clipboard -run-command '{cmd}'") } ,
     { MODKEY|ShiftMask,             XK_v,               spawn,                  SHCMD("rofi -show emoji -modi 'emoji'") } ,
     { MODKEY,                       XK_n,               spawn,                  SHCMD("networkmanager_dmenu") } ,
+    { MODKEY|ShiftMask,             XK_d,               spawn,                  SHCMD("~/.local/bin/torr") } ,
     { MODKEY|Mod1Mask,              XK_x,               spawn,                  SHCMD("rofi -show powermenu -modi powermenu:~/.local/bin/powermenu") } ,
     /* Custom Key Bindings */
 	{ MODKEY,                       XK_x,               spawn,                  {.v = termcmd } },
@@ -316,9 +317,9 @@ static Key keys[] = {
 	{ MODKEY,                       XK_s,               togglescratch,          {.ui = 1 } },
 	{ MODKEY,                       XK_d,               togglescratch,          {.ui = 2 } },
     /* Screenshot */
-    { 0,                            XK_Print,           spawn,                  SHCMD("flameshot full -p ~/Himanshu/Data/Backup/Screenshots") } ,
-    { Mod1Mask,                     XK_Print,           spawn,                  SHCMD("flameshot screen -p ~/Himanshu/Data/Backup/Screenshots") } ,
-    { ControlMask,                  XK_Print,           spawn,                  SHCMD("flameshot gui -p ~/Himanshu/Data/Backup/Screenshots") } ,
+    { 0,                            XK_Print,           spawn,                  SHCMD("flameshot full -p ~/Himanshu/Data/Screenshots") } ,
+    { Mod1Mask,                     XK_Print,           spawn,                  SHCMD("flameshot screen -p ~/Himanshu/Data/Screenshots") } ,
+    { ControlMask,                  XK_Print,           spawn,                  SHCMD("flameshot gui -p ~/Himanshu/Data/Screenshots") } ,
     /* Media+Vol+Brightness Keys */
     { 0,                            XF86XK_AudioMute,   spawn,                  SHCMD("amixer -D pulse set Master 1+ toggle; kill -44 $(pidof dwmblocks)") },
     { 0,                            XF86XK_AudioRaiseVolume, spawn,             SHCMD("amixer set Master 5%+; kill -44 $(pidof dwmblocks)") },
