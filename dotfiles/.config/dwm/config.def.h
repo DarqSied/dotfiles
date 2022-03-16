@@ -182,7 +182,7 @@ static const Rule rules[] = {
 	{ NULL,       NULL,        NULL,       	   WTYPE "UTILITY",  0,            1,           0,          1,         -1 },
 	{ NULL,       NULL,        NULL,       	   WTYPE "TOOLBAR",  0,            1,           0,          1,         -1 },
 	{ NULL,       NULL,        NULL,       	   WTYPE "SPLASH",   0,            1,           0,          1,         -1 },
-	{ "Gimp",     NULL,        NULL,       	   NULL,             1 << 6,       0,           0,          0,         -1 },
+	/* { "Gimp",     NULL,        NULL,       	   NULL,             1 << 6,       0,           0,          0,         -1 }, */
 	{ Termclass,  NULL,        NULL,       	   NULL,             0,            0,           1,          0,         -1 },
 	{ NULL,       NULL,        "Event Tester", NULL,             0,            0,           0,          1,         -1 },
 	{ NULL,       "spterm",    NULL,       	   NULL,             SPTAG(0),     1,           1,          0,         -1 },
