@@ -16,7 +16,6 @@
 #include "swallow.h"
 #include "tagothermonitor.h"
 #include "vanitygaps.h"
-#include "warp.h"
 /* Layouts */
 #include "layout_monocle.h"
 #include "layout_tile.h"
