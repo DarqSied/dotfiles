@@ -156,7 +156,7 @@ function write_message {
     text="<span font_size=\"medium\">$2</span>"
     if [ "$showsymbols" = "true" ]
     then
-        echo -n "\u200e$icon  \u2068$text\u2069"
+        echo -n "\u200e$icon \u2068$text\u2069"
     else
         echo -n "$text"
     fi
