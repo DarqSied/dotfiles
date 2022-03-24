@@ -41,9 +41,6 @@ greenclip daemon &
 # Screenshot utility
 flameshot &
 
-# Youtube local server
-python ~/.local/share/youtube-local/server.py &
-
 # Screen temperature
 gummy start &
 
