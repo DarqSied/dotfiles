@@ -32,6 +32,9 @@ picom --experimental-backends &
 # Polkit
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 
+# Torrent daemon
+transmission-daemon &
+
 # Hide mouse when typing
 xbanish &
 
