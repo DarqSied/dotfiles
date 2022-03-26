@@ -1,15 +1,15 @@
 {
+    "als_polling_rate": 5000,
     "brt_auto_fps": 60,
-    "log_level": 3,
     "screens": [
         {
-            "brt_auto": false,
             "brt_auto_max": 500,
             "brt_auto_min": 250,
             "brt_auto_offset": 0,
             "brt_auto_polling_rate": 1000,
             "brt_auto_speed": 1000,
             "brt_auto_threshold": 8,
+            "brt_mode": 0,
             "brt_step": 500,
             "temp_auto": true,
             "temp_step": 0
