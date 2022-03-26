@@ -312,10 +312,11 @@ static Key keys[] = {
     { MODKEY|ShiftMask,             XK_e,               spawn,                  SHCMD("thunar") },
     { MODKEY,                       XK_a,               spawn,                  SHCMD(Terminal " -e htop") },
     { MODKEY|ShiftMask,             XK_s,               spawn,                  SHCMD("signal-desktop") },
+    { MODKEY,                       XK_d,               spawn,                  SHCMD(Terminal " -e tremc") },
     /* Scratchpads */
     { MODKEY|ShiftMask,             XK_x,               togglescratch,          {.ui = 0 } },
 	{ MODKEY,                       XK_s,               togglescratch,          {.ui = 1 } },
-	{ MODKEY,                       XK_d,               togglescratch,          {.ui = 2 } },
+	{ MODKEY,                       XK_c,               togglescratch,          {.ui = 2 } },
     /* Screenshot */
     { 0,                            XK_Print,           spawn,                  SHCMD("flameshot full -p ~/Himanshu/Data/Screenshots") } ,
     { Mod1Mask,                     XK_Print,           spawn,                  SHCMD("flameshot screen -p ~/Himanshu/Data/Screenshots") } ,

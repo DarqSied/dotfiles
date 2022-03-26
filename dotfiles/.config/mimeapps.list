@@ -1,7 +1,7 @@
 [Added Associations]
 application/toml=userapp-nvim-launch-HBZDH1.desktop
 text/x-python=userapp-nvim-launch-HBZDH1.desktop
-text/plain=userapp-nvim-launch-HBZDH1.desktop
+text/plain=userapp-transmission-gtk.desktop-47P8I1.desktop;userapp-nvim-launch-HBZDH1.desktop;
 text/x-ooc=userapp-nvim-launch-HBZDH1.desktop
 text/x-opencl-src=userapp-nvim-launch-HBZDH1.desktop
 text/x-pascal=userapp-nvim-launch-HBZDH1.desktop
@@ -27,8 +27,8 @@ application/pdf=org.pwmt.zathura-pdf-poppler.desktop;
 application/json=nvim.desktop;
 
 [Default Applications]
-x-scheme-handler/magnet=torrent.desktop;
-application/x.bittorrent=torrent.desktop;
+x-scheme-handler/magnet=transmission-gtk.desktop;
+application/x.bittorrent=transmission-gtk.desktop;
 video/x-matroska=mpv.desktop
 video/mp4=mpv.desktop
 image/gif=mpvgif.desktop
