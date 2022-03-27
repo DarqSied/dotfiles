@@ -50,6 +50,9 @@ gummy start &
 # Power manager
 xfce4-power-manager &
 
+# File manager
+thunar --daemon &
+
 # Notification Daemon
 #/usr/lib/xfce4/notifyd/xfce4-notifyd &
 /usr/bin/dunst &
