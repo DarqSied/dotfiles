@@ -1,7 +1,7 @@
 [Added Associations]
 application/toml=userapp-nvim-launch-HBZDH1.desktop
 text/x-python=userapp-nvim-launch-HBZDH1.desktop
-text/plain=userapp-transmission-gtk.desktop-47P8I1.desktop;userapp-nvim-launch-HBZDH1.desktop;
+text/plain=userapp-nvim-launch-HBZDH1.desktop;
 text/x-ooc=userapp-nvim-launch-HBZDH1.desktop
 text/x-opencl-src=userapp-nvim-launch-HBZDH1.desktop
 text/x-pascal=userapp-nvim-launch-HBZDH1.desktop
@@ -22,18 +22,19 @@ application/x-extension-xhtml=librewolf.desktop;
 application/x-extension-xht=librewolf.desktop;
 text/x-chdr=userapp-nvim-launch-HBZDH1.desktop;
 x-scheme-handler/tg=userapp-Telegram Desktop-8C0NI1.desktop;
-image/jpeg=sxiv.desktop;
 application/pdf=org.pwmt.zathura-pdf-poppler.desktop;
-application/json=nvim.desktop;
+application/json=userapp-nvim-launch-HBZDH1.desktop;
+application/x-bittorrent=userapp-transadd-R34CJ1.desktop;
+x-scheme-handler/magnet=userapp-transadd-R34CJ1.desktop;
 
 [Default Applications]
-x-scheme-handler/magnet=transmission-gtk.desktop;
-application/x.bittorrent=transmission-gtk.desktop;
+x-scheme-handler/magnet=userapp-transadd-R34CJ1.desktop
+application/x-bittorrent=userapp-transadd-R34CJ1.desktop
 video/x-matroska=mpv.desktop
 video/mp4=mpv.desktop
 image/gif=mpvgif.desktop
-image/png=sxiv.desktop
-image/jpeg=sxiv.desktop
+image/png=nsxiv.desktop
+image/jpeg=nsxiv.desktop
 text/html=librewolf.desktop
 text/xml=librewolf.desktop
 x-scheme-handler/http=librewolf.desktop

@@ -17,15 +17,15 @@ static const int topbar                  = 1;   /* 0 means bottom bar */
 /* Status is to be shown on: -1 (all monitors), 0 (a specific monitor by index), 'A' (active monitor) */
 static const int statusmon               = -1;
 static const int horizpadbar             = 2;   /* horizontal padding for statusbar */
-static const int vertpadbar              = 4;   /* vertical padding for statusbar */
+static const int vertpadbar              = 6;   /* vertical padding for statusbar */
 
 /* Indicators: see patch/bar_indicators.h for options */
 static int tagindicatortype              = INDICATOR_NONE;
 static int tiledindicatortype            = INDICATOR_NONE;
 static int floatindicatortype            = INDICATOR_TOP_LEFT_SQUARE;
-static const char *fonts[]               = { "Hack Font:size=11:antialias=true:autohint=true",
-                                             "Hack Nerd Font:size=11:antialias=true:autohint=true",
-                                             "FontAwesome:size:11:antialias=true:autohint=true"};
+static const char *fonts[]               = {"Hack Font:size=11:antialias=true:autohint=true",
+                                            "Hack Nerd Font:size=11:antialias=true:autohint=true",
+                                            "FontAwesome:size:11:antialias=true:autohint=true"};
 static const char dmenufont[]            = "Hack Nerd Font:size=11";
 
 static char c000000[]                    = "#000000"; // placeholder value
