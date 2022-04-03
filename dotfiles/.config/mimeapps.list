@@ -28,7 +28,7 @@ application/x-bittorrent=userapp-transadd-R34CJ1.desktop;
 x-scheme-handler/magnet=userapp-transadd-R34CJ1.desktop;
 
 [Default Applications]
-x-scheme-handler/magnet=userapp-transadd-R34CJ1.desktop
+x-scheme-handler/magnet=transmission-gtk.desktop
 application/x-bittorrent=userapp-transadd-R34CJ1.desktop
 video/x-matroska=mpv.desktop
 video/mp4=mpv.desktop
