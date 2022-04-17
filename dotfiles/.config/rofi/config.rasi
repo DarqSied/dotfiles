@@ -17,10 +17,10 @@ configuration {
 
 * {
     foreground: #f8f8f2;
-    background-color: #282a3655;
-    active-background: #44475a55;
-    urgent-background: #ff555555;
-    selected-background: #bd93f955;
+    background-color: #282a36cc;
+    active-background: #44475a77;
+    urgent-background: #ff555577;
+    selected-background: #bd93f977;
     selected-urgent-background: #ffb86c55;
     selected-active-background: @selected-background;
     separatorcolor: @background-color;
@@ -43,19 +43,23 @@ listview {
 } */
 
 #mainbox {
+    background-color: #00000000;
     border:  0;
     padding: 10;
     border-radius: 10;
 }
 #message {
+    background-color: #00000000;
     border:       1px dash 0px 0px ;
     border-color: @separatorcolor;
     padding:      1px ;
 }
 #textbox {
+    background-color: #00000000;
     text-color: @foreground;
 }
 #listview {
+    background-color: #00000000;
     fixed-height: 0;
     border:       2px dash 0px 0px ;
     border-color: @bordercolor;
@@ -118,6 +122,7 @@ listview {
     text-color:       @foreground;
 }
 #inputbar {
+    background-color: #00000000;
     spacing:    0;
     text-color: @foreground;
     padding:    1px ;
@@ -127,10 +132,12 @@ listview {
     text-color: @foreground;
 }
 #entry {
+    background-color: #00000000;
     spacing:    0;
     text-color: @foreground;
 }
 #prompt {
+    background-color: #00000000;
     spacing:    0;
     text-color: @foreground;
 }
@@ -138,6 +145,7 @@ listview {
     children:   [ prompt,textbox-prompt-colon,entry,case-indicator ];
 }
 #textbox-prompt-colon {
+    background-color: #00000000;
     expand:     false;
     str:        ":";
     margin:     0px 0.3em 0em 0em ;
