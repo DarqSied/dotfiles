@@ -17,7 +17,7 @@ configuration {
 
 * {
     foreground: #f8f8f2;
-    background-color: #282a36cc;
+    background-color: #282a36aa;
     active-background: #44475a77;
     urgent-background: #ff555577;
     selected-background: #bd93f977;
