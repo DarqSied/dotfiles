@@ -128,6 +128,7 @@ listview {
     padding:    1px ;
 }
 #case-indicator {
+    background-color: #00000000;
     spacing:    0;
     text-color: @foreground;
 }
