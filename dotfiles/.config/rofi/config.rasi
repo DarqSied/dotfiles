@@ -6,7 +6,7 @@ configuration {
     font: "Hack Nerd Font 13, Hack Font 14";
     modi: "window,run,drun,combi,emoji";
     sorting-method: "fzf";
-    cycle: true;
+    cycle: false;
     auto-select: true;
     scroll-method: 1;
     icon-theme: "Papirus";
@@ -18,10 +18,10 @@ configuration {
 * {
     foreground: #f8f8f2;
     background-color: #282a36aa;
-    active-background: #44475a77;
-    urgent-background: #ff555577;
-    selected-background: #bd93f977;
-    selected-urgent-background: #ffb86c55;
+    active-background: #44475a88;
+    urgent-background: #ff555588;
+    selected-background: #bd93f988;
+    selected-urgent-background: #ffb86c88;
     selected-active-background: @selected-background;
     separatorcolor: @background-color;
     bordercolor: @active-background;
