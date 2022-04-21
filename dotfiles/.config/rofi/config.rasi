@@ -3,7 +3,7 @@ configuration {
     display-run: "";
     display-window: "#";
     drun-display-format: "{name}";
-    font: "Hack Nerd Font 13, Hack Font 14";
+    font: "Hack Nerd Font Mono 14";
     modi: "window,run,drun,combi,emoji";
     sorting-method: "fzf";
     cycle: false;
