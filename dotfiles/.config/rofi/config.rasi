@@ -3,10 +3,10 @@ configuration {
     display-run: "";
     display-window: "#";
     drun-display-format: "{name}";
-    font: "Hack Nerd Font 13";
+    font: "Hack Nerd Font 13, Hack Font 14";
     modi: "window,run,drun,combi,emoji";
     sorting-method: "fzf";
-    cycle: false;
+    cycle: true;
     auto-select: true;
     scroll-method: 1;
     icon-theme: "Papirus";
@@ -28,31 +28,25 @@ configuration {
 }
 
 listview {
-    lines: 20;
+    lines: 18;
 }
 
-/* #window {
-    height:   100%;
-    width: 35%;
-    location: north;
-    background-color: @background;
-    border:           0;
-    border-radius: 8;
-    border-color: @bordercolor;
-    padding:          5;
-} */
+#window {
+    border:     0;
+    padding:    8;
+    border-radius: 10;
+}
 
 #mainbox {
     background-color: #00000000;
-    border:  0;
-    padding: 10;
-    border-radius: 10;
+    border:     0;
+    padding:    8;
 }
 #message {
     background-color: #00000000;
-    border:       1px dash 0px 0px ;
-    border-color: @separatorcolor;
-    padding:      1px ;
+    border:         1px dash 0px 0px ;
+    border-color:   @separatorcolor;
+    padding:        1px ;
 }
 #textbox {
     background-color: #00000000;
