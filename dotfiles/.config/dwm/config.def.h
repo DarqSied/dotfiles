@@ -303,9 +303,8 @@ static Key keys[] = {
     { MODKEY|ShiftMask,             XK_d,               spawn,                  SHCMD("~/.local/bin/torr") } ,
     { MODKEY|Mod1Mask,              XK_x,               spawn,                  SHCMD("rofi -show powermenu -modi powermenu:~/.local/bin/powermenu") } ,
     /* Custom Key Bindings */
-	{ MODKEY,                       XK_x,               spawn,                  {.v = termcmd } },
-	{ MODKEY,                       XK_Return,          spawn,                  SHCMD(Terminal " -e tmux") },
-    { MODKEY|ShiftMask,             XK_Return,          spawn,                  SHCMD(Terminal " -e tmux a") },
+	{ MODKEY,                       XK_Return,          spawn,                  {.v = termcmd } },
+    { MODKEY|ShiftMask,             XK_Return,          spawn,                  SHCMD(Terminal " -e ~/.local/bin/atmux") },
     { MODKEY,                       XK_w,               spawn,                  SHCMD("librewolf") },
     { MODKEY|ShiftMask,             XK_w,               spawn,                  SHCMD("librewolf --private-window") },
     { MODKEY,                       XK_e,               spawn,                  SHCMD(Terminal " -e ~/.local/bin/lfrun") },
