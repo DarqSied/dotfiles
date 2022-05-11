@@ -1,4 +1,4 @@
-const NAME = "DarcSied";
+const NAME = "DarqSied";
 
 const CARDS = [
   {
@@ -9,12 +9,12 @@ const CARDS = [
   {
     name: "YouTube",
     icon: "ri-youtube-line",
-    link: "http://localhost:9000/https://youtube.com/",
+    link: "http://piped.kavin.rocks/feed/",
   },
   {
     name: "Anime",
     icon: "ri-tv-line",
-    link: "https://gogoanime.film/",
+    link: "https://gogoanime.gg/",
   },
   {
     name: "MyAnimeList",
