@@ -292,8 +292,8 @@ static Key keys[] = {
     /* Quit, Kill & Restart */
 	{ MODKEY,                       XK_q,               killclient,             {0} },
 	{ MODKEY|ShiftMask,             XK_q,               spawn,                  SHCMD("xkill") },
-	{ MODKEY|Mod1Mask,              XK_q,               quit,                   {0} },
-	{ MODKEY|Mod1Mask,              XK_r,               quit,                   {1} },
+	{ MODKEY|ControlMask,           XK_q,               quit,                   {0} },
+	{ MODKEY|ControlMask,           XK_r,               quit,                   {1} },
     /* Rofi */
     { MODKEY,                       XK_r,               spawn,                  SHCMD("rofi -show combi -combi-modi 'window,drun' -modi combi -show-icons") } ,
     { MODKEY|ShiftMask,             XK_r,               spawn,                  SHCMD("rofi -show run -modi 'run'") } ,
@@ -301,7 +301,7 @@ static Key keys[] = {
     { MODKEY|ShiftMask,             XK_v,               spawn,                  SHCMD("rofi -show emoji -modi 'emoji'") } ,
     { MODKEY,                       XK_n,               spawn,                  SHCMD("networkmanager_dmenu") } ,
     { MODKEY|ShiftMask,             XK_d,               spawn,                  SHCMD("~/.local/bin/torr") } ,
-    { MODKEY|Mod1Mask,              XK_x,               spawn,                  SHCMD("rofi -show powermenu -modi powermenu:~/.local/bin/powermenu") } ,
+    { MODKEY|ControlMask,           XK_x,               spawn,                  SHCMD("rofi -show powermenu -modi powermenu:~/.local/bin/powermenu") } ,
     /* Custom Key Bindings */
 	{ MODKEY,                       XK_Return,          spawn,                  {.v = termcmd } },
     { MODKEY|ShiftMask,             XK_Return,          spawn,                  SHCMD(Terminal " -e ~/.local/bin/atmux") },
@@ -314,7 +314,7 @@ static Key keys[] = {
     { MODKEY|ShiftMask,             XK_s,               spawn,                  SHCMD("signal-desktop") },
     { MODKEY,                       XK_d,               spawn,                  SHCMD(Terminal " -e tremc") },
     /* Scratchpads */
-    { MODKEY|ShiftMask,             XK_x,               togglescratch,          {.ui = 0 } },
+    { MODKEY,                       XK_x,               togglescratch,          {.ui = 0 } },
 	{ MODKEY,                       XK_s,               togglescratch,          {.ui = 1 } },
 	{ MODKEY,                       XK_c,               togglescratch,          {.ui = 2 } },
     /* Screenshot */
