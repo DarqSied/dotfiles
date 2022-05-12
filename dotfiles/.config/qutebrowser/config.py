@@ -162,6 +162,9 @@ c.url.default_page = str(config.configdir / "startpage.html")
 # c.url.default_page = 'https://search.brave.com/'
 c.url.start_pages = c.url.default_page
 
+# Misc. settings
+c.zoom.levels = ['25%', '33%', '50%', '60%', '67%', '75%', '90%', '100%', '110%', '125%', '150%', '175%', '200%', '250%', '300%', '400%', '500%']
+
 # AdBlock
 c.content.blocking.enabled = True
 c.content.blocking.method = "adblock"
@@ -217,3 +220,5 @@ config.bind('M', 'hint links spawn mpv {hint-url}')
 config.bind('Z', 'hint links spawn alacritty -e yt-dlp {hint-url}')
 config.bind('t', 'set-cmd-text -s :open -t')
 config.bind('xx', 'config-cycle tabs.show multiple never')
+config.bind('=', 'zoom-in')
+config.bind('<Ctrl-=>', 'zoom')
