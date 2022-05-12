@@ -307,6 +307,7 @@ static Key keys[] = {
     { MODKEY|ShiftMask,             XK_Return,          spawn,                  SHCMD(Terminal " -e ~/.local/bin/atmux") },
     { MODKEY,                       XK_w,               spawn,                  SHCMD("librewolf") },
     { MODKEY|ShiftMask,             XK_w,               spawn,                  SHCMD("librewolf --private-window") },
+    { MODKEY|Mod1Mask,              XK_w,               spawn,                  SHCMD("qutebrowser") },
     { MODKEY,                       XK_e,               spawn,                  SHCMD(Terminal " -e ~/.local/bin/lfrun") },
     { MODKEY|ShiftMask,             XK_e,               spawn,                  SHCMD("thunar") },
     { MODKEY,                       XK_a,               spawn,                  SHCMD(Terminal " -e htop") },
