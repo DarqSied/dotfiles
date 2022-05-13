@@ -5,10 +5,8 @@
 # If you don't plan on reverting to bash, you can remove the link in ~/.profile
 # to clean up.
 
-# Adds `~/.local/bin` to $PATH
-export PATH="$PATH:${$(find ~/.local/bin -type d -printf %p:)%%:}"
 # Path
-path=("$HOME/.local/bin/dwm-scripts" "$HOME/.config/polybar/scripts" "$HOME/.local/share/go/bin" "$HOME/.cargo/bin:$PATH" "$path[@]")
+path=("$HOME/.local/bin" "$HOME/.local/bin/dwm-scripts" "$HOME/.config/polybar/scripts" "$HOME/.local/share/go/bin" "$HOME/.cargo/bin" "$path[@]")
 export PATH
 # export LESSOPEN="| /usr/bin/highlight -O ansi %s 2>/dev/null"
 
@@ -37,6 +35,7 @@ export XDG_STATE_HOME=${XDG_STATE_HOME:="$HOME/.local/state"}
 
 # Disable files
 export LESSHISTFILE=-
+export HISTORY_IGNORE="(ls|cd|pwd|exit|sudo reboot|history|cd -|cd ..)"
 
 # Fixing Paths:
 export XINITRC="${XDG_CONFIG_HOME:-$HOME/.config}/x11/xinitrc"

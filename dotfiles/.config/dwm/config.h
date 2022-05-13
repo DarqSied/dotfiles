@@ -177,17 +177,20 @@ static const Rule rules[] = {
 	* RULE(.wintype = WTYPE "SPLASH", .isfloating = 1)
     */
 
-	/* class      instance     title       	   wintype           tags mask     isfloating   isterminal  noswallow  monitor */
-	{ NULL,       NULL,        NULL,       	   WTYPE "DIALOG",   0,            1,           0,          1,         -1 },
-	{ NULL,       NULL,        NULL,       	   WTYPE "UTILITY",  0,            1,           0,          1,         -1 },
-	{ NULL,       NULL,        NULL,       	   WTYPE "TOOLBAR",  0,            1,           0,          1,         -1 },
-	{ NULL,       NULL,        NULL,       	   WTYPE "SPLASH",   0,            1,           0,          1,         -1 },
-	/* { "Gimp",     NULL,        NULL,       	   NULL,             1 << 6,       0,           0,          0,         -1 }, */
-	{ Termclass,  NULL,        NULL,       	   NULL,             0,            0,           1,          0,         -1 },
-	{ NULL,       NULL,        "Event Tester", NULL,             0,            0,           0,          1,         -1 },
-	{ NULL,       "spterm",    NULL,       	   NULL,             SPTAG(0),     1,           1,          0,         -1 },
-	{ NULL,       "spspt",     NULL,       	   NULL,             SPTAG(1),     1,           1,          0,         -1 },
-	{ NULL,       "spvol",     NULL,       	   NULL,             SPTAG(2),     1,           1,          0,         -1 },
+	/* class                instance     title       	   wintype           tags mask     isfloating   isterminal  noswallow  monitor */
+	{ NULL,                 NULL,        NULL,       	   WTYPE "DIALOG",   0,            1,           0,          1,         -1 },
+	{ NULL,                 NULL,        NULL,       	   WTYPE "UTILITY",  0,            1,           0,          1,         -1 },
+	{ NULL,                 NULL,        NULL,       	   WTYPE "TOOLBAR",  0,            1,           0,          1,         -1 },
+	{ NULL,                 NULL,        NULL,       	   WTYPE "SPLASH",   0,            1,           0,          1,         -1 },
+	/* { "Gimp",             NULL,        NULL,       	   NULL,             1 << 6,       0,           0,          0,         -1 }, */
+	{ "Signal",             NULL,        NULL,       	   NULL,             1 << 6,       0,           0,          0,         -1 },
+	{ "TelegramDesktop",    NULL,        NULL,       	   NULL,             1 << 6,       0,           0,          0,         -1 },
+	{ "mpv",                NULL,        NULL,       	   NULL,             1 << 7,       0,           0,          0,         -1 },
+	{ Termclass,            NULL,        NULL,       	   NULL,             0,            0,           1,          0,         -1 },
+	{ NULL,                 NULL,        "Event Tester", NULL,             0,            0,           0,          1,         -1 },
+	{ NULL,                 "spterm",    NULL,       	   NULL,             SPTAG(0),     1,           1,          0,         -1 },
+	{ NULL,                 "spspt",     NULL,       	   NULL,             SPTAG(1),     1,           1,          0,         -1 },
+	{ NULL,                 "spvol",     NULL,       	   NULL,             SPTAG(2),     1,           1,          0,         -1 },
 };
 
 
@@ -259,9 +262,9 @@ static Key keys[] = {
 	{ MODKEY,                       XK_o,               incnmaster,             {.i = -1 } },
 	{ MODKEY,                       XK_h,               setmfact,               {.f = -0.05} },
 	{ MODKEY,                       XK_l,               setmfact,               {.f = +0.05} },
-	{ MODKEY|Mod1Mask,              XK_u,               incrgaps,               {.i = +1 } },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_u,               incrgaps,               {.i = -1 } },
-	{ MODKEY|Mod1Mask,              XK_i,               incrigaps,              {.i = +1 } },
+	{ MODKEY|ControlMask,           XK_g,               incrgaps,               {.i = +1 } },
+	{ MODKEY|ControlMask|ShiftMask, XK_g,               incrgaps,               {.i = -1 } },
+	/* { MODKEY|Mod1Mask,              XK_i,               incrigaps,              {.i = +1 } },
 	{ MODKEY|Mod1Mask|ShiftMask,    XK_i,               incrigaps,              {.i = -1 } },
 	{ MODKEY|Mod1Mask,              XK_o,               incrogaps,              {.i = +1 } },
 	{ MODKEY|Mod1Mask|ShiftMask,    XK_o,               incrogaps,              {.i = -1 } },
@@ -272,9 +275,9 @@ static Key keys[] = {
 	{ MODKEY|Mod1Mask,              XK_8,               incrohgaps,             {.i = +1 } },
 	{ MODKEY|Mod1Mask|ShiftMask,    XK_8,               incrohgaps,             {.i = -1 } },
 	{ MODKEY|Mod1Mask,              XK_9,               incrovgaps,             {.i = +1 } },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_9,               incrovgaps,             {.i = -1 } },
-	{ MODKEY|Mod1Mask,              XK_0,               togglegaps,             {0} },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_0,               defaultgaps,            {0} },
+	{ MODKEY|Mod1Mask|ShiftMask,    XK_9,               incrovgaps,             {.i = -1 } }, */
+	{ MODKEY|Mod1Mask,              XK_g,               defaultgaps,            {0} },
+	{ MODKEY|Mod1Mask|ShiftMask,    XK_g,               togglegaps,             {0} },
 	{ MODKEY,                       XK_Tab,             view,                   {0} },
     /* Layouts */
 	{ MODKEY,                       XK_b,               togglebar,              {0} },
@@ -300,31 +303,32 @@ static Key keys[] = {
     { MODKEY,                       XK_v,               spawn,                  SHCMD("rofi -modi 'clipboard:greenclip print' -show clipboard -run-command '{cmd}'") } ,
     { MODKEY|ShiftMask,             XK_v,               spawn,                  SHCMD("rofi -show emoji -modi 'emoji'") } ,
     { MODKEY,                       XK_n,               spawn,                  SHCMD("networkmanager_dmenu") } ,
-    { MODKEY|ShiftMask,             XK_d,               spawn,                  SHCMD("~/.local/bin/torr") } ,
-    { MODKEY|ControlMask,           XK_x,               spawn,                  SHCMD("rofi -show powermenu -modi powermenu:~/.local/bin/powermenu") } ,
+    { MODKEY|ShiftMask,             XK_d,               spawn,                  SHCMD("torr") } ,
+    { MODKEY|ControlMask,           XK_x,               spawn,                  SHCMD("rofi -show powermenu -modi powermenu:powermenu") } ,
     /* Custom Key Bindings */
 	{ MODKEY,                       XK_Return,          spawn,                  {.v = termcmd } },
-    { MODKEY|ShiftMask,             XK_Return,          spawn,                  SHCMD(Terminal " -e ~/.local/bin/atmux") },
+    { MODKEY|ShiftMask,             XK_Return,          spawn,                  SHCMD(Terminal " -e atmux") },
     { MODKEY,                       XK_w,               spawn,                  SHCMD("librewolf") },
     { MODKEY|ShiftMask,             XK_w,               spawn,                  SHCMD("librewolf --private-window") },
     { MODKEY|Mod1Mask,              XK_w,               spawn,                  SHCMD("qutebrowser") },
-    { MODKEY,                       XK_e,               spawn,                  SHCMD(Terminal " -e ~/.local/bin/lfrun") },
+    { MODKEY,                       XK_e,               spawn,                  SHCMD(Terminal " -e lfrun") },
     { MODKEY|ShiftMask,             XK_e,               spawn,                  SHCMD("thunar") },
     { MODKEY,                       XK_a,               spawn,                  SHCMD(Terminal " -e htop") },
-    { MODKEY|ShiftMask,             XK_s,               spawn,                  SHCMD("signal-desktop") },
     { MODKEY,                       XK_d,               spawn,                  SHCMD(Terminal " -e tremc") },
+    { MODKEY,                       XK_c,               spawn,                  SHCMD("clock") },
+    { MODKEY|ShiftMask,             XK_c,               spawn,                  SHCMD("cal-popup --popup") },
     /* Scratchpads */
     { MODKEY,                       XK_x,               togglescratch,          {.ui = 0 } },
 	{ MODKEY,                       XK_s,               togglescratch,          {.ui = 1 } },
-	{ MODKEY,                       XK_c,               togglescratch,          {.ui = 2 } },
+	{ MODKEY,                       XK_y,               togglescratch,          {.ui = 2 } },
     /* Screenshot */
     { 0,                            XK_Print,           spawn,                  SHCMD("flameshot full -p ~/Himanshu/Data/Screenshots") } ,
     { Mod1Mask,                     XK_Print,           spawn,                  SHCMD("flameshot screen -p ~/Himanshu/Data/Screenshots") } ,
     { ControlMask,                  XK_Print,           spawn,                  SHCMD("flameshot gui -p ~/Himanshu/Data/Screenshots") } ,
     /* Media+Vol+Brightness Keys */
-    { 0,                            XF86XK_AudioMute,   spawn,                  SHCMD("amixer -D pulse set Master 1+ toggle; kill -44 $(pidof dwmblocks)") },
-    { 0,                            XF86XK_AudioRaiseVolume, spawn,             SHCMD("amixer set Master 5%+; kill -44 $(pidof dwmblocks)") },
-    { 0,                            XF86XK_AudioLowerVolume, spawn,             SHCMD("amixer set Master 5%-; kill -44 $(pidof dwmblocks)") },
+    { 0,                            XF86XK_AudioMute,   spawn,                  SHCMD("volume mute") },
+    { 0,                            XF86XK_AudioRaiseVolume, spawn,             SHCMD("volume up") },
+    { 0,                            XF86XK_AudioLowerVolume, spawn,             SHCMD("volume down") },
     { 0,                            XF86XK_MonBrightnessUp, spawn,              SHCMD("brightnessctl set +10%") },
     { 0,                            XF86XK_MonBrightnessDown, spawn,            SHCMD("brightnessctl set 10%-") },
     { 0,                            XF86XK_AudioPlay,   spawn,                  SHCMD("playerctl play-pause") },

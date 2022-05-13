@@ -35,8 +35,8 @@ config.load_autoconfig(False)
 #   - no-3rdparty: Accept cookies from the same origin only. This is known to break some sites, such as GMail.
 #   - no-unknown-3rdparty: Accept cookies from the same origin only, unless a cookie is already set for the domain. On QtWebEngine, this is the same as no-3rdparty.
 #   - never: Don't accept cookies at all.
-config.set('content.cookies.accept', 'no-unknown-3rdparty', 'chrome-devtools://*')
-config.set('content.cookies.accept', 'no-unknown-3rdparty', 'devtools://*')
+config.set('content.cookies.accept', 'no-3rdparty', 'chrome-devtools://*')
+config.set('content.cookies.accept', 'no-3rdparty', 'devtools://*')
 
 # Value to send in the `Accept-Language` header. Note that the value
 # read from JavaScript is always the global value.
@@ -161,9 +161,6 @@ c.statusbar.show = 'never'
 c.url.default_page = str(config.configdir / "startpage.html")
 # c.url.default_page = 'https://search.brave.com/'
 c.url.start_pages = c.url.default_page
-
-# Misc. settings
-c.zoom.levels = ['25%', '33%', '50%', '60%', '67%', '75%', '90%', '100%', '110%', '125%', '150%', '175%', '200%', '250%', '300%', '400%', '500%']
 
 # AdBlock
 c.content.blocking.enabled = True
