@@ -6,13 +6,13 @@
 /* appearance */
 static const unsigned int borderpx       = 0;   /* border pixel of windows */
 static const unsigned int snap           = 32;  /* snap pixel */
-static const unsigned int gappih         = 5;  /* horiz inner gap between windows */
-static const unsigned int gappiv         = 5;  /* vert inner gap between windows */
-static const unsigned int gappoh         = 5;  /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov         = 5;  /* vert outer gap between windows and screen edge */
+static const unsigned int gappih         = 5;   /* horiz inner gap between windows */
+static const unsigned int gappiv         = 5;   /* vert inner gap between windows */
+static const unsigned int gappoh         = 5;   /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov         = 5;   /* vert outer gap between windows and screen edge */
 static const int swallowfloating         = 0;   /* 1 means swallow floating windows by default */
 static const int smartgaps_fact          = 0;   /* gap factor when there is only one client; 0 = no gaps, 3 = 3x outer gaps */
-static const int showbar                 = 1;   /* 0 means no bar */
+static const int showbar                 = 0;   /* 0 means no bar */
 static const int topbar                  = 1;   /* 0 means bottom bar */
 /* Status is to be shown on: -1 (all monitors), 0 (a specific monitor by index), 'A' (active monitor) */
 static const int statusmon               = -1;
@@ -182,12 +182,11 @@ static const Rule rules[] = {
 	{ NULL,                 NULL,        NULL,       	   WTYPE "UTILITY",  0,            1,           0,          1,         -1 },
 	{ NULL,                 NULL,        NULL,       	   WTYPE "TOOLBAR",  0,            1,           0,          1,         -1 },
 	{ NULL,                 NULL,        NULL,       	   WTYPE "SPLASH",   0,            1,           0,          1,         -1 },
-	/* { "Gimp",             NULL,        NULL,       	   NULL,             1 << 6,       0,           0,          0,         -1 }, */
 	{ "Signal",             NULL,        NULL,       	   NULL,             1 << 6,       0,           0,          0,         -1 },
 	{ "TelegramDesktop",    NULL,        NULL,       	   NULL,             1 << 6,       0,           0,          0,         -1 },
 	{ "mpv",                NULL,        NULL,       	   NULL,             1 << 7,       0,           0,          0,         -1 },
 	{ Termclass,            NULL,        NULL,       	   NULL,             0,            0,           1,          0,         -1 },
-	{ NULL,                 NULL,        "Event Tester", NULL,             0,            0,           0,          1,         -1 },
+	{ NULL,                 NULL,        "Event Tester",   NULL,             0,            0,           0,          1,         -1 },
 	{ NULL,                 "spterm",    NULL,       	   NULL,             SPTAG(0),     1,           1,          0,         -1 },
 	{ NULL,                 "spspt",     NULL,       	   NULL,             SPTAG(1),     1,           1,          0,         -1 },
 	{ NULL,                 "spvol",     NULL,       	   NULL,             SPTAG(2),     1,           1,          0,         -1 },
@@ -221,8 +220,6 @@ static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 
-
-
 static const Layout layouts[] = {
 	/* symbol     arrange function */
 	{ "[]=",      tile },    /* first entry is default */
@@ -252,104 +249,92 @@ static const char *termcmd[] = { Terminal, NULL };
 
 
 static Key keys[] = {
-	/* modifier                     key                 function                argument */
-	{ MODKEY,                       XK_p,               spawn,                  {.v = dmenucmd } },
-	{ MODKEY,                       XK_j,               focusstack,             {.i = +1 } },
-	{ MODKEY,                       XK_k,               focusstack,             {.i = -1 } },
-	{ MODKEY|ControlMask,           XK_j,               movestack,              {.i = +1 } },
-	{ MODKEY|ControlMask,           XK_k,               movestack,              {.i = -1 } },
-	{ MODKEY,                       XK_i,               incnmaster,             {.i = +1 } },
-	{ MODKEY,                       XK_o,               incnmaster,             {.i = -1 } },
-	{ MODKEY,                       XK_h,               setmfact,               {.f = -0.05} },
-	{ MODKEY,                       XK_l,               setmfact,               {.f = +0.05} },
-	{ MODKEY|ControlMask,           XK_g,               incrgaps,               {.i = +1 } },
-	{ MODKEY|ControlMask|ShiftMask, XK_g,               incrgaps,               {.i = -1 } },
-	/* { MODKEY|Mod1Mask,              XK_i,               incrigaps,              {.i = +1 } },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_i,               incrigaps,              {.i = -1 } },
-	{ MODKEY|Mod1Mask,              XK_o,               incrogaps,              {.i = +1 } },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_o,               incrogaps,              {.i = -1 } },
-	{ MODKEY|Mod1Mask,              XK_6,               incrihgaps,             {.i = +1 } },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_6,               incrihgaps,             {.i = -1 } },
-	{ MODKEY|Mod1Mask,              XK_7,               incrivgaps,             {.i = +1 } },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_7,               incrivgaps,             {.i = -1 } },
-	{ MODKEY|Mod1Mask,              XK_8,               incrohgaps,             {.i = +1 } },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_8,               incrohgaps,             {.i = -1 } },
-	{ MODKEY|Mod1Mask,              XK_9,               incrovgaps,             {.i = +1 } },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_9,               incrovgaps,             {.i = -1 } }, */
-	{ MODKEY|Mod1Mask,              XK_g,               defaultgaps,            {0} },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_g,               togglegaps,             {0} },
-	{ MODKEY,                       XK_Tab,             view,                   {0} },
+	/* modifier                     key                         function                argument */
+	{ MODKEY,                       XK_p,                       spawn,                  {.v = dmenucmd } },
+	{ MODKEY,                       XK_j,                       focusstack,             {.i = +1 } },
+	{ MODKEY,                       XK_k,                       focusstack,             {.i = -1 } },
+	{ MODKEY|ControlMask,           XK_j,                       movestack,              {.i = +1 } },
+	{ MODKEY|ControlMask,           XK_k,                       movestack,              {.i = -1 } },
+	{ MODKEY,                       XK_i,                       incnmaster,             {.i = +1 } },
+	{ MODKEY,                       XK_o,                       incnmaster,             {.i = -1 } },
+	{ MODKEY,                       XK_h,                       setmfact,               {.f = -0.05} },
+	{ MODKEY,                       XK_l,                       setmfact,               {.f = +0.05} },
+	{ MODKEY|ControlMask,           XK_g,                       incrgaps,               {.i = +1 } },
+	{ MODKEY|ControlMask|ShiftMask, XK_g,                       incrgaps,               {.i = -1 } },
+	{ MODKEY|Mod1Mask,              XK_g,                       defaultgaps,            {0} },
+	{ MODKEY|Mod1Mask|ShiftMask,    XK_g,                       togglegaps,             {0} },
+	{ MODKEY,                       XK_Tab,                     view,                   {0} },
     /* Layouts */
-	{ MODKEY,                       XK_b,               togglebar,              {0} },
-	{ MODKEY,                       XK_z,               zoom,                   {0} },
-    { MODKEY,                       XK_t,               setlayout,              {.v = &layouts[0]} },
-	{ MODKEY,                       XK_f,               setlayout,              {.v = &layouts[1]} },
-	{ MODKEY,                       XK_m,               setlayout,              {.v = &layouts[2]} },
-	{ MODKEY,                       XK_space,           setlayout,              {0} },
-    { MODKEY,                       XK_0,               view,                   {.ui = ~SPTAGMASK } },
-	{ MODKEY|ShiftMask,             XK_0,               tag,                    {.ui = ~SPTAGMASK } },
-	{ MODKEY,                       XK_comma,           focusmon,               {.i = -1 } },
-	{ MODKEY,                       XK_period,          focusmon,               {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_comma,           tagmon,                 {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_period,          tagmon,                 {.i = +1 } },
+	{ MODKEY,                       XK_b,                       togglebar,              {0} },
+	{ MODKEY,                       XK_z,                       zoom,                   {0} },
+    { MODKEY,                       XK_t,                       setlayout,              {.v = &layouts[0]} },
+	{ MODKEY,                       XK_f,                       setlayout,              {.v = &layouts[1]} },
+	{ MODKEY,                       XK_m,                       setlayout,              {.v = &layouts[2]} },
+	{ MODKEY,                       XK_space,                   setlayout,              {0} },
+    { MODKEY,                       XK_0,                       view,                   {.ui = ~SPTAGMASK } },
+	{ MODKEY|ShiftMask,             XK_0,                       tag,                    {.ui = ~SPTAGMASK } },
+	{ MODKEY,                       XK_comma,                   focusmon,               {.i = -1 } },
+	{ MODKEY,                       XK_period,                  focusmon,               {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_comma,                   tagmon,                 {.i = -1 } },
+	{ MODKEY|ShiftMask,             XK_period,                  tagmon,                 {.i = +1 } },
     /* Quit, Kill & Restart */
-	{ MODKEY,                       XK_q,               killclient,             {0} },
-	{ MODKEY|ShiftMask,             XK_q,               spawn,                  SHCMD("xkill") },
-	{ MODKEY|ControlMask,           XK_q,               quit,                   {0} },
-	{ MODKEY|ControlMask,           XK_r,               quit,                   {1} },
+	{ MODKEY,                       XK_q,                       killclient,             {0} },
+	{ MODKEY|ShiftMask,             XK_q,                       spawn,                  SHCMD("xkill") },
+	{ MODKEY|ControlMask,           XK_q,                       quit,                   {0} },
+	{ MODKEY|ControlMask,           XK_r,                       quit,                   {1} },
     /* Rofi */
-    { MODKEY,                       XK_r,               spawn,                  SHCMD("rofi -show combi -combi-modi 'window,drun' -modi combi -show-icons") } ,
-    { MODKEY|ShiftMask,             XK_r,               spawn,                  SHCMD("rofi -show run -modi 'run'") } ,
-    { MODKEY,                       XK_v,               spawn,                  SHCMD("rofi -modi 'clipboard:greenclip print' -show clipboard -run-command '{cmd}'") } ,
-    { MODKEY|ShiftMask,             XK_v,               spawn,                  SHCMD("rofi -show emoji -modi 'emoji'") } ,
-    { MODKEY,                       XK_n,               spawn,                  SHCMD("networkmanager_dmenu") } ,
-    { MODKEY|ShiftMask,             XK_d,               spawn,                  SHCMD("torr") } ,
-    { MODKEY|ControlMask,           XK_x,               spawn,                  SHCMD("rofi -show powermenu -modi powermenu:powermenu") } ,
+    { MODKEY,                       XK_r,                       spawn,                  SHCMD("rofi -show combi -combi-modi 'window,drun' -modi combi -show-icons") } ,
+    { MODKEY|ShiftMask,             XK_r,                       spawn,                  SHCMD("rofi -show run -modi 'run'") } ,
+    { MODKEY,                       XK_v,                       spawn,                  SHCMD("rofi -modi 'clipboard:greenclip print' -show clipboard -run-command '{cmd}'") } ,
+    { MODKEY|ShiftMask,             XK_v,                       spawn,                  SHCMD("rofi -show emoji -modi 'emoji'") } ,
+    { MODKEY,                       XK_n,                       spawn,                  SHCMD("networkmanager_dmenu") } ,
+    { MODKEY|ShiftMask,             XK_d,                       spawn,                  SHCMD("torr") } ,
+    { MODKEY|ControlMask,           XK_x,                       spawn,                  SHCMD("rofi -show powermenu -modi powermenu:powermenu") } ,
     /* Custom Key Bindings */
-	{ MODKEY,                       XK_Return,          spawn,                  {.v = termcmd } },
-    { MODKEY|ShiftMask,             XK_Return,          spawn,                  SHCMD(Terminal " -e atmux") },
-    { MODKEY,                       XK_w,               spawn,                  SHCMD("librewolf") },
-    { MODKEY|ShiftMask,             XK_w,               spawn,                  SHCMD("librewolf --private-window") },
-    { MODKEY|Mod1Mask,              XK_w,               spawn,                  SHCMD("qutebrowser") },
-    { MODKEY,                       XK_e,               spawn,                  SHCMD(Terminal " -e lfrun") },
-    { MODKEY|ShiftMask,             XK_e,               spawn,                  SHCMD("thunar") },
-    { MODKEY,                       XK_a,               spawn,                  SHCMD(Terminal " -e htop") },
-    { MODKEY,                       XK_d,               spawn,                  SHCMD(Terminal " -e tremc") },
-    { MODKEY,                       XK_c,               spawn,                  SHCMD("clock") },
-    { MODKEY|ShiftMask,             XK_c,               spawn,                  SHCMD("cal-popup --popup") },
+	{ MODKEY,                       XK_Return,                  spawn,                  {.v = termcmd } },
+    { MODKEY|ShiftMask,             XK_Return,                  spawn,                  SHCMD(Terminal " -e atmux") },
+    { MODKEY,                       XK_w,                       spawn,                  SHCMD("librewolf") },
+    { MODKEY|ShiftMask,             XK_w,                       spawn,                  SHCMD("librewolf --private-window") },
+    { MODKEY|Mod1Mask,              XK_w,                       spawn,                  SHCMD("qutebrowser") },
+    { MODKEY,                       XK_e,                       spawn,                  SHCMD(Terminal " -e lfrun") },
+    { MODKEY|ShiftMask,             XK_e,                       spawn,                  SHCMD("thunar") },
+    { MODKEY,                       XK_a,                       spawn,                  SHCMD(Terminal " -e bpytop") },
+    { MODKEY,                       XK_d,                       spawn,                  SHCMD(Terminal " -e tremc") },
+    { MODKEY,                       XK_c,                       spawn,                  SHCMD("clock") },
+    { MODKEY|ShiftMask,             XK_c,                       spawn,                  SHCMD("cal-popup --popup") },
     /* Scratchpads */
-    { MODKEY,                       XK_x,               togglescratch,          {.ui = 0 } },
-	{ MODKEY,                       XK_s,               togglescratch,          {.ui = 1 } },
-	{ MODKEY,                       XK_y,               togglescratch,          {.ui = 2 } },
+    { MODKEY,                       XK_x,                       togglescratch,          {.ui = 0 } },
+	{ MODKEY,                       XK_s,                       togglescratch,          {.ui = 1 } },
+	{ MODKEY,                       XK_y,                       togglescratch,          {.ui = 2 } },
     /* Screenshot */
-    { 0,                            XK_Print,           spawn,                  SHCMD("flameshot full -p ~/Himanshu/Data/Screenshots") } ,
-    { Mod1Mask,                     XK_Print,           spawn,                  SHCMD("flameshot screen -p ~/Himanshu/Data/Screenshots") } ,
-    { ControlMask,                  XK_Print,           spawn,                  SHCMD("flameshot gui -p ~/Himanshu/Data/Screenshots") } ,
+    { 0,                            XK_Print,                   spawn,                  SHCMD("flameshot full -p ~/Himanshu/Data/Screenshots") } ,
+    { Mod1Mask,                     XK_Print,                   spawn,                  SHCMD("flameshot screen -p ~/Himanshu/Data/Screenshots") } ,
+    { ControlMask,                  XK_Print,                   spawn,                  SHCMD("flameshot gui -p ~/Himanshu/Data/Screenshots") } ,
     /* Media+Vol+Brightness Keys */
-    { 0,                            XF86XK_AudioMute,   spawn,                  SHCMD("volume mute") },
-    { 0,                            XF86XK_AudioRaiseVolume, spawn,             SHCMD("volume up") },
-    { 0,                            XF86XK_AudioLowerVolume, spawn,             SHCMD("volume down") },
-    { 0,                            XF86XK_MonBrightnessUp, spawn,              SHCMD("brightnessctl set +10%") },
-    { 0,                            XF86XK_MonBrightnessDown, spawn,            SHCMD("brightnessctl set 10%-") },
-    { 0,                            XF86XK_AudioPlay,   spawn,                  SHCMD("playerctl play-pause") },
-    { 0,                            XF86XK_AudioStop,   spawn,                  SHCMD("playerctl stop") },
-    { 0,                            XF86XK_AudioNext,   spawn,                  SHCMD("playerctl next") },
-    { 0,                            XF86XK_AudioPrev,   spawn,                  SHCMD("playerctl previous") },
+    { 0,                            XF86XK_AudioMute,           spawn,                  SHCMD("volume mute") },
+    { 0,                            XF86XK_AudioRaiseVolume,    spawn,                  SHCMD("volume up") },
+    { 0,                            XF86XK_AudioLowerVolume,    spawn,                  SHCMD("volume down") },
+    { 0,                            XF86XK_MonBrightnessUp,     spawn,                  SHCMD("brightnessctl set +10%") },
+    { 0,                            XF86XK_MonBrightnessDown,   spawn,                  SHCMD("brightnessctl set 10%-") },
+    { 0,                            XF86XK_AudioPlay,           spawn,                  SHCMD("playerctl play-pause") },
+    { 0,                            XF86XK_AudioStop,           spawn,                  SHCMD("playerctl stop") },
+    { 0,                            XF86XK_AudioNext,           spawn,                  SHCMD("playerctl next") },
+    { 0,                            XF86XK_AudioPrev,           spawn,                  SHCMD("playerctl previous") },
     /* Notification Controls */
-    {MODKEY,                        XK_grave,           spawn,                  SHCMD("dunstctl close") },
-    {MODKEY|Mod1Mask,               XK_grave,           spawn,                  SHCMD("dunstctl close-all") },
-    {MODKEY|ShiftMask,              XK_grave,           spawn,                  SHCMD("dunstctl history-pop") },
-    {MODKEY|ControlMask,            XK_grave,           spawn,                  SHCMD("dunstctl set-paused toggle") },
+    {MODKEY,                        XK_grave,                   spawn,                  SHCMD("dunstctl close") },
+    {MODKEY|Mod1Mask,               XK_grave,                   spawn,                  SHCMD("dunstctl close-all") },
+    {MODKEY|ShiftMask,              XK_grave,                   spawn,                  SHCMD("dunstctl history-pop") },
+    {MODKEY|ControlMask,            XK_grave,                   spawn,                  SHCMD("dunstctl set-paused toggle") },
 
-    TAGKEYS(                        XK_1,                                       0)
-	TAGKEYS(                        XK_2,                                       1)
-	TAGKEYS(                        XK_3,                                       2)
-	TAGKEYS(                        XK_4,                                       3)
-	TAGKEYS(                        XK_5,                                       4)
-	TAGKEYS(                        XK_6,                                       5)
-	TAGKEYS(                        XK_7,                                       6)
-	TAGKEYS(                        XK_8,                                       7)
-	TAGKEYS(                        XK_9,                                       8)
+    TAGKEYS(                        XK_1,                                               0)
+	TAGKEYS(                        XK_2,                                               1)
+	TAGKEYS(                        XK_3,                                               2)
+	TAGKEYS(                        XK_4,                                               3)
+	TAGKEYS(                        XK_5,                                               4)
+	TAGKEYS(                        XK_6,                                               5)
+	TAGKEYS(                        XK_7,                                               6)
+	TAGKEYS(                        XK_8,                                               7)
+	TAGKEYS(                        XK_9,                                               8)
 };
 
 
