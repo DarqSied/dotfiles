@@ -255,14 +255,14 @@ static Key keys[] = {
 	{ MODKEY,                       XK_k,                       focusstack,             {.i = -1 } },
 	{ MODKEY|ControlMask,           XK_j,                       movestack,              {.i = +1 } },
 	{ MODKEY|ControlMask,           XK_k,                       movestack,              {.i = -1 } },
-	{ MODKEY,                       XK_i,                       incnmaster,             {.i = +1 } },
-	{ MODKEY,                       XK_o,                       incnmaster,             {.i = -1 } },
+	{ MODKEY,                       XK_u,                       incnmaster,             {.i = +1 } },
+	{ MODKEY,                       XK_i,                       incnmaster,             {.i = -1 } },
 	{ MODKEY,                       XK_h,                       setmfact,               {.f = -0.05} },
 	{ MODKEY,                       XK_l,                       setmfact,               {.f = +0.05} },
 	{ MODKEY|ControlMask,           XK_g,                       incrgaps,               {.i = +1 } },
 	{ MODKEY|ControlMask|ShiftMask, XK_g,                       incrgaps,               {.i = -1 } },
 	{ MODKEY|Mod1Mask,              XK_g,                       defaultgaps,            {0} },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_g,                       togglegaps,             {0} },
+	{ MODKEY,                       XK_g,                       togglegaps,             {0} },
 	{ MODKEY,                       XK_Tab,                     view,                   {0} },
     /* Layouts */
 	{ MODKEY,                       XK_b,                       togglebar,              {0} },
@@ -305,7 +305,7 @@ static Key keys[] = {
     /* Scratchpads */
     { MODKEY,                       XK_x,                       togglescratch,          {.ui = 0 } },
 	{ MODKEY,                       XK_s,                       togglescratch,          {.ui = 1 } },
-	{ MODKEY,                       XK_y,                       togglescratch,          {.ui = 2 } },
+	{ MODKEY,                       XK_o,                       togglescratch,          {.ui = 2 } },
     /* Screenshot */
     { 0,                            XK_Print,                   spawn,                  SHCMD("flameshot full -p ~/Himanshu/Data/Screenshots") } ,
     { Mod1Mask,                     XK_Print,                   spawn,                  SHCMD("flameshot screen -p ~/Himanshu/Data/Screenshots") } ,

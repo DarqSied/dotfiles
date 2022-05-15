@@ -21,7 +21,8 @@ setxkbmap -option caps:swapescape
 xrdb ${XDG_CONFIG_HOME:-$HOME/.config}/x11/xresources &
 
 # Wallpaper
-feh --no-fehbg --bg-fill ~/.config/background.jpg &
+# feh --no-fehbg --bg-fill ~/.config/background.jpg &
+feh --no-fehbg --bg-fill -z ~/.config/backgrounds
 
 # Network Manager Applet
 nm-applet --indicator &

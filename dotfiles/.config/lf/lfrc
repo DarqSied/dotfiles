@@ -44,8 +44,6 @@ cmd sudomkfile ${{
   sudo $EDITOR $ans
 }}
 
-cmd setwallpaper %cp "$f" ~/dotfiles/dotfiles/.config/background.jpg && feh --bg-fill --no-fehbg ~/.config/background.jpg && betterlockscreen -u ~/.config/background.jpg
-
 cmd fzf_jump ${{
   res="$(find . -maxdepth 3 | fzf --reverse --header='Jump to location')"
   if [ -f "$res" ]; then
@@ -158,7 +156,6 @@ map mr sudomkfile
 map md mkdir
 map ms $mkscript
 map ch chmod
-map bg setwallpaper
 map br $vimv $fx
 map r rename
 map H top
