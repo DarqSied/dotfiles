@@ -293,15 +293,16 @@ static Key keys[] = {
     /* Custom Key Bindings */
 	{ MODKEY,                       XK_Return,                  spawn,                  {.v = termcmd } },
     { MODKEY|ShiftMask,             XK_Return,                  spawn,                  SHCMD(Terminal " -e atmux") },
-    { MODKEY,                       XK_w,                       spawn,                  SHCMD("librewolf") },
+    { MODKEY,                       XK_w,                       spawn,                  SHCMD("qutebrowser") },
+    { MODKEY|Mod1Mask,              XK_w,                       spawn,                  SHCMD("librewolf") },
     { MODKEY|ShiftMask,             XK_w,                       spawn,                  SHCMD("librewolf --private-window") },
-    { MODKEY|Mod1Mask,              XK_w,                       spawn,                  SHCMD("qutebrowser") },
     { MODKEY,                       XK_e,                       spawn,                  SHCMD(Terminal " -e lfrun") },
     { MODKEY|ShiftMask,             XK_e,                       spawn,                  SHCMD("thunar") },
     { MODKEY,                       XK_a,                       spawn,                  SHCMD(Terminal " -e bpytop") },
     { MODKEY,                       XK_d,                       spawn,                  SHCMD(Terminal " -e tremc") },
     { MODKEY,                       XK_c,                       spawn,                  SHCMD("clock") },
     { MODKEY|ShiftMask,             XK_c,                       spawn,                  SHCMD("cal-popup --popup") },
+    { MODKEY,                       XK_F10,                     spawn,                  SHCMD("feh --no-fehbg --bg-fill -z ~/.config/backgrounds") },
     /* Scratchpads */
     { MODKEY,                       XK_x,                       togglescratch,          {.ui = 0 } },
 	{ MODKEY,                       XK_s,                       togglescratch,          {.ui = 1 } },
