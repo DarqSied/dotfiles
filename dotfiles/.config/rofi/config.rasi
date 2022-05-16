@@ -1,16 +1,19 @@
 configuration {
+    auto-select: true;
+    cycle: false;
     display-drun: "";
+    disable-history: true;
     display-run: "";
     display-window: "#";
     drun-display-format: "{name}";
+    fixed-num-lines: false;
     font: "Hack Nerd Font Mono 14";
+    icon-theme: "Papirus";
+    location: 2;
     modi: "window,run,drun,combi,emoji";
     sorting-method: "fzf";
-    cycle: false;
-    auto-select: true;
     scroll-method: 1;
-    icon-theme: "Papirus";
-    disable-history: true;
+    yoffset: 250;
 }
 
 @theme "/dev/null"
@@ -28,7 +31,7 @@ configuration {
 }
 
 listview {
-    lines: 18;
+    lines: 17;
 }
 
 #window {
