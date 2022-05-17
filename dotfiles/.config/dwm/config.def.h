@@ -298,7 +298,7 @@ static Key keys[] = {
     { MODKEY|ShiftMask,             XK_w,                       spawn,              SHCMD("librewolf --private-window") },
     { MODKEY,                       XK_e,                       spawn,              SHCMD(Terminal " -e lfrun") },
     { MODKEY|ShiftMask,             XK_e,                       spawn,              SHCMD("thunar") },
-    { MODKEY,                       XK_a,                       spawn,              SHCMD(Terminal " -e bpytop") },
+    { MODKEY,                       XK_a,                       spawn,              SHCMD(Terminal " -e btop") },
     { MODKEY,                       XK_d,                       spawn,              SHCMD(Terminal " -e tremc") },
     { MODKEY,                       XK_c,                       spawn,              SHCMD("clock") },
     { MODKEY|ShiftMask,             XK_c,                       spawn,              SHCMD("cal-popup --popup") },
