@@ -265,7 +265,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_g,                       togglegaps,         {0} },
 	{ MODKEY,                       XK_Tab,                     view,               {0} },
     /* Layouts */
-	{ MODKEY,                       XK_b,                       togglebar,          {0} },
+	{ MODKEY|ControlMask,           XK_b,                       togglebar,          {0} },
 	{ MODKEY,                       XK_z,                       zoom,               {0} },
     { MODKEY,                       XK_t,                       setlayout,          {.v = &layouts[0]} },
 	{ MODKEY,                       XK_f,                       setlayout,          {.v = &layouts[1]} },
@@ -288,6 +288,7 @@ static Key keys[] = {
     { MODKEY,                       XK_v,                       spawn,              SHCMD("rofi -modi 'clipboard:greenclip print' -show clipboard -run-command '{cmd}'") } ,
     { MODKEY|ShiftMask,             XK_v,                       spawn,              SHCMD("rofi -show emoji -modi 'emoji'") } ,
     { MODKEY,                       XK_n,                       spawn,              SHCMD("networkmanager_dmenu") } ,
+    { MODKEY,                       XK_b,                       spawn,              SHCMD("bookman") } ,
     { MODKEY|ShiftMask,             XK_d,                       spawn,              SHCMD("torr") } ,
     { MODKEY|ControlMask,           XK_x,                       spawn,              SHCMD("rofi -show powermenu -modi powermenu:powermenu") } ,
     /* Custom Key Bindings */
