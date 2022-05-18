@@ -1,0 +1,52 @@
+#!/bin/bash
+
+has() {
+	case "$(command -v "$1" 2>/dev/null)" in
+		alias*|"") return 1
+	esac
+}
+# check for installed browsers
+browser_count=1
+for prog in librewolf firefox icecat palemoon; do
+	if has "$prog" ; then
+		browser_count=$((browser_count+1))
+		installed_browsers[$browser_count]="$prog	: $(command -v $prog)"
+		browser_count=$((browser_count+1))
+		installed_browsers[$browser_count]="$prog-Private   : $(command -v $prog) --private-window"
+	fi
+done
+for prog in chromium brave vivaldi-stable opera; do
+	if has "$prog" ; then
+		browser_count=$((browser_count+1))
+		installed_browsers[$browser_count]="$prog	: $(command -v $prog)"
+		browser_count=$((browser_count+1))
+		installed_browsers[$browser_count]="$prog-Private   : $(command -v $prog) --incognito"
+	fi
+done
+for prog in badwolf qutebrowser ephemeral ; do
+	if has "$prog" ; then
+		browser_count=$((browser_count+1))
+		installed_browsers[$browser_count]="$prog	: $(command -v $prog)"
+	fi
+done
+
+declare -a bookmarks=(
+"$(cat $HOME/.config/bookmarks.txt)"
+"Quit"
+)
+
+choice=$(printf '%s\n' "${bookmarks[@]}" | awk -F '-' '{print $1}' | rofi -dmenu -i -l 17 -p "Choose a bookmark")
+
+if [[ "$choice" == Quit ]]; then
+	exit 1
+elif [ "$choice" ]; then
+	link=$(cat $HOME/.config/bookmarks.txt | grep "$choice" | awk -F '-' '{print $NF}')
+    touch /tmp/browsers
+    printf "%s\n" "${installed_browsers[@]}" > /tmp/browsers
+    options=$(cat /tmp/browsers | awk -F ':' '{print $1}' | rofi -dmenu -i -p "Open with")
+    browser=$(cat /tmp/browsers | grep "$options" | awk -F ': ' '{print $NF}')
+
+    $browser $link
+else
+	exit 1
+fi
