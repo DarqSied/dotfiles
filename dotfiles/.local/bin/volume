@@ -1,14 +1,9 @@
 #!/bin/bash
 
-case "$(pacmd list | grep 'active port:' | grep 'output' | awk -F '-' '{print $NF}')" in
-    "speaker>") output="Speakers" ;;
-    "headphones>") output="Headphones" ;;
-    *) exit 1 ;;
-esac
-
 function send_notification() {
 	volume=$(pulsemixer --get-volume | awk '{print $1}')
-	dunstify  -u low -r "9993" -h int:value:"$volume" -i "volume-$1" "Volume [$output]: ${volume}%"
+    output=$(pacmd list | grep 'active port:' | grep 'output' | sed -e 's/^.*output-\([^&]*\)>.*/\1/' -e "s/\b\(.\)/\u\1/g")
+	dunstify  -u low -r 9993 -h int:value:"$volume" -i "volume-$1" "$output: ${volume}%"
 }
 
 case $1 in
