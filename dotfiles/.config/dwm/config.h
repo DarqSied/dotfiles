@@ -303,6 +303,7 @@ static Key keys[] = {
     { MODKEY,                       XK_d,                       spawn,              SHCMD(Terminal " -e tremc") },
     { MODKEY,                       XK_c,                       spawn,              SHCMD("clock") },
     { MODKEY|ShiftMask,             XK_c,                       spawn,              SHCMD("cal-popup --popup") },
+    { MODKEY,                       XK_o,                       spawn,              SHCMD("overview") },
     { MODKEY,                       XK_F10,                     spawn,              SHCMD("feh --no-fehbg --bg-fill -z ~/.config/backgrounds") },
     /* Scratchpads */
     { MODKEY,                       XK_x,                       togglescratch,      {.ui = 0 } },
