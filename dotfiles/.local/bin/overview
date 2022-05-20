@@ -1,0 +1,63 @@
+#!/bin/bash
+
+## BATTERY
+# Loop through all attached batteries and format the info
+for battery in /sys/class/power_supply/BAT?*; do
+	# If non-first battery, print a space separator.
+	[ -n "${capacity+x}" ] && printf " "
+    # Prints battery percentage
+	capacity="$(cat "$battery/capacity" 2>&1)"
+    # Sets up the status
+    status="$(cat "$battery/status" 2>&1)"
+
+
+
+## CPU
+read cpu a b c previdle rest < /proc/stat
+prevtotal=$((a+b+c+previdle))
+sleep 0.5
+read cpu a b c idle rest < /proc/stat
+total=$((a+b+c+idle))
+cpu=$((100*( (total-prevtotal) - (idle-previdle) ) / (total-prevtotal) ))
+
+
+
+## INTERNET
+# if grep -xq 'up' /sys/class/net/w*/operstate 2>/dev/null ; then
+# 	wifiicon="$(awk '/^\s*w/ { print "  ", int($3 * 100 / 70) "% " }' /proc/net/wireless)"
+# elif grep -xq 'down' /sys/class/net/w*/operstate 2>/dev/null ; then
+# 	grep -xq '0x1003' /sys/class/net/w*/flags && wifiicon="睊  " || wifiicon="睊  "
+# fi
+#
+# printf "%s%s%s\n" "$wifiicon" "$(sed "s/down/  /;s/up/  /" /sys/class/net/e*/operstate 2>/dev/null)" "$(sed "s/.*/嬨  /" /sys/class/net/tun*/operstate 2>/dev/null)"
+
+
+
+## MEMORY
+mem=$(free | sed -n '2{p;q}' | awk '{print int($3 / $2 * 100)}')
+
+
+
+## NET TRAFFIC
+update() {
+    sum=0
+    for arg; do
+        read -r i < "$arg"
+        sum=$(( sum + i ))
+    done
+    cache=${XDG_CACHE_HOME:-$HOME/.cache}/${1##*/}
+    [ -f "$cache" ] && read -r old < "$cache" || old=0
+    printf %d\\n "$sum" > "$cache"
+    printf %d\\n $(( sum - old ))
+}
+rx=$(update /sys/class/net/[ew]*/statistics/rx_bytes)
+tx=$(update /sys/class/net/[ew]*/statistics/tx_bytes)
+
+
+
+
+notify-send -t 7000 "System overview" "    Battery is at $capacity%.[$status]
+    CPU at $cpu% & MEM at $mem% utilization.
+    Net Traffic     Up:$(numfmt --to=iec $tx)B   Down:$(numfmt --to=iec $rx)B
+"
+done

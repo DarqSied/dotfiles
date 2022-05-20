@@ -250,7 +250,7 @@ static const char *termcmd[] = { Terminal, NULL };
 
 static Key keys[] = {
 	/* modifier                     key                         function            argument */
-	{ MODKEY,                       XK_p,                       spawn,              {.v = dmenucmd } },
+	{ MODKEY,                       XK_y,                       spawn,              {.v = dmenucmd } },
 	{ MODKEY,                       XK_j,                       focusstack,         {.i = +1 } },
 	{ MODKEY,                       XK_k,                       focusstack,         {.i = -1 } },
 	{ MODKEY|ControlMask,           XK_j,                       movestack,          {.i = +1 } },
@@ -307,7 +307,7 @@ static Key keys[] = {
     /* Scratchpads */
     { MODKEY,                       XK_x,                       togglescratch,      {.ui = 0 } },
 	{ MODKEY,                       XK_s,                       togglescratch,      {.ui = 1 } },
-	{ MODKEY,                       XK_o,                       togglescratch,      {.ui = 2 } },
+	{ MODKEY,                       XK_p,                       togglescratch,      {.ui = 2 } },
     /* Screenshot */
     { 0,                            XK_Print,                   spawn,              SHCMD("flameshot full -p ~/Himanshu/Data/Screenshots") } ,
     { Mod1Mask,                     XK_Print,                   spawn,              SHCMD("flameshot screen -p ~/Himanshu/Data/Screenshots") } ,

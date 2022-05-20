@@ -2,7 +2,7 @@
 
 function send_notification() {
 	volume=$(pulsemixer --get-volume | awk '{print $1}')
-	dunstify  -u low -r "9993" -h int:value:"$volume" -i "volume-$1" "Volume: ${volume}%" -t 1000
+	dunstify  -u low -r "9993" -h int:value:"$volume" -i "volume-$1" "Volume: ${volume}%"
 }
 
 case $1 in
@@ -20,7 +20,7 @@ down)
 mute)
 	pulsemixer --toggle-mute
 	if [ $(pulsemixer --get-mute) = 1 ]; then
-		dunstify -i volume-mute -t 1000 -r 9993 -u low "Muted"
+		dunstify -i volume-mute -r 9993 -u low "Muted"
 	else
 		send_notification up
 	fi
