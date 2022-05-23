@@ -27,6 +27,17 @@ mem=$(free --mebi | sed -n '2{p;q}' | awk '{printf ("%.2fGB\n", $3 / 1024)}')
 
 
 
+## CONNECTION
+con_type=$(nmcli d | grep -w "connected  " | awk '{print $2}')
+con=$(nmcli d | grep -w "connected  " | awk '{print $NF}')
+if [[ $(nmcli d | grep -w tun) ]]; then
+    vpn=[V]
+else
+    vpn=[-]
+fi
+
+
+
 ## NET TRAFFIC
 update() {
     sum=0
@@ -44,10 +55,19 @@ tx=$(update /sys/class/net/[ew]*/statistics/tx_bytes)
 
 
 
+## INTERNET
+if [[ $(nmcli d | grep -w "connected  ") ]]; then
+    int=$(echo "Connected to $con_type : $con $vpn\nNet Traffic      Up:$(numfmt --to=iec $tx)B   Down:$(numfmt --to=iec $rx)B")
+else
+    int=$(echo "You are currently offline.")
+fi
+
+
+
 
 dunstify -r 9992 -t 7000 "System overview" "Battery is at $capacity%[$status].
 CPU usage is $cpu%.
 Memory is at $mem utilization.
-Net Traffic     Up:$(numfmt --to=iec $tx)B   Down:$(numfmt --to=iec $rx)B
+$int
 "
 done
