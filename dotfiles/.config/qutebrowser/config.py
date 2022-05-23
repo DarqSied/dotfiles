@@ -213,7 +213,8 @@ with open(config.configdir / "engines", "r") as f:
 
 
 # Bindings for normal mode
-config.bind('M', 'hint links spawn mpv {hint-url}')
+config.bind('e', 'spawn --detach mpv {url}')
+config.bind('E', 'hint links spawn --detach mpv {hint-url}')
 config.bind('Z', 'hint links spawn alacritty -e yt-dlp {hint-url}')
 config.bind('t', 'set-cmd-text -s :open -t')
 config.bind('xx', 'config-cycle tabs.show multiple never')

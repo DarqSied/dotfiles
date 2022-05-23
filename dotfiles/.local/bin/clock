@@ -46,4 +46,4 @@
 # %:::z	    numeric time zone with : to necessary precision (e.g., -04, +05:30)
 # %Z	    alphabetic time zone abbreviation (e.g., EDT)
 
-dunstify -r 9991 -t 5000 "Time & Date" "$(date "+%B %d, %Y (%A)   [ %H:%M:%S ]")"
+dunstify -r 9991 -t 5000 "Time & Date" "$(date "+%B %d, %Y (%A)   [ %R ]")"

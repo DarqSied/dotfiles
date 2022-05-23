@@ -4,6 +4,10 @@ alias f='zi'
 alias g='lazygit'
 alias plugup="find "$ZDOTDIR/plugins" -type d -exec test -e '{}/.git' ';' -print0 | xargs -I {} -0 git -C {} pull -q"
 
+
+alias so="source ~/.config/zsh/zsh-aliases"
+alias valias="nvim ~/.config/zsh/zsh-aliases"
+
 # Use neovim for vim if present.
 [ -x "$(command -v nvim)" ] && alias vim="nvim" vimdiff="nvim -d"
 alias nano='nvim'
@@ -116,4 +120,5 @@ alias ls='exa --icons --classify -al --color=always --group-directories-first' #
 alias la='exa --icons --classify -a --color=always --group-directories-first'  # all files and dirs
 alias ll='exa --icons --classify -l --color=always --group-directories-first'  # long format
 alias lt='exa --icons --classify -aT --color=always --group-directories-first' # tree listing
+alias l='exa --icons -1'
 alias l.='exa --icons --classify -a | egrep "^\."'
