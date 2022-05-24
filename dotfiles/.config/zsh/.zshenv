@@ -247,5 +247,5 @@ ex=:\
 
 
 if [[ "$(tty)" = "/dev/tty1" ]]; then
-	 pgrep dwm || startx ~/.config/x11/xinitrc
+	 pgrep xmonad || startx ~/.config/x11/xinitrc
 fi

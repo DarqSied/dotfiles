@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Loop through all attached batteries and format the info
+for battery in /sys/class/power_supply/BAT?*; do
+	# If non-first battery, print a space separator.
+	[ -n "${capacity+x}" ] && printf " "
+    # Prints battery percentage
+	capacity="$(cat "$battery/capacity" 2>&1)"
+
+	# Sets up the status and capacity
+	status="$(cat "$battery/status" 2>&1)"
+
+	# Notify about the battery status
+	if [ "$status" = "Discharging" ] && [ "$capacity" -le 30 ] && [ "$capacity" -gt 15 ] ; then
+        if [ ! -f /tmp/bat-low ] ; then
+            notify-send -t 15000 "Battery Monitor" "Battery low, connect to power."
+        fi
+        touch /tmp/bat-low
+	elif [ "$status" = "Discharging" ] && [ "$capacity" -le 15 ] ; then
+        if [ ! -f /tmp/bat-crit ] ; then
+            notify-send -u critical "Battery Monitor" "Battery critically low, connect to power now."
+        fi
+        touch /tmp/bat-crit
+    elif [ "$status" = "Full" ] ; then
+        if [ ! -f /tmp/bat-full ] ; then
+            notify-send "Battery Monitor" "Battery full, disconnect from power."
+        fi
+        touch /tmp/bat-full
+    elif [ "$status" = "Charging" ] ; then
+        rm /tmp/bat-low /tmp/bat-crit
+    else 
+        rm /tmp/bat-full
+    fi
+done
