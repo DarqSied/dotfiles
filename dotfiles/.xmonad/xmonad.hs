@@ -62,22 +62,22 @@ myFont :: String
 myFont = "xft:Hack Nerd Font Mono:regular:size=11:antialias=true:hinting=true"
 
 myModMask :: KeyMask
-myModMask = mod4Mask        -- Sets modkey to super/windows key
+myModMask = mod4Mask                        -- Sets modkey to super/windows key
 
-myTerminal :: String
-myTerminal = "alacritty"    -- Sets default terminal
+myTerminal :: String                        -- Sets default terminal
+myTerminal = "alacritty"
 
 myEditor :: String
-myEditor = myTerminal ++ " -e nvim "    -- Sets vim as editor
+myEditor = myTerminal ++ " -e nvim "        -- Sets vim as editor
 
-myBorderWidth :: Dimension
-myBorderWidth = 2           -- Sets border width for windows
+myBorderWidth :: Dimension                  -- Sets border width for windows
+myBorderWidth = 2
 
-myNormColor :: String       -- Border color of normal windows
-myNormColor   = "#282a36"   -- This variable is imported from Colors.THEME
+myNormColor :: String                       -- Border color of normal windows
+myNormColor   = "#282a36"
 
-myFocusColor :: String      -- Border color of focused windows
-myFocusColor  = "#bd93f9"     -- This variable is imported from Colors.THEME
+myFocusColor :: String                      -- Border color of focused windows
+myFocusColor  = "#bd93f9"
 
 windowCount :: X (Maybe String)
 windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace . W.current . windowset
@@ -188,6 +188,8 @@ myManageHook = composeAll
      , className =? "toolbar"         --> doFloat
      , className =? "Yad"             --> doCenterFloat
      , className =? "mpv"             --> doCenterFloat
+     , className =? "Signal"          --> doShift ( myWorkspaces !! 6 )
+     , className =? "TelegramDesktop" --> doShift ( myWorkspaces !! 6 )
      , className =? "mpv"             --> doShift ( myWorkspaces !! 7 )
      , (className =? "librewolf" <&&> resource =? "Dialog") --> doFloat  -- Float Librewolf Dialog
      , isFullscreen -->  doFullFloat
@@ -262,7 +264,7 @@ myKeys =
         , ("M-C-<Tab>", rotAllDown)                                                                         -- Rotate all the windows in the current stack
 
     -- KB_GROUP Layouts
-        , ("M-<Tab>", sendMessage NextLayout)                                                               -- Switch to next layout
+        , ("M-<Space>", sendMessage NextLayout)                                                             -- Switch to next layout
         , ("M-m", sendMessage (MT.Toggle NBFULL))                                                           -- Toggles noborder/full
 
     -- KB_GROUP Increase/decrease windows in the master pane or the stack
@@ -322,7 +324,7 @@ main = do
                                -- Uncomment this line to enable fullscreen support on things like YouTube/Netflix.
                                -- This works perfect on SINGLE monitor systems. On multi-monitor systems,
                                -- it adds a border around the window if screen does not have focus. So, my solution
-                               -- is to use a keybinding to toggle fullscreen noborders instead.  (M-<Space>)
+                               -- is to use a keybinding to toggle fullscreen noborders instead.  (M-m)
         , modMask            = myModMask
         , terminal           = myTerminal
         , startupHook        = myStartupHook
