@@ -42,5 +42,4 @@ for battery in /sys/class/power_supply/BAT?*; do
 	esac
 
     printf " %s %s \\n" "$status" "$capacity%"
-	# Prints the info
 done

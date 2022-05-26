@@ -52,7 +52,7 @@ flameshot &
 gummy start &
 
 # Power manager
-xfce4-power-manager &
+~/.local/bin/bat_state &
 
 # File manager
 thunar --daemon &

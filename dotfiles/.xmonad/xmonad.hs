@@ -34,7 +34,6 @@ import XMonad.Hooks.WorkspaceHistory
     -- Layouts
 import XMonad.Layout.SimplestFloat
 import XMonad.Layout.ResizableTile
-import XMonad.Layout.ThreeColumns
 
     -- Layouts modifiers
 import XMonad.Layout.LayoutModifier
@@ -139,12 +138,6 @@ monocle  = renamed [Replace "monocle"]
 floats   = renamed [Replace "floats"]
            $ smartBorders
            $ limitWindows 20 simplestFloat
-threeCol = renamed [Replace "threeCol"]
-           $ smartBorders
-           $ windowNavigation
-           $ subLayout [] (smartBorders Simplest)
-           $ limitWindows 6
-           $ ThreeCol 1 (3/100) (1/2)
 
 -- Theme for showWName which prints current workspace when you change workspaces.
 myShowWNameTheme :: SWNConfig
@@ -162,7 +155,6 @@ myLayoutHook = smartBorders $ mouseResize $ windowArrange $ T.toggleLayouts floa
                myDefaultLayout =     withBorder myBorderWidth tall
                                  ||| noBorders monocle
                                  ||| floats
-                                 ||| threeCol
 
 -- myWorkspaces = [" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", " 9 "]
 myWorkspaces = map show [1..6] ++ ["chat", "vid", "vbox" ]
