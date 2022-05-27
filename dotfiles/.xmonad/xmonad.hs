@@ -178,7 +178,7 @@ myManageHook = composeAll
      , className =? "pinentry-gtk-2"  --> doFloat
      , className =? "splash"          --> doFloat
      , className =? "toolbar"         --> doFloat
-     , className =? "Yad"             --> doCenterFloat
+     , className =? "Yad"             --> doFloat
      , className =? "mpv"             --> doCenterFloat
      , className =? "Signal"          --> doShift ( myWorkspaces !! 6 )
      , className =? "TelegramDesktop" --> doShift ( myWorkspaces !! 6 )
@@ -218,7 +218,7 @@ myKeys =
         , ("M-a"            , spawn (myTerminal ++ " -e btop"))                                                           -- Launch system monitor
         , ("M-d"            , spawn (myTerminal ++ " -e tremc"))                                                          -- Launch transmission
         , ("M-c"            , spawn "clock")                                                                              -- Time & date
-        , ("M-S-c"          , spawn "cal-popup --popup")                                                                  -- Launch mini calender
+        , ("M-S-c"          , spawn "cal-popup")                                                                          -- Launch calender
         , ("M-o"            , spawn "overview")                                                                           -- System overview
         , ("M-<F10>"        , spawn "feh --no-fehbg --bg-fill -z ~/.config/backgrounds")                                  -- Shuffle desktop background
 
