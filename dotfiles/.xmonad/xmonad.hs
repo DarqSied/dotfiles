@@ -191,117 +191,118 @@ myManageHook = composeAll
 myKeys :: [(String, X ())]
 myKeys =
     -- KB_GROUP Xmonad
-        [ ("M-C-r", spawn "xmonad --recompile; xmonad --restart")                                           -- Restart xmonad
-        , ("M-C-q", io exitSuccess)                                                                         -- Quit xmonad
+        [ ("M-C-r"  , spawn "xmonad --recompile; xmonad --restart")                                                       -- Restart xmonad
+        , ("M-C-q"  , io exitSuccess)                                                                                     -- Quit xmonad
 
     -- KB_GROUP Get Help
-        , ("M-S-/", spawn "~/.xmonad/xmonad_keys.sh")                                                       -- Get list of keybindings
+        , ("M-S-/"  , spawn "~/.xmonad/xmonad_keys.sh")                                                                   -- Get list of keybindings
 
     -- KB_GROUP Rofi Prompts
-        , ("M-r", spawn "rofi -show combi -combi-modi 'window,drun' -modi combi -show-icons")               -- Run desktop apps
-        , ("M-S-r", spawn "rofi -show run -modi 'run'")                                                     -- Run prompt
-        , ("M-v", spawn "rofi -modi 'clipboard:greenclip print' -show clipboard -run-command '{cmd}'")      -- Clipboard manager
-        , ("M-S-v", spawn "rofi -show emoji -modi 'emoji'")                                                 -- Emoji selector
-        , ("M-n", spawn "networkmanager_dmenu")                                                             -- NM_dmenu
-        , ("M-b", spawn "bookman")                                                                          -- Bookmark list
-        , ("M-S-d", spawn "torr")                                                                           -- Torrent search
-        , ("M-C-x", spawn "rofi -show powermenu -modi powermenu:powermenu")                                 -- Powermenu
+        , ("M-r"    , spawn "rofi -show combi -combi-modi 'window,drun' -modi combi -show-icons -display-combi 'LoF '")   -- Run desktop apps
+        , ("M-S-r"  , spawn "rofi -show run -modi 'run'")                                                                 -- Run prompt
+        , ("M-v"    , spawn "rofi -modi 'clipboard:greenclip print' -show clipboard -run-command '{cmd}'")                -- Clipboard manager
+        , ("M-S-v"  , spawn "rofi -show emoji -modi 'emoji'")                                                             -- Emoji selector
+        , ("M-n"    , spawn "networkmanager_dmenu")                                                                       -- NM_dmenu
+        , ("M-b"    , spawn "bookman")                                                                                    -- Bookmark list
+        , ("M-S-d"  , spawn "torr")                                                                                       -- Torrent search
+        , ("M-C-x"  , spawn "rofi -show powermenu -modi powermenu:powermenu")                                             -- Powermenu
 
     -- KB_GROUP Useful programs to have a keybinding for launch
-        , ("M-<Return>", spawn (myTerminal))                                                                -- Launch terminal
-        , ("M-S-<Return>", spawn (myTerminal ++ " -e atmux"))                                               -- Launch tmux
-        , ("M-w", spawn "qutebrowser")                                                                      -- Launch qutebrowser
-        , ("M-M1-w", spawn "librewolf")                                                                     -- Launch librewolf
-        , ("M-S-w", spawn "librewolf --private-window")                                                     -- Launch librewolf-private
-        , ("M-e", spawn (myTerminal ++ " -e lfrun"))                                                        -- Launch lf
-        , ("M-S-e", spawn "thunar")                                                                         -- Launch thunar
-        , ("M-a", spawn (myTerminal ++ " -e btop"))                                                         -- Launch system monitor
-        , ("M-d", spawn (myTerminal ++ " -e tremc"))                                                        -- Launch transmission
-        , ("M-c", spawn "clock")                                                                            -- Time & date
-        , ("M-S-c", spawn "cal-popup --popup")                                                              -- Launch mini calender
-        , ("M-o", spawn "overview")                                                                         -- System overview
-        , ("M-<F10>", spawn "feh --no-fehbg --bg-fill -z ~/.config/backgrounds")                            -- Shuffle desktop background
+        , ("M-<Return>"     , spawn (myTerminal))                                                                         -- Launch terminal
+        , ("M-S-<Return>"   , spawn (myTerminal ++ " -e atmux"))                                                          -- Launch tmux
+        , ("M-w"            , spawn "qutebrowser")                                                                        -- Launch qutebrowser
+        , ("M-M1-w"         , spawn "librewolf")                                                                          -- Launch librewolf
+        , ("M-S-w"          , spawn "librewolf --private-window")                                                         -- Launch librewolf-private
+        , ("M-e"            , spawn (myTerminal ++ " -e lfrun"))                                                          -- Launch lf
+        , ("M-S-e"          , spawn "thunar")                                                                             -- Launch thunar
+        , ("M-a"            , spawn (myTerminal ++ " -e btop"))                                                           -- Launch system monitor
+        , ("M-d"            , spawn (myTerminal ++ " -e tremc"))                                                          -- Launch transmission
+        , ("M-c"            , spawn "clock")                                                                              -- Time & date
+        , ("M-S-c"          , spawn "cal-popup --popup")                                                                  -- Launch mini calender
+        , ("M-o"            , spawn "overview")                                                                           -- System overview
+        , ("M-<F10>"        , spawn "feh --no-fehbg --bg-fill -z ~/.config/backgrounds")                                  -- Shuffle desktop background
 
     -- KB_GROUP Kill windows
-        , ("M-q", kill1)                                                                                    -- Kill the currently focused client
-        , ("M-M1-q", killAll)                                                                               -- Kill all windows on current workspace
-        , ("M-S-q", spawn "xkill")                                                                          -- Launch xkill
+        , ("M-q"    , kill1)                                                                                              -- Kill the currently focused client
+        , ("M-M1-q" , killAll)                                                                                            -- Kill all windows on current workspace
+        , ("M-S-q"  , spawn "xkill")                                                                                      -- Launch xkill
 
     -- KB_GROUP Workspaces
-        , ("M-.", nextScreen)                                                                               -- Switch focus to next monitor
-        , ("M-,", prevScreen)                                                                               -- Switch focus to prev monitor
-        , ("M-S-<KP_Add>", shiftTo Next nonNSP >> moveTo Next nonNSP)                                       -- Shifts focused window to next ws
-        , ("M-S-<KP_Subtract>", shiftTo Prev nonNSP >> moveTo Prev nonNSP)                                  -- Shifts focused window to prev ws
+        , ("M-."        , nextScreen)                                                                                     -- Switch focus to next monitor
+        , ("M-,"        , prevScreen)                                                                                     -- Switch focus to prev monitor
+        , ("M-C-]"      , shiftTo Next nonNSP >> moveTo Next nonNSP)                                                      -- Shifts focused window to next ws
+        , ("M-C-["      , shiftTo Prev nonNSP >> moveTo Prev nonNSP)                                                      -- Shifts focused window to prev ws
+        , ("M-<Tab>"    , moveTo Next nonEmptyNonNSP)                                                                     -- Cycle through active workspaces
 
     -- KB_GROUP Floating windows
-        , ("M-f", sendMessage (T.Toggle "floats"))                                                          -- Toggles my 'floats' layout
-        , ("M-C-t", withFocused $ windows . W.sink)                                                         -- Push floating window back to tile
-        , ("M-t", sinkAll)                                                                                  -- Push ALL floating windows to tile
+        , ("M-f"    , sendMessage (T.Toggle "floats"))                                                                    -- Toggles my 'floats' layout
+        , ("M-C-t"  , withFocused $ windows . W.sink)                                                                     -- Push floating window back to tile
+        , ("M-t"    , sinkAll)                                                                                            -- Push ALL floating windows to tile
 
     -- KB_GROUP Increase/decrease spacing (gaps)
-        , ("C-M1-j", decWindowSpacing 5)                                                                    -- Decrease window spacing
-        , ("C-M1-k", incWindowSpacing 5)                                                                    -- Increase window spacing
-        , ("C-M1-h", decScreenSpacing 5)                                                                    -- Decrease screen spacing
-        , ("C-M1-l", incScreenSpacing 5)                                                                    -- Increase screen spacing
+        , ("C-M1-j" , decWindowSpacing 5)                                                                                 -- Decrease window spacing
+        , ("C-M1-k" , incWindowSpacing 5)                                                                                 -- Increase window spacing
+        , ("C-M1-h" , decScreenSpacing 5)                                                                                 -- Decrease screen spacing
+        , ("C-M1-l" , incScreenSpacing 5)                                                                                 -- Increase screen spacing
 
     -- KB_GROUP Windows navigation
-        , ("M-S-m", windows W.focusMaster)                                                                  -- Move focus to the master window
-        , ("M-j", windows W.focusDown)                                                                      -- Move focus to the next window
-        , ("M-k", windows W.focusUp)                                                                        -- Move focus to the prev window
-        , ("M-C-m", windows W.swapMaster)                                                                   -- Swap the focused window and the master window
-        , ("M-C-j", windows W.swapDown)                                                                     -- Swap focused window with next window
-        , ("M-C-k", windows W.swapUp)                                                                       -- Swap focused window with prev window
-        , ("M-M1-m>", promote)                                                                              -- Moves focused window to master, others maintain order
-        , ("M-M1-<Tab>", rotSlavesDown)                                                                     -- Rotate all windows except master and keep focus in place
-        , ("M-C-<Tab>", rotAllDown)                                                                         -- Rotate all the windows in the current stack
+        , ("M-S-m"      , windows W.focusMaster)                                                                          -- Move focus to the master window
+        , ("M-j"        , windows W.focusDown)                                                                            -- Move focus to the next window
+        , ("M-k"        , windows W.focusUp)                                                                              -- Move focus to the prev window
+        , ("M-C-m"      , windows W.swapMaster)                                                                           -- Swap the focused window and the master window
+        , ("M-C-j"      , windows W.swapDown)                                                                             -- Swap focused window with next window
+        , ("M-C-k"      , windows W.swapUp)                                                                               -- Swap focused window with prev window
+        , ("M-M1-m"     , promote)                                                                                        -- Moves focused window to master, others maintain order
+        , ("M-M1-<Tab>" , rotSlavesDown)                                                                                  -- Rotate all windows except master and keep focus in place
+        , ("M-C-<Tab>"  , rotAllDown)                                                                                     -- Rotate all the windows in the current stack
 
     -- KB_GROUP Layouts
-        , ("M-<Space>", sendMessage NextLayout)                                                             -- Switch to next layout
-        , ("M-m", sendMessage (MT.Toggle NBFULL))                                                           -- Toggles noborder/full
+        , ("M-<Space>"  , sendMessage NextLayout)                                                                         -- Switch to next layout
+        , ("M-m"        , sendMessage (MT.Toggle NBFULL))                                                                 -- Toggles noborder/full
 
     -- KB_GROUP Increase/decrease windows in the master pane or the stack
-        , ("M-S-<Up>", sendMessage (IncMasterN 1))                                                          -- Increase # of clients master pane
-        , ("M-S-<Down>", sendMessage (IncMasterN (-1)))                                                     -- Decrease # of clients master pane
-        , ("M-C-<Up>", increaseLimit)                                                                       -- Increase # of windows
-        , ("M-C-<Down>", decreaseLimit)                                                                     -- Decrease # of windows
+        , ("M-S-<Up>"   , sendMessage (IncMasterN 1))                                                                     -- Increase # of clients master pane
+        , ("M-S-<Down>" , sendMessage (IncMasterN (-1)))                                                                  -- Decrease # of clients master pane
+        , ("M-C-<Up>"   , increaseLimit)                                                                                  -- Increase # of windows
+        , ("M-C-<Down>" , decreaseLimit)                                                                                  -- Decrease # of windows
 
     -- KB_GROUP Window resizing
-        , ("M-h", sendMessage Shrink)                                                                       -- Shrink horiz window width
-        , ("M-l", sendMessage Expand)                                                                       -- Expand horiz window width
-        , ("M-M1-j", sendMessage MirrorShrink)                                                              -- Shrink vert window width
-        , ("M-M1-k", sendMessage MirrorExpand)                                                              -- Expand vert window width
+        , ("M-h"    , sendMessage Shrink)                                                                                 -- Shrink horiz window width
+        , ("M-l"    , sendMessage Expand)                                                                                 -- Expand horiz window width
+        , ("M-M1-j" , sendMessage MirrorShrink)                                                                           -- Shrink vert window width
+        , ("M-M1-k" , sendMessage MirrorExpand)                                                                           -- Expand vert window width
 
     -- KB_GROUP Scratchpads
     -- Toggle show/hide these programs.  They run on a hidden workspace.
     -- When you toggle them to show, it brings them to your current workspace.
     -- Toggle them to hide and it sends them back to hidden workspace (NSP).
-        , ("M-x", namedScratchpadAction myScratchPads "term")
-        , ("M-s", namedScratchpadAction myScratchPads "spot")
-        , ("M-p", namedScratchpadAction myScratchPads "mixer")
+        , ("M-x"    , namedScratchpadAction myScratchPads "term")
+        , ("M-s"    , namedScratchpadAction myScratchPads "spot")
+        , ("M-p"    , namedScratchpadAction myScratchPads "mixer")
 
     -- KB_GROUP Multimedia Keys
-        , ("<XF86AudioPlay>", spawn "playerctl play-pause")
-        , ("<XF86AudioPrev>", spawn "playerctl previous")
-        , ("<XF86AudioNext>", spawn "playerctl next")
-        , ("<XF86AudioStop>", spawn "playerctl stop")
-        , ("<XF86AudioMute>", spawn "volume mute")
-        , ("<XF86AudioLowerVolume>", spawn "volume down")
-        , ("<XF86AudioRaiseVolume>", spawn "volume up")
+        , ("<XF86AudioPlay>"        , spawn "playerctl play-pause")
+        , ("<XF86AudioPrev>"        , spawn "playerctl previous")
+        , ("<XF86AudioNext>"        , spawn "playerctl next")
+        , ("<XF86AudioStop>"        , spawn "playerctl stop")
+        , ("<XF86AudioMute>"        , spawn "volume mute")
+        , ("<XF86AudioLowerVolume>" , spawn "volume down")
+        , ("<XF86AudioRaiseVolume>" , spawn "volume up")
 
     -- KB_GROUP Brightness Control
-        , ("<XF86MonBrightnessUp>", spawn "brightnessctl set +10%")
-        , ("<XF86MonBrightnessDown>", spawn "brightnessctl set 10%-")
+        , ("<XF86MonBrightnessUp>"      , spawn "brightnessctl set +10%")
+        , ("<XF86MonBrightnessDown>"    , spawn "brightnessctl set 10%-")
 
     -- KB_GROUP Screenshot
-        , ("<Print>", spawn "flameshot full -p ~/Himanshu/Data/Screenshots/")
-        , ("M1-<Print>", spawn "flameshot screen -p ~/Himanshu/Data/Screenshots/")
-        , ("C-<Print>", spawn "flameshot gui -p ~/Himanshu/Data/Screenshots/")
+        , ("<Print>"    , spawn "flameshot full -p ~/Himanshu/Data/Screenshots/")
+        , ("M1-<Print>" , spawn "flameshot screen -p ~/Himanshu/Data/Screenshots/")
+        , ("C-<Print>"  , spawn "flameshot gui -p ~/Himanshu/Data/Screenshots/")
 
     -- KB_GROUP Notification Control
-        , ("M-`", spawn "dunstctl close")
-        , ("M-M1-`", spawn "dunstctl close-all")
-        , ("M-S-`", spawn "dunstctl history-pop")
-        , ("M-C-`", spawn "dunstctl set-paused toggle")
+        , ("M-`"    , spawn "dunstctl close")
+        , ("M-M1-`" , spawn "dunstctl close-all")
+        , ("M-S-`"  , spawn "dunstctl history-pop")
+        , ("M-C-`"  , spawn "dunstctl set-paused toggle")
         ]
     -- The following lines are needed for named scratchpads.
           where nonNSP          = WSIs (return (\ws -> W.tag ws /= "NSP"))
