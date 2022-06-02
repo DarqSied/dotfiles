@@ -29,7 +29,6 @@ elif [ "$query" == "" ] ; then
   exit 0
 fi
 
-
 # Seeders and Leechers
 grep -o '<td class="coll-2 seeds.*</td>\|<td class="coll-3 leeches.*</td>' $cachedir/tmp.html |
   sed 's/<[^>]*>//g' | sed 'N;s/\n/ /' > $cachedir/seedleech.bw
@@ -43,8 +42,6 @@ grep -o '<td class="coll-4 size.*</td>' $cachedir/tmp.html |
 grep -E '/torrent/' $cachedir/tmp.html |
   sed -E 's#.*(/torrent/.*)/">.*/#\1#' |
   sed 's/td>//g' > $cachedir/links.bw
-
-
 
 # Cleaning up some data to display
 sed 's/\./ /g; s/\-/ /g' $cachedir/titles.bw |
@@ -64,10 +61,11 @@ fullURL="${baseurl}${url}/"
 
 # Requesting page for magnet link
 curl -s $fullURL > $cachedir/tmp.html
-magnet=$(grep -Po "magnet:\?xt=urn:btih:[a-zA-Z0-9]*" $cachedir/tmp.html | head -n 1) 
+magnet=$(grep -Po "magnet:\?xt=urn:btih:[[:alnum:][:punct:]]*" $cachedir/tmp.html | head -n 1) 
 
-transmission-remote --add "$magnet"
-# transmission-cli "$magnet"
-
-# Simple notification
-notify-send "Torrent" "Downloading File"
+if [ $magnet ] ; then
+    transmission-remote --add "$magnet"
+    notify-send "Torrent" "Downloading File"
+else
+    exit 1
+fi
