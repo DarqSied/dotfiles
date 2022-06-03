@@ -401,7 +401,7 @@
 
 [history-ignore]
     # This notification will not be saved in history
-    summary = "Time & Date", "Clock"
+    summary = "Time & Date","Clock","System Overview"
     history_ignore = yes
 
 #[skip-display]
