@@ -43,10 +43,10 @@ GET="cat /proc/net/dev"
 IF=$(nmcli d | grep -w "connected  " | awk '{print $1}')
 
 RX1=`$GET | grep $IF | awk '{print $2}'`; TX1=`$GET | grep $IF | awk '{print $10}'`
-sleep 1
+sleep 0.5
 RX2=`$GET | grep $IF | awk '{print $2}'`; TX2=`$GET | grep $IF | awk '{print $10}'`
 
-rx=$(($RX2 - $RX1)); tx=$(($TX2 - $TX1))
+rx=$((($RX2 - $RX1) * 2)); tx=$((($TX2 - $TX1) * 2))
 
 
 

@@ -24,11 +24,10 @@ text/x-chdr=userapp-nvim-launch-HBZDH1.desktop;
 x-scheme-handler/tg=userapp-Telegram Desktop-8C0NI1.desktop;
 application/pdf=org.pwmt.zathura-pdf-poppler.desktop;
 application/json=userapp-nvim-launch-HBZDH1.desktop;
-application/x-bittorrent=userapp-transadd-R34CJ1.desktop;
-x-scheme-handler/magnet=userapp-transadd-R34CJ1.desktop;
+text/x-lua=userapp-nvim-launch-HBZDH1.desktop;
 
 [Default Applications]
-x-scheme-handler/magnet=transmission-gtk.desktop
+x-scheme-handler/magnet=userapp-transadd-R34CJ1.desktop
 application/x-bittorrent=userapp-transadd-R34CJ1.desktop
 video/x-matroska=mpv.desktop
 video/mp4=mpv.desktop

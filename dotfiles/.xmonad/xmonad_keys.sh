@@ -4,7 +4,7 @@ set -euo pipefail
 # Launches an YAD text box with all the keybindings of xmonad
 # in the center of the screen
 
-YAD_WIDTH=1400
+YAD_WIDTH=1560
 YAD_HEIGHT=900
 CUR_X=$(xdotool getdisplaygeometry | awk '{print $1}')
 CUR_Y=$(xdotool getdisplaygeometry | awk '{print $NF}')
@@ -23,7 +23,7 @@ sed -n '/START_KEYS/,/END_KEYS/p' ~/.xmonad/xmonad.hs | \
     -e 's/-- KB_GROUP /\n/' \
     -e 's/("/   /' \
     -e 's/"  /  /g' \
-    -e 's/) / /g' \
+    -e 's/)//' \
     -e 's/" ,/ ,/g' \
     -e 's/ , / : /' | \
     yad --text-info --no-buttons \

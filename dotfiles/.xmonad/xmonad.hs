@@ -198,7 +198,7 @@ myKeys =
         , ("M-S-/"  , spawn "~/.xmonad/xmonad_keys.sh")                                                                   -- Get list of keybindings
 
     -- KB_GROUP Rofi Prompts
-        , ("M-r"    , spawn "rofi -show combi -combi-modi 'window,drun' -modi combi -show-icons -display-combi 'LoF '")   -- Run desktop apps
+        , ("M-r"    , spawn "rofi -show combi -combi-modi 'window,drun' -modi combi -show-icons -display-combi 'LoF '")   -- Launch or Focus applications
         , ("M-S-r"  , spawn "rofi -show run -modi 'run'")                                                                 -- Run prompt
         , ("M-v"    , spawn "rofi -modi 'clipboard:greenclip print' -show clipboard -run-command '{cmd}'")                -- Clipboard manager
         , ("M-S-v"  , spawn "rofi -show emoji -modi 'emoji'")                                                             -- Emoji selector
@@ -239,7 +239,7 @@ myKeys =
         , ("M-C-t"  , withFocused $ windows . W.sink)                                                                     -- Push floating window back to tile
         , ("M-t"    , sinkAll)                                                                                            -- Push ALL floating windows to tile
 
-    -- KB_GROUP Increase/decrease spacing (gaps)
+    -- KB_GROUP Increase/decrease spacing
         , ("C-M1-j" , decWindowSpacing 5)                                                                                 -- Decrease window spacing
         , ("C-M1-k" , incWindowSpacing 5)                                                                                 -- Increase window spacing
         , ("C-M1-h" , decScreenSpacing 5)                                                                                 -- Decrease screen spacing

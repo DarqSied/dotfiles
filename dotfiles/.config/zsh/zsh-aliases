@@ -83,7 +83,7 @@ alias archlinux-fix-keys="sudo pacman-key --init && sudo pacman-key --populate a
 # systemd
 alias syslist="systemctl list-unit-files --state=enabled"
 
-# git
+# git & wget
 alias \
 	addup="git add -u" \
 	addall="git add ." \
@@ -98,7 +98,8 @@ alias \
 	tag="git tag" \
 	newtag="git tag -a" \
 	m="git checkout master" \
-	s="git checkout stable"
+	s="git checkout stable" \
+    wget='wget --hsts-file="$XDG_CACHE_HOME/wget-hsts"'
 
 
 # These common commands are just too long! Abbreviate them.
