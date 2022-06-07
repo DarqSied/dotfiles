@@ -272,13 +272,24 @@ myKeys =
         , ("M-M1-j" , sendMessage MirrorShrink)                                                                           -- Shrink vert window width
         , ("M-M1-k" , sendMessage MirrorExpand)                                                                           -- Expand vert window width
 
+    -- KB_GROUP Screenshot
+        , ("<Print>"    , spawn "flameshot full -p ~/Himanshu/Data/Screenshots/")                                         -- Take screenshot of the entire desktop
+        , ("M1-<Print>" , spawn "flameshot screen -p ~/Himanshu/Data/Screenshots/")                                       -- Take screenshot of a single screen
+        , ("C-<Print>"  , spawn "flameshot gui -p ~/Himanshu/Data/Screenshots/")                                          -- Take screenshot of a selected region
+
+    -- KB_GROUP Notification Control
+        , ("M-`"    , spawn "dunstctl close")                                                                             -- Close notifications one-at-a-time
+        , ("M-M1-`" , spawn "dunstctl close-all")                                                                         -- Close all the notifications
+        , ("M-S-`"  , spawn "dunstctl history-pop")                                                                       -- Recall closed notifications
+        , ("M-C-`"  , spawn "dunstctl set-paused toggle")                                                                 -- Toggle DND
+
     -- KB_GROUP Scratchpads
     -- Toggle show/hide these programs.  They run on a hidden workspace.
     -- When you toggle them to show, it brings them to your current workspace.
     -- Toggle them to hide and it sends them back to hidden workspace (NSP).
-        , ("M-x"    , namedScratchpadAction myScratchPads "term")
-        , ("M-s"    , namedScratchpadAction myScratchPads "spot")
-        , ("M-p"    , namedScratchpadAction myScratchPads "mixer")
+        , ("M-x"    , namedScratchpadAction myScratchPads "term")                                                         -- Launch terminal in SP
+        , ("M-s"    , namedScratchpadAction myScratchPads "spot")                                                         -- Launch ncspot in SP
+        , ("M-p"    , namedScratchpadAction myScratchPads "mixer")                                                        -- Launch pulsemixer in SP
 
     -- KB_GROUP Multimedia Keys
         , ("<XF86AudioPlay>"        , spawn "playerctl play-pause")
@@ -292,17 +303,6 @@ myKeys =
     -- KB_GROUP Brightness Control
         , ("<XF86MonBrightnessUp>"      , spawn "brightnessctl set +10%")
         , ("<XF86MonBrightnessDown>"    , spawn "brightnessctl set 10%-")
-
-    -- KB_GROUP Screenshot
-        , ("<Print>"    , spawn "flameshot full -p ~/Himanshu/Data/Screenshots/")
-        , ("M1-<Print>" , spawn "flameshot screen -p ~/Himanshu/Data/Screenshots/")
-        , ("C-<Print>"  , spawn "flameshot gui -p ~/Himanshu/Data/Screenshots/")
-
-    -- KB_GROUP Notification Control
-        , ("M-`"    , spawn "dunstctl close")
-        , ("M-M1-`" , spawn "dunstctl close-all")
-        , ("M-S-`"  , spawn "dunstctl history-pop")
-        , ("M-C-`"  , spawn "dunstctl set-paused toggle")
         ]
     -- The following lines are needed for named scratchpads.
           where nonNSP          = WSIs (return (\ws -> W.tag ws /= "NSP"))
