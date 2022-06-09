@@ -44,9 +44,10 @@ elif [ "$choice" ]; then
     touch /tmp/browsers
     printf "%s\n" "${installed_browsers[@]}" > /tmp/browsers
     options=$(cat /tmp/browsers | awk -F ':' '{print $1}' | rofi -dmenu -i -p "Open with")
-    browser=$(cat /tmp/browsers | grep "$options" | awk -F ': ' '{print $NF}')
-
-    $browser $link
+    if [[ $options ]]; then
+        browser=$(cat /tmp/browsers | grep "$options" | awk -F ': ' '{print $NF}')
+        $browser $link
+    fi
 else
 	exit 1
 fi
