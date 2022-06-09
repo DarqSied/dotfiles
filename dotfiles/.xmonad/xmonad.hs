@@ -272,11 +272,6 @@ myKeys =
         , ("M-M1-j" , sendMessage MirrorShrink)                                                                           -- Shrink vert window width
         , ("M-M1-k" , sendMessage MirrorExpand)                                                                           -- Expand vert window width
 
-    -- KB_GROUP Screenshot
-        , ("<Print>"    , spawn "flameshot full -p ~/Himanshu/Data/Screenshots/")                                         -- Take screenshot of the entire desktop
-        , ("M1-<Print>" , spawn "flameshot screen -p ~/Himanshu/Data/Screenshots/")                                       -- Take screenshot of a single screen
-        , ("C-<Print>"  , spawn "flameshot gui -p ~/Himanshu/Data/Screenshots/")                                          -- Take screenshot of a selected region
-
     -- KB_GROUP Notification Control
         , ("M-`"    , spawn "dunstctl close")                                                                             -- Close notifications one-at-a-time
         , ("M-M1-`" , spawn "dunstctl close-all")                                                                         -- Close all the notifications
@@ -303,6 +298,14 @@ myKeys =
     -- KB_GROUP Brightness Control
         , ("<XF86MonBrightnessUp>"      , spawn "brightnessctl set +10%")
         , ("<XF86MonBrightnessDown>"    , spawn "brightnessctl set 10%-")
+
+    -- KB_GROUP Screenshot
+        , ("<Print>"    , spawn "screenshot -f screen")
+        , ("M1-<Print>" , spawn "screenshot -f window")
+        , ("C-<Print>"  , spawn "screenshot -f region")
+        , ("S-<Print>"  , spawn "screenshot -b screen")
+        , ("S-M1-<Print>"  , spawn "screenshot -b window")
+        , ("S-C-<Print>"  , spawn "screenshot -b region")
         ]
     -- The following lines are needed for named scratchpads.
           where nonNSP          = WSIs (return (\ws -> W.tag ws /= "NSP"))

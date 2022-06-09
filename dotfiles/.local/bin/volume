@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function send_notification() {
-	volume=$(pulsemixer --get-volume | awk '{print $1}')
+	volume=$(pamixer --get-volume)
     output=$(pacmd list | grep 'active port:' | grep 'output' | sed -e 's/^.*output-\([^&]*\)>.*/\1/' -e "s/\b\(.\)/\u\1/g")
 	dunstify  -u low -r 9993 -h int:value:"$volume" -i "volume-$1" "$output: ${volume}%"
 }
@@ -9,18 +9,18 @@ function send_notification() {
 case $1 in
 up)
 	# Set the volume on (if it was muted)
-	pulsemixer --unmute
+	pamixer --unmute
 	amixer set Master 5%+
 	send_notification $1
 	;;
 down)
-	pulsemixer --unmute
+	pamixer --unmute
 	amixer set Master 5%-
 	send_notification $1
 	;;
 mute)
-	pulsemixer --toggle-mute
-	if [ $(pulsemixer --get-mute) = 1 ]; then
+	pamixer --toggle-mute
+	if [ $(pamixer --get-mute) = 1 ]; then
 		dunstify -i volume-mute -r 9993 -u low "Muted"
 	else
 		send_notification up

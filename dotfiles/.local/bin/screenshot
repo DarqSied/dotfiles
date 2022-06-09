@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+name=$(date '+%F_%k-%M')
+dir=~/Himanshu/Data/Screenshots/$(date '+%Y-%m')
+mkdir -p $dir
+
+clip() {
+  case "$XDG_SESSION_TYPE" in
+    'x11') xclip -selection clipboard -t image/png;;
+    'wayland') wl-copy -t image/png;;
+  esac
+}
+
+case $2 in
+screen)
+    args=""
+    ;;
+window)
+    args="-i $(xdotool getactivewindow)"
+    ;;
+region)
+    args="-s"
+    ;;
+esac
+
+case $1 in
+-f)
+    maim $args "$dir/$name.png"
+    notify-send "Screenshot" "$name.png saved in directory."
+	;;
+-c)
+    maim $args | clip
+    notify-send "Screenshot" "$name.png available in clipboard."
+	;;
+-b)
+    maim $args | tee "$dir/$name.png" | clip
+    notify-send "Screenshot" "$name.png available in clipboard and the directory."
+	;;
+esac
+
