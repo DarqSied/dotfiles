@@ -205,7 +205,7 @@ myKeys =
         , ("M-n"    , spawn "networkmanager_dmenu")                                                                       -- NM_dmenu
         , ("M-b"    , spawn "bookman")                                                                                    -- Bookmark list
         , ("M-S-d"  , spawn "torr")                                                                                       -- Torrent search
-        , ("M-C-x"  , spawn "rofi -show powermenu -modi powermenu:powermenu")                                             -- Powermenu
+        , ("M-C-x"  , spawn "powermenu")                                                                                  -- Powermenu
 
     -- KB_GROUP Useful programs to have a keybinding for launch
         , ("M-<Return>"     , spawn (myTerminal))                                                                         -- Launch terminal
