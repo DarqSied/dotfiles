@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# A simple rofi prompt for shutdown,logout,etc.
 
 options="Logout Lockscreen Shutdown Reboot Hibernate Suspend"
 menu=$(printf '%s\n' $options | rofi -dmenu -i -p "Actions ")
