@@ -5,7 +5,7 @@
 mkdir -p $HOME/.cache/torrent
 
 if [ -z $1 ]; then
-  query=$(rofi -dmenu -i -p "Search Torrent")
+  query=$(rofi -dmenu -i -p "Search Torrent ")
 else
   query=$1
 fi
@@ -54,7 +54,7 @@ awk '{print "[S:"$1 ", L:"$2"]" }' $cachedir/seedleech.bw > $cachedir/tmp && mv 
 
 # Getting the line number
 LINE=$(paste -d\   $cachedir/size.bw $cachedir/seedleech.bw $cachedir/titles.bw |
-  rofi -dmenu -i -l 25 -p "Choose" |
+  rofi -dmenu -i -l 25 -p "Choose " |
   cut -d\- -f1 |
   awk '{$1=$1; print}')
 

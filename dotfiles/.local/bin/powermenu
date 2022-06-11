@@ -28,7 +28,7 @@ esac
 
 if [[ $menu == @(Logout|Shutdown|Reboot) ]]; then
     confirm=`printf '%s\n' "Yes" "No, cancel" | rofi -dmenu -i -p "Are you sure? "`
-    if [[ $confirm = Yes ]]; then
+    if [[ $confirm == Yes ]]; then
         $action
     else
         exit 1
