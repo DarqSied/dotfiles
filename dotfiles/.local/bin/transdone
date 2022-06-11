@@ -1,4 +1,5 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
+
 # Sends a notification when a torrent is completed in transmission
 # Signals an update to the bar torrent module
 

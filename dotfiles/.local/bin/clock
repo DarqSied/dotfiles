@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # %%	    a literal %
 # %a	    locale’s abbreviated weekday name (e.g., Sun)

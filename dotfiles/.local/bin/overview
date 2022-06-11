@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# A script to move the whole functionality of a bar(polybar,lemonbar,etc) away
+# thus eliminating its need and saving screen real estate using notifications
 
 ## BATTERY
 # Loop through all attached batteries and format the info

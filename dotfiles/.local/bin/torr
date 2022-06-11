@@ -1,4 +1,6 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
+
+# A script to simplify torrenting using 1337x as base
 
 mkdir -p $HOME/.cache/torrent
 

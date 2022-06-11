@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Simple script to take screenshots using maim and xclip
+
 name=$(date '+%F_%k-%M')
 dir=~/Himanshu/Data/Screenshots/$(date '+%Y-%m')
 clip="xclip -selection clipboard -t image/png"

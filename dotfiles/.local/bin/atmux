@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# Launch a new tmux session if none is in the memory
+
 ll=$(tmux ls | head -n1 | awk '{print $1}')
 if [ "$ll" == "0:" ] ; then
    tmux a

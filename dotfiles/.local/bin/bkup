@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# Combine the whole git commands for a single step commit
+
 read -p "Commit message: " msg
 
 git add .

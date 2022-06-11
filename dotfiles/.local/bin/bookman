@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# An easy bookmark-manager with browser choice function
 
 has() {
 	case "$(command -v "$1" 2>/dev/null)" in

@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# A script to notify about the current battery state and warnings 
+# in a simple way instead of using complex programs and daemons
 
 # Loop through all attached batteries and format the info
 while [[ ! -d /sys/class/power_supply/BAT?* ]]; do
