@@ -300,12 +300,12 @@ myKeys =
         , ("<XF86MonBrightnessDown>"    , spawn "brightnessctl set 10%-")
 
     -- KB_GROUP Screenshot
-        , ("<Print>"    , spawn "screenshot -f screen")
-        , ("M1-<Print>" , spawn "screenshot -f window")
-        , ("C-<Print>"  , spawn "screenshot -f region")
-        , ("S-<Print>"  , spawn "screenshot -b screen")
-        , ("S-M1-<Print>"  , spawn "screenshot -b window")
-        , ("S-C-<Print>"  , spawn "screenshot -b region")
+        , ("<Print>"        , spawn "screenshot -f screen")
+        , ("M1-<Print>"     , spawn "screenshot -f window")
+        , ("C-<Print>"      , spawn "screenshot -f region")
+        , ("S-<Print>"      , spawn "screenshot -b screen")
+        , ("S-M1-<Print>"   , spawn "screenshot -b window")
+        , ("S-C-<Print>"    , spawn "screenshot -b region")
         ]
     -- The following lines are needed for named scratchpads.
           where nonNSP          = WSIs (return (\ws -> W.tag ws /= "NSP"))
