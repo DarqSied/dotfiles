@@ -58,7 +58,7 @@ import XMonad.Util.Run (runProcessWithInput, safeSpawn, spawnPipe)
 import XMonad.Util.SpawnOnce
 
 myFont :: String
-myFont = "xft:Hack Nerd Font Mono:regular:size=11:antialias=true:hinting=true"
+myFont = "xft:Ubuntu Nerd Font Mono:regular:size=11:antialias=true:hinting=true"
 
 myModMask :: KeyMask
 myModMask = mod4Mask                        -- Sets modkey to super/windows key
@@ -142,7 +142,7 @@ floats   = renamed [Replace "floats"]
 -- Theme for showWName which prints current workspace when you change workspaces.
 myShowWNameTheme :: SWNConfig
 myShowWNameTheme = def
-    { swn_font              = "xft:Hack Font:bold:size=60"
+    { swn_font              = "xft:Ubuntu:bold:size=60"
     , swn_fade              = 1.0
     , swn_bgcolor           = "#282a36"
     , swn_color             = "#f8f8f2"
@@ -220,7 +220,8 @@ myKeys =
         , ("M-c"            , spawn "clock")                                                                              -- Time & date
         , ("M-S-c"          , spawn "cal-popup")                                                                          -- Launch calender
         , ("M-o"            , spawn "overview")                                                                           -- System overview
-        , ("M-<F10>"        , spawn "feh --no-fehbg --bg-fill -z ~/.config/backgrounds")                                  -- Shuffle desktop background
+        , ("M-<F10>"        , spawn "wall")                                                                               -- Shuffle desktop background
+        , ("M-C-<F10>"      , spawn "nsxiv -bt ~/.config/backgrounds/*")                                                  -- Select desktop background from collection
 
     -- KB_GROUP Kill windows
         , ("M-q"    , kill1)                                                                                              -- Kill the currently focused client

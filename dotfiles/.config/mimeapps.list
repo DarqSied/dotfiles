@@ -25,6 +25,7 @@ x-scheme-handler/tg=userapp-Telegram Desktop-8C0NI1.desktop;userapp-Telegram Des
 application/pdf=org.pwmt.zathura-pdf-poppler.desktop;
 application/json=userapp-nvim-launch-HBZDH1.desktop;
 text/x-lua=userapp-nvim-launch-HBZDH1.desktop;
+image/png=nsxiv.desktop;
 
 [Default Applications]
 x-scheme-handler/magnet=userapp-transadd-R34CJ1.desktop

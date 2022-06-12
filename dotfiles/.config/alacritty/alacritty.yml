@@ -14,21 +14,21 @@ scrolling:
   history: 5000
 font:
   normal:
-    family: Hack Nerd Font
+    family: UbuntuMono Nerd Font
     style: Regular
   bold:
-    family: Hack Nerd Font
+    family: UbuntuMono Nerd Font
     style: Bold
   italic:
-    family: Hack Nerd Font
+    family: UbuntuMono Nerd Font
     style: Italic
   bold_italic:
-    family: Hack Nerd Font
+    family: UbuntuMono Nerd Font
     style: Bold Italic
-  size: 10
+  size: 12
   offset:
-    x: 0
-    y: 1
+    x: 1
+    y: 2
 draw_bold_text_with_bright_colors: true
 key_bindings:
   - key: V

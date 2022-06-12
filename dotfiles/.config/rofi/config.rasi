@@ -7,7 +7,7 @@ configuration {
     display-window: "#";
     drun-display-format: "{name}";
     fixed-num-lines: false;
-    font: "Hack Font Mono 14";
+    font: "Ubuntu 16";
     icon-theme: "Papirus";
     location: 2;
     modi: "window,run,drun,combi,emoji";

@@ -4,7 +4,6 @@ alias f='zi'
 alias g='lazygit'
 alias plugup="find "$ZDOTDIR/plugins" -type d -exec test -e '{}/.git' ';' -print0 | xargs -I {} -0 git -C {} pull -q"
 
-
 alias so="source ~/.config/zsh/zsh-aliases"
 alias valias="nvim ~/.config/zsh/zsh-aliases"
 
@@ -109,7 +108,8 @@ alias \
 	v="$EDITOR" \
     dip="dunstctl is-paused" \
     lf="lfrun" \
-    ani="ani-cli -q 1080"
+    ani="ani-cli -q 1080" \
+    sxiv="nsxiv"
 
 # switch between shells
 # I do not recommend switching default SHELL from bash.

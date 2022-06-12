@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Simple script to move the whole volume function away from a bar(polybar,lemonbar,etc) 
-# using notifications instead
+# using pamixer, amixer and dunst
 
 function send_notification() {
 	volume=$(pamixer --get-volume)

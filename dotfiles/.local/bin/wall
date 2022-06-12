@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# Simple script to set wallpaper using xwallpaper
+
+dir=(~/.config/backgrounds/*)
+
+case $1 in
+-s)
+    file=$(realpath $2)
+    ;;
+*)
+    file=$(printf "%s\n" "${dir[RANDOM % ${#dir[@]}]}")
+    ;;
+esac
+
+xwallpaper --zoom $file

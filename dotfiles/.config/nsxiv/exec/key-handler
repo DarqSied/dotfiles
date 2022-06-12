@@ -4,6 +4,7 @@ while read file
 do
     case "$1" in
        "d") gio trash $file;;
-       "r") rm -rf ~/.cache/sxiv;;
+       "r") rm -rf ~/.cache/nsxiv;;
+       "w") wall -s $file;;
     esac
 done
