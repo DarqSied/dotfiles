@@ -36,16 +36,17 @@ function preexec() {
   timer=$(($(date +%s%0N)*0.000000001))
 }
 function precmd() {
-  if [ $timer ]; then
-    now=$(($(date +%s%0N)*0.000000001))
-    elapsed=$(echo $(($now-$timer)) | awk '{printf "%.1f", $1}')
-    if [[ $elapsed -le 0.5 ]]; then
-        time=""
-    else
-        time="[took ${elapsed}s]"
+    print ""
+    if [ $timer ]; then
+        now=$(($(date +%s%0N)*0.000000001))
+        elapsed=$(echo $(($now-$timer)) | awk '{printf "%.1f", $1}')
+        if [[ $elapsed -le 0.5 ]]; then
+            time=""
+        else
+            time="[took ${elapsed}s]"
+        fi
+        export RPROMPT="%F%{$fg_bold[yellow]%}${time}%{$reset_color%}"
     fi
-    export RPROMPT="%F%{$fg_bold[yellow]%}${time}%{$reset_color%}"
-  fi
 }
 
 PROMPT="%B%(?:%{$fg_bold[green]%}➜ :%{$fg_bold[red]%}➜ ) %{$fg[magenta]%}%c%{$reset_color%}"
