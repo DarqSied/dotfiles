@@ -28,24 +28,34 @@ zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
 }
 
 zstyle ':vcs_info:*' check-for-changes true
-# zstyle ':vcs_info:git:*' formats " %r/%S %b %m%u%c "
 zstyle ':vcs_info:git:*' formats " %{$fg_bold[white]%}(%{$fg_bold[red]%}%m%u%c%{$fg[yellow]%}%{$fg_bold[cyan]%} %b%{$fg_bold[white]%})"
 
 # format our main prompt for hostname current folder, and permissions.
 function preexec() {
-  timer=$(($(date +%s%0N)*0.000000001))
+  timer=$(date +%s%3N)
 }
 function precmd() {
     print ""
     if [ $timer ]; then
-        now=$(($(date +%s%0N)*0.000000001))
-        elapsed=$(echo $(($now-$timer)) | awk '{printf "%.1f", $1}')
-        if [[ $elapsed -le 0.5 ]]; then
+        local now=$(date +%s%3N)
+        local d_ms=$(($now-$timer))
+        local d_s=$((d_ms / 1000))
+        local ms=$((d_ms % 1000))
+        local s=$((d_s % 60))
+        local m=$(((d_s / 60) % 60))
+        local h=$((d_s / 3600))
+        if ((h > 0)); then elapsed=${h}h${m}m
+        elif ((m > 0)); then elapsed=${m}m${s}s
+        elif ((s > 0)); then elapsed=${s}.$((ms / 100))s
+        else elapsed=${ms}ms
+        fi
+        if [[ $elapsed == ${ms}ms ]]; then
             time=""
         else
-            time="[took ${elapsed}s]"
+            time="[took ${elapsed}]"
         fi
         export RPROMPT="%F%{$fg_bold[green]%}${time}%{$reset_color%}"
+        unset timer
     fi
 }
 
