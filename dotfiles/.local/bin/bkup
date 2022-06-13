@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Combine the whole git commands for a single step commit
+# Combine the git commands for a single step commit
 
 read -p "Commit message: " msg
 

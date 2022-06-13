@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
+
 $TERMINAL -e sh -c "sleep 0.1 && nvim '$@'"
