@@ -2,7 +2,16 @@
 
 # Combine the git commands for a single step commit
 
-read -p "Commit message: " msg
+# read -p "Commit message: " msg
+case $1 in
+-m)
+    msg=$2
+    ;;
+*)
+    msg="Backing up"
+    ;;
+esac
+
 
 git add .
 git commit -m "$msg"
