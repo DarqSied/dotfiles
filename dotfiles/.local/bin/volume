@@ -4,30 +4,30 @@
 # using pamixer, amixer and dunst
 
 function send_notification() {
-	volume=$(pamixer --get-volume)
+    volume=$(pamixer --get-volume)
     output=$(pacmd list | grep 'active port:' | grep 'output' | sed -e 's/^.*output-\([^&]*\)>.*/\1/' -e "s/\b\(.\)/\u\1/g")
-	dunstify  -u low -r 9993 -h int:value:"$volume" -i "volume-$1" "$output: ${volume}%"
+    dunstify  -u low -r 9993 -h int:value:"$volume" -i "volume-$1" "$output: ${volume}%"
 }
 
 case $1 in
-up)
-	# Set the volume on (if it was muted)
-	pamixer --unmute
-	amixer set Master 5%+
-	send_notification $1
-	;;
-down)
-	pamixer --unmute
-	amixer set Master 5%-
-	send_notification $1
-	;;
-mute)
-	pamixer --toggle-mute
-	if [ $(pamixer --get-mute) = 1 ]; then
-		dunstify -i volume-mute -r 9993 -u low "Muted"
-	else
-		send_notification up
-	fi
-	;;
+    up)
+        # Set the volume on (if it was muted)
+        pamixer --unmute
+        amixer set Master 5%+
+        send_notification $1
+        ;;
+    down)
+        pamixer --unmute
+        amixer set Master 5%-
+        send_notification $1
+        ;;
+    mute)
+        pamixer --toggle-mute
+        if [ $(pamixer --get-mute) = 1 ]; then
+            dunstify -i volume-mute -r 9993 -u low "Muted"
+        else
+            send_notification up
+        fi
+        ;;
 esac
 

@@ -6,10 +6,10 @@
 ## BATTERY
 # Loop through all attached batteries and format the info
 for battery in /sys/class/power_supply/BAT?*; do
-	# If non-first battery, print a space separator.
-	[ -n "${capacity+x}" ] && printf " "
+    # If non-first battery, print a space separator.
+    [ -n "${capacity+x}" ] && printf " "
     # Prints battery percentage
-	capacity="$(cat "$battery/capacity" 2>&1)"
+    capacity="$(cat "$battery/capacity" 2>&1)"
     # Sets up the status
     status="$(cat "$battery/status" 2>&1)"
 

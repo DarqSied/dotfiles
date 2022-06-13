@@ -4,7 +4,7 @@
 
 ll=$(tmux ls | head -n1 | awk '{print $1}')
 if [ "$ll" == "0:" ] ; then
-   tmux a
+    tmux a
 else
-   tmux
+    tmux
 fi

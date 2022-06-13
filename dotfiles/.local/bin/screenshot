@@ -7,40 +7,40 @@ dir=~/Himanshu/Data/Screenshots/$(date '+%Y-%m')
 clip="xclip -selection clipboard -t image/png"
 
 case $2 in
-screen)
-    args=""
-    ;;
-window)
-    args="-i $(xdotool getactivewindow)"
-    ;;
-region)
-    args="-s"
-    ;;
-*)
-    notify-send "Screenshot" "The only options are screen, window or region."
-    exit 1
-    ;;
+    screen)
+        args=""
+        ;;
+    window)
+        args="-i $(xdotool getactivewindow)"
+        ;;
+    region)
+        args="-s"
+        ;;
+    *)
+        notify-send "Screenshot" "The only options are screen, window or region."
+        exit 1
+        ;;
 esac
 
 case $1 in
--f)
-    mkdir -p $dir
-    maim $args "$dir/$name.png"
-    notify-send "Screenshot" "$name.png saved in directory."
-    ;;
--c)
-    mkdir -p $dir
-    maim $args | $clip
-    notify-send "Screenshot" "$name.png available in clipboard."
-    ;;
--b)
-    mkdir -p $dir
-    maim $args | tee "$dir/$name.png" | $clip
-    notify-send "Screenshot" "$name.png available in clipboard and the directory."
-	;;
-*)
-    notify-send "Screenshot" "Available arguments are -f(ile), -c(lipboard) or -b(oth)."
-    exit 1
-    ;;
+    -f)
+        mkdir -p $dir
+        maim $args "$dir/$name.png"
+        notify-send "Screenshot" "$name.png saved in directory."
+        ;;
+    -c)
+        mkdir -p $dir
+        maim $args | $clip
+        notify-send "Screenshot" "$name.png available in clipboard."
+        ;;
+    -b)
+        mkdir -p $dir
+        maim $args | tee "$dir/$name.png" | $clip
+        notify-send "Screenshot" "$name.png available in clipboard and the directory."
+        ;;
+    *)
+        notify-send "Screenshot" "Available arguments are -f(ile), -c(lipboard) or -b(oth)."
+        exit 1
+        ;;
 esac
 

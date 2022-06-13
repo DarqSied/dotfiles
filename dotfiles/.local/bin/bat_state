@@ -36,6 +36,6 @@ while [[ ! -d /sys/class/power_supply/BAT?* ]]; do
             rm /tmp/bat-full
         fi
     done
-sleep 180
+    sleep 180
 done
 

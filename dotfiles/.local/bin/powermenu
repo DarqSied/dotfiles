@@ -6,24 +6,24 @@ options="Logout Lockscreen Shutdown Reboot Hibernate Suspend"
 menu=$(printf '%s\n' $options | rofi -dmenu -i -p "Actions ")
 
 case "$menu" in
-Logout)
-    action="loginctl terminate-session ${XDG_SESSION_ID}"
-    ;;
-Lockscreen)
-    action="loginctl lock-session ${XDG_SESSION_ID}"
-    ;;
-Shutdown)
-    action="systemctl poweroff"
-    ;;
-Reboot)
-    action="systemctl reboot"
-    ;;
-Hibernate)
-    action="systemctl hibernate"
-    ;;
-Suspend)
-    action="systemctl suspend"
-    ;;
+    Logout)
+        action="loginctl terminate-session ${XDG_SESSION_ID}"
+        ;;
+    Lockscreen)
+        action="loginctl lock-session ${XDG_SESSION_ID}"
+        ;;
+    Shutdown)
+        action="systemctl poweroff"
+        ;;
+    Reboot)
+        action="systemctl reboot"
+        ;;
+    Hibernate)
+        action="systemctl hibernate"
+        ;;
+    Suspend)
+        action="systemctl suspend"
+        ;;
 esac
 
 if [[ $menu == @(Logout|Shutdown|Reboot) ]]; then

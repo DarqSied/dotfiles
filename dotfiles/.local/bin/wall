@@ -5,12 +5,12 @@
 dir=(~/.config/backgrounds/*)
 
 case $1 in
--s)
-    file=$(realpath $2)
-    ;;
-*)
-    file=$(printf "%s\n" "${dir[RANDOM % ${#dir[@]}]}")
-    ;;
+    -s)
+        file=$(realpath $2)
+        ;;
+    *)
+        file=$(printf "%s\n" "${dir[RANDOM % ${#dir[@]}]}")
+        ;;
 esac
 
 xwallpaper --zoom $file
