@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# Script to launch the basic rofi prompts
+
+case $1 in
+    lof) 
+        rofi -show combi -combi-modi 'window,drun' -modi combi -show-icons -display-combi 'LoF '
+        ;;
+    run) 
+        rofi -show run -modi 'run'
+        ;;
+    clip) 
+        rofi -modi 'clipboard:greenclip print' -show clipboard -run-command '{cmd}'
+        ;;
+    emoji) 
+        rofi -show emoji -modi 'emoji'
+        ;;
+    *) 
+        printf "%s\n" "The only available options are lof,run,clip or emoji"
+        ;;
+esac
+
