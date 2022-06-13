@@ -10,8 +10,8 @@ zle_highlight=('paste:none')
 
 # completions
 autoload -Uz compinit
-# zstyle ':completion:*' menu select
-zstyle ':completion::complete:lsof:*' menu yes select
+zstyle ':completion:*' menu select
+# zstyle ':completion::complete:lsof:*' menu yes select
 zmodload zsh/complist
 compinit -d $XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION
 _comp_options+=(globdots)		# Include hidden files.
