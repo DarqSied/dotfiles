@@ -10,7 +10,7 @@ zle_highlight=('paste:none')
 
 # completions
 autoload -Uz compinit
-zstyle ':completion:*' menu select
+zstyle ':completion:*' menu select=2 list-colors
 # zstyle ':completion::complete:lsof:*' menu yes select
 zmodload zsh/complist
 compinit -d $XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION
@@ -36,6 +36,7 @@ zsh_add_file "zsh-prompt"
 # Plugins
 zsh_add_plugin "zsh-users/zsh-autosuggestions"
 zsh_add_plugin "zsh-users/zsh-syntax-highlighting"
+zsh_add_plugin "zsh-users/zsh-completions"
 zsh_add_plugin "hlissner/zsh-autopair"
 zsh_add_plugin "MichaelAquilina/zsh-you-should-use"
 
@@ -43,7 +44,7 @@ zsh_add_plugin "MichaelAquilina/zsh-you-should-use"
 # More completions https://github.com/zsh-users/zsh-completions
 
 # Key-bindings
-bindkey -s '^o' 'lfrun^M'
+bindkey -s '^o' 'lf^M'
 bindkey -s '^f' 'zi^M'
 bindkey -s '^s' 'ncdu^M'
 bindkey -s '^z' 'zi^M'
