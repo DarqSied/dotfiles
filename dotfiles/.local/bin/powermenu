@@ -5,18 +5,22 @@
 options="Logout Lockscreen Shutdown Reboot Hibernate Suspend"
 menu=$(printf '%s\n' $options | rofi -dmenu -i -p "Actions ")
 
+if [[ $(pgrep xmonad) ]]; then
+    session="xmonad-x86_64-linux"
+fi
+
 case "$menu" in
     Logout)
-        action="loginctl terminate-session ${XDG_SESSION_ID}"
+        action="killall $session"
         ;;
     Lockscreen)
-        action="loginctl lock-session ${XDG_SESSION_ID}"
+        action="betterlockscreen -l blur"
         ;;
     Shutdown)
-        action="systemctl poweroff"
+        action="shutdown -h now"
         ;;
     Reboot)
-        action="systemctl reboot"
+        action="reboot"
         ;;
     Hibernate)
         action="systemctl hibernate"
