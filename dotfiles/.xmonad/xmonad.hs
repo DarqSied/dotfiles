@@ -87,6 +87,7 @@ myStartupHook = setWMName "LG3D"
 
 myScratchPads :: [NamedScratchpad]
 myScratchPads = [ NS "term" spawnTerm findTerm manageTerm
+                , NS "sysmon" spawnMon findMon manageMon
                 , NS "spot" spawnSpot findSpot manageSpot
                 , NS "mixer" spawnMix findMix manageMix
                 ]
@@ -94,6 +95,14 @@ myScratchPads = [ NS "term" spawnTerm findTerm manageTerm
     spawnTerm  = myTerminal ++ " -t scratchpad"
     findTerm   = title =? "scratchpad"
     manageTerm = customFloating $ W.RationalRect l t w h
+               where
+                 h = 0.9
+                 w = 0.9
+                 t = 0.95 -h
+                 l = 0.95 -w
+    spawnMon  = myTerminal ++ " -t sysmon -e btop"
+    findMon   = title =? "sysmon"
+    manageMon = customFloating $ W.RationalRect l t w h
                where
                  h = 0.9
                  w = 0.9
@@ -215,7 +224,6 @@ myKeys =
         , ("M-S-w"          , spawn "librewolf --private-window")                   -- Launch librewolf-private
         , ("M-e"            , spawn (myTerminal ++ " -e lfrun"))                    -- Launch lf
         , ("M-S-e"          , spawn "thunar")                                       -- Launch thunar
-        , ("M-a"            , spawn (myTerminal ++ " -e btop"))                     -- Launch system monitor
         , ("M-d"            , spawn (myTerminal ++ " -e tremc"))                    -- Launch transmission
         , ("M-c"            , spawn "clock")                                        -- Time & date
         , ("M-S-c"          , spawn "cal-popup")                                    -- Launch calender
@@ -274,7 +282,7 @@ myKeys =
         , ("M-M1-k"         , sendMessage MirrorExpand)                             -- Expand vert window width
 
     -- KB_GROUP Notification Control
-        , ("M-`"            , spawn "dunstctl close")                               -- Close notifications one-at-a-time
+        , ("M-`"            , spawn "dunstctl close")                               -- Close notifications one-by-one
         , ("M-M1-`"         , spawn "dunstctl close-all")                           -- Close all the notifications
         , ("M-S-`"          , spawn "dunstctl history-pop")                         -- Recall closed notifications
         , ("M-C-`"          , spawn "dunstctl set-paused toggle")                   -- Toggle DND
@@ -286,6 +294,7 @@ myKeys =
         , ("M-x"            , namedScratchpadAction myScratchPads "term")           -- Launch terminal in SP
         , ("M-s"            , namedScratchpadAction myScratchPads "spot")           -- Launch ncspot in SP
         , ("M-p"            , namedScratchpadAction myScratchPads "mixer")          -- Launch pulsemixer in SP
+        , ("M-a"            , namedScratchpadAction myScratchPads "sysmon")         -- Launch system monitor in SP
 
     -- KB_GROUP Multimedia Keys
         , ("<XF86AudioPlay>"            , spawn "playerctl play-pause")

@@ -42,14 +42,16 @@ fi
 
 
 ## NET TRAFFIC
-GET="cat /proc/net/dev"
-IF=$(nmcli d | grep -w "connected  " | awk '{print $1}')
+if [[ $(nmcli d | grep -w "connected  ") ]]; then
+    GET="cat /proc/net/dev"
+    IF=$(nmcli d | grep -w "connected  " | awk '{print $1}')
 
-RX1=`$GET | grep $IF | awk '{print $2}'`; TX1=`$GET | grep $IF | awk '{print $10}'`
-sleep 0.2
-RX2=`$GET | grep $IF | awk '{print $2}'`; TX2=`$GET | grep $IF | awk '{print $10}'`
+        RX1=`$GET | grep $IF | awk '{print $2}'`; TX1=`$GET | grep $IF | awk '{print $10}'`
+        sleep 0.2
+        RX2=`$GET | grep $IF | awk '{print $2}'`; TX2=`$GET | grep $IF | awk '{print $10}'`
 
-rx=$((($RX2 - $RX1) * 5)); tx=$((($TX2 - $TX1) * 5))
+        rx=$((($RX2 - $RX1) * 5)); tx=$((($TX2 - $TX1) * 5))
+fi
 
 
 
