@@ -45,12 +45,10 @@ fi
 if [[ $(nmcli d | grep -w "connected  ") ]]; then
     GET="cat /proc/net/dev"
     IF=$(nmcli d | grep -w "connected  " | awk '{print $1}')
-
-        RX1=`$GET | grep $IF | awk '{print $2}'`; TX1=`$GET | grep $IF | awk '{print $10}'`
-        sleep 0.2
-        RX2=`$GET | grep $IF | awk '{print $2}'`; TX2=`$GET | grep $IF | awk '{print $10}'`
-
-        rx=$((($RX2 - $RX1) * 5)); tx=$((($TX2 - $TX1) * 5))
+    RX1=`$GET | grep $IF | awk '{print $2}'`; TX1=`$GET | grep $IF | awk '{print $10}'`
+    sleep 1
+    RX2=`$GET | grep $IF | awk '{print $2}'`; TX2=`$GET | grep $IF | awk '{print $10}'`
+    rx=$((($RX2 - $RX1) * 1)); tx=$((($TX2 - $TX1) * 1))
 fi
 
 
@@ -65,9 +63,19 @@ fi
 
 
 
-dunstify -r 9992 -t 7000 "System Overview" "Battery is at $capacity%[$status].
+run(){
+dunstify -r 9992 "System Overview" "Battery is at $capacity%[$status].
 CPU usage is $cpu%.
 Memory is at $mem utilization.
 $int
 "
+}
+
+var=0
+while [[ $var -le 5 ]]; do
+    run
+    sleep 2
+    ((var++))
+done
+
 done
