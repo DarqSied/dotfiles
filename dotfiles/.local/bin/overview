@@ -54,8 +54,10 @@ traf() {
 ## INTERNET
     if [[ $(nmcli d | grep -w "connected  ") ]]; then
         int=$(echo "Connected to $con_type : $con $vpn\nNet Traffic      Up:$(numfmt --to=iec $tx)B   Down:$(numfmt --to=iec $rx)B")
+        dur="1500"
     else
         int=$(echo "You are currently offline.")
+        dur="7000"
     fi
 }
 
@@ -64,7 +66,7 @@ traf() {
 
 run(){
 traf
-dunstify -r 9992 -t 1500 "System Overview" "Battery is at $capacity%[$status].
+dunstify -r 9992 -t $dur "System Overview" "Battery is at $capacity%[$status].
 CPU usage is $cpu%.
 Memory is at $mem utilization.
 $int
