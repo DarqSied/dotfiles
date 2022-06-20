@@ -28,7 +28,7 @@ zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
 }
 
 zstyle ':vcs_info:*' check-for-changes true
-zstyle ':vcs_info:git:*' formats " %{$fg_bold[black]%}(%{$fg_bold[blue]%}%m%u%c%{$fg[cyan]%}%{$fg_bold[white]%} %b%{$fg_bold[black]%})"
+zstyle ':vcs_info:git:*' formats "%{$fg_bold[white]%}(%{$fg_bold[blue]%}%m%u%c%{$fg[cyan]%}%{$fg_bold[white]%} %b%{$fg_bold[white]%})"
 
 # format our main prompt for hostname current folder, and permissions.
 function preexec() {
@@ -54,13 +54,13 @@ function precmd() {
         else
             time="[took ${elapsed}]"
         fi
-        export RPROMPT="%F%{$fg_bold[yellow]%}${time}%{$reset_color%}"
+        RPROMPT="%F%{$fg_bold[yellow]%}${time}%{$reset_color%}"
+        RPROMPT+="\$vcs_info_msg_0_ "
         unset timer
     fi
 }
 
-PROMPT="%F%{$fg[magenta]%}%c %(?:%{$fg_bold[green]%}:%{$fg_bold[red]%})%{$reset_color%}"
-PROMPT+="\$vcs_info_msg_0_ "
+PROMPT="%F%{$fg[magenta]%}%c %(?:%{$fg_bold[green]%}:%{$fg_bold[red]%}) %{$reset_color%}"
 # TODO look into this for more colors
 # https://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/
 # also ascii escape codes
