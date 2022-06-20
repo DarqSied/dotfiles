@@ -1,3 +1,3 @@
-WebBrowser=custom-WebBrowser
-TerminalEmulator=custom-TerminalEmulator
+TerminalEmulator=alacritty
+TerminalEmulatorDismissed=true
 
