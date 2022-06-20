@@ -54,7 +54,7 @@ function precmd() {
         else
             time="[took ${elapsed}]"
         fi
-        RPROMPT="%F%{$fg_bold[yellow]%}${time}%{$reset_color%}"
+        RPROMPT="%F%{$fg_bold[yellow]%}${time} %{$reset_color%}"
         RPROMPT+="\$vcs_info_msg_0_ "
         unset timer
     fi
