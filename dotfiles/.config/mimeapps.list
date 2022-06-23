@@ -9,7 +9,6 @@ application/x-extension-shtml=librewolf.desktop;
 application/x-extension-xht=librewolf.desktop;
 application/x-extension-xhtml=librewolf.desktop;
 application/x-shellscript=userapp-nvim-launch-HBZDH1.desktop
-application/x-shellscript=userapp-nvim-launch-HBZDH1.desktop
 application/xhtml+xml=librewolf.desktop;
 image/png=nsxiv.desktop;
 text/html=userapp-nvim-launch-HBZDH1.desktop;librewolf.desktop;
@@ -65,3 +64,4 @@ x-scheme-handler/http=librewolf.desktop
 x-scheme-handler/https=librewolf.desktop
 x-scheme-handler/magnet=userapp-transadd-R34CJ1.desktop
 x-scheme-handler/tg=userapp-Telegram Desktop-MY0YM1.desktop
+
