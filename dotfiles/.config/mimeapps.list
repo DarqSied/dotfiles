@@ -26,6 +26,7 @@ x-scheme-handler/chrome=librewolf.desktop;
 x-scheme-handler/http=librewolf.desktop;
 x-scheme-handler/https=librewolf.desktop;
 x-scheme-handler/tg=userapp-Telegram Desktop-MY0YM1.desktop;
+text/x-matlab=userapp-nvim-launch-HBZDH1.desktop;
 
 [Default Applications]
 application/json=nvim.desktop
@@ -64,4 +65,3 @@ x-scheme-handler/http=librewolf.desktop
 x-scheme-handler/https=librewolf.desktop
 x-scheme-handler/magnet=userapp-transadd-R34CJ1.desktop
 x-scheme-handler/tg=userapp-Telegram Desktop-MY0YM1.desktop
-
