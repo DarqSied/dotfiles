@@ -168,5 +168,6 @@ map U unselect
 map gtr cd ~/.local/share/Trash/files
 map gd cd ~/Downloads
 map gf cd ~/Documents
+map gc cd ~/.config
 map gs cd ~/.local/bin
 map \;j cd ~
