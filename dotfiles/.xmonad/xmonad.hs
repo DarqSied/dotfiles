@@ -101,7 +101,7 @@ myScratchPads = [ NS "term" spawnTerm findTerm manageTerm
                  w = 0.9
                  t = 0.95 -h
                  l = 0.95 -w
-    spawnTorr  = myTerminal ++ " -t torr -e tremc"
+    spawnTorr  = myTerminal ++ " -t torr -e transcli"
     findTorr   = title =? "torr"
     manageTorr = customFloating $ W.RationalRect l t w h
                where

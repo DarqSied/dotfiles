@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# Starts transmission-daemon before launching tremc
+
+pgrep -x transmission-daemon > /dev/null || transmission-daemon &
+tremc
