@@ -37,10 +37,10 @@ picom --experimental-backends &
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 
 # Torrent daemon
-transmission-daemon &
+# transmission-daemon &
 
 # Hide mouse when typing
-xbanish &
+unclutter &
 
 # Clipboard Manager
 greenclip daemon &

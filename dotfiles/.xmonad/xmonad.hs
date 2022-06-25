@@ -87,6 +87,7 @@ myStartupHook = setWMName "LG3D"
 
 myScratchPads :: [NamedScratchpad]
 myScratchPads = [ NS "term" spawnTerm findTerm manageTerm
+                , NS "torr" spawnTorr findTorr manageTorr
                 , NS "sysmon" spawnMon findMon manageMon
                 , NS "spot" spawnSpot findSpot manageSpot
                 , NS "mixer" spawnMix findMix manageMix
@@ -95,6 +96,14 @@ myScratchPads = [ NS "term" spawnTerm findTerm manageTerm
     spawnTerm  = myTerminal ++ " -t scratchpad"
     findTerm   = title =? "scratchpad"
     manageTerm = customFloating $ W.RationalRect l t w h
+               where
+                 h = 0.9
+                 w = 0.9
+                 t = 0.95 -h
+                 l = 0.95 -w
+    spawnTorr  = myTerminal ++ " -t torr -e tremc"
+    findTorr   = title =? "torr"
+    manageTorr = customFloating $ W.RationalRect l t w h
                where
                  h = 0.9
                  w = 0.9
@@ -224,7 +233,6 @@ myKeys =
         , ("M-S-w"          , spawn "librewolf --private-window")                   -- Launch librewolf-private
         , ("M-e"            , spawn (myTerminal ++ " -e lfrun"))                    -- Launch lf
         , ("M-S-e"          , spawn "thunar")                                       -- Launch thunar
-        , ("M-d"            , spawn (myTerminal ++ " -e tremc"))                    -- Launch transmission
         , ("M-c"            , spawn "clock")                                        -- Time & date
         , ("M-S-c"          , spawn "cal-popup")                                    -- Launch calender
         , ("M-o"            , spawn "overview")                                     -- System overview
@@ -295,6 +303,7 @@ myKeys =
         , ("M-s"            , namedScratchpadAction myScratchPads "spot")           -- Launch ncspot in SP
         , ("M-p"            , namedScratchpadAction myScratchPads "mixer")          -- Launch pulsemixer in SP
         , ("M-a"            , namedScratchpadAction myScratchPads "sysmon")         -- Launch system monitor in SP
+        , ("M-d"            , namedScratchpadAction myScratchPads "torr")           -- Launch transmission in SP
 
     -- KB_GROUP Multimedia Keys
         , ("<XF86AudioPlay>"            , spawn "playerctl play-pause")

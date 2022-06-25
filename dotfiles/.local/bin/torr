@@ -66,6 +66,7 @@ curl -s $fullURL > $cachedir/tmp.html
 magnet=$(grep -Po "magnet:\?xt=urn:btih:[[:alnum:][:punct:]]*" $cachedir/tmp.html | head -n 1) 
 
 if [ $magnet ] ; then
+    pgrep -x transmission-daemon > /dev/null || transmission-daemon
     transmission-remote --add "$magnet"
     notify-send "Torrent" "Downloading File"
 else
