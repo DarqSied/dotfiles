@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Simple search prompt with browser choice functionality 
+# Simple search prompt with browser choice function
 
 has() {
     case "$(command -v "$1" 2>/dev/null)" in
@@ -40,7 +40,7 @@ declare -a searchengs=(
 "Quit"
 )
 
-choice=$(printf '%s\n' "${searchengs[@]}" | awk -F '-' '{print $1}' | rofi -dmenu -i -l 17 -p "Choose a search engine ")
+choice=$(printf '%s\n' "${searchengs[@]}" | awk -F '-' '{print $1}' | rofi -dmenu -i -l 17 -p "Choose a search engine " -matching fuzzy)
 option=$(cat $HOME/.config/searchengs.txt | grep "$choice" | awk -F ' - ' '{print $NF}')
 browser=$(cat /tmp/browsers | grep "$option" | awk -F ': ' '{print $NF}')
 
