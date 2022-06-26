@@ -17,21 +17,22 @@ while [[ ! -d /sys/class/power_supply/BAT?* ]]; do
         # Notify about the battery status
         if [ "$status" = "Discharging" ] && [ "$capacity" -le 30 ] && [ "$capacity" -gt 15 ] ; then
             if [ ! -f /tmp/bat-low ] ; then
-                notify-send -t 15000 "Battery Monitor" "Battery low, connect to power."
+                dunstify -r 9990 -t 15000 "Battery Monitor" "Battery low, connect to power."
             fi
             touch /tmp/bat-low
         elif [ "$status" = "Discharging" ] && [ "$capacity" -le 15 ] ; then
             if [ ! -f /tmp/bat-crit ] ; then
-                notify-send -u critical "Battery Monitor" "Battery critically low, connect to power now."
+                dunstify -r 9990 -u critical "Battery Monitor" "Battery critically low, connect to power now."
             fi
             touch /tmp/bat-crit
         elif [ "$status" = "Full" ] ; then
             if [ ! -f /tmp/bat-full ] ; then
-                notify-send "Battery Monitor" "Battery full, disconnect from power."
+                dunstify -r 9990 "Battery Monitor" "Battery full, disconnect from power."
             fi
             touch /tmp/bat-full
         elif [ "$status" = "Charging" ] ; then
             rm /tmp/bat-low /tmp/bat-crit
+            dunstify --close=9990
         else 
             rm /tmp/bat-full
         fi
