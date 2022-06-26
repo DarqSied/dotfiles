@@ -316,8 +316,9 @@ myKeys =
         , ("<XF86AudioRaiseVolume>"     , spawn "volume up")
 
     -- KB_GROUP Brightness Control
-        , ("<XF86MonBrightnessUp>"      , spawn "brightnessctl set +10%")
-        , ("<XF86MonBrightnessDown>"    , spawn "brightnessctl set 10%-")
+        , ("<XF86MonBrightnessUp>"      , spawn "brightness up")
+        , ("<XF86MonBrightnessDown>"    , spawn "brightness down")
+        , ("M-<F11>"                    , spawn "brightness toggle")
 
     -- KB_GROUP Screenshot
         , ("<Print>"        , spawn "screenshot -f screen")

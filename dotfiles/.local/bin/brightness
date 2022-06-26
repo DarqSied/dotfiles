@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Simple script to move the whole brightness function away from a bar(polybar,lemonbar,etc) 
+# using brightnessctl and dunst
+
+function send_notification() {
+    brightness=$(printf "%.0f\n" $((( $(brightnessctl g) * 100 ) / $(brightnessctl m) )))
+    dunstify -u low -r 9994 -h int:value:"$brightness" -i "brightness-$1" "Brightness: $brightness%"
+}
+
+case $1 in
+    up)
+        brightnessctl s +10%
+        send_notification $1
+        ;;
+    down)
+        brightnessctl s 10%-
+        send_notification $1
+        ;;
+    toggle)
+        if [[ $(brightnessctl g) == $(brightnessctl m) ]]; then
+            brightnessctl s 10%
+        else
+            brightnessctl s 100%
+        fi
+        send_notification $1
+        ;;
+esac
