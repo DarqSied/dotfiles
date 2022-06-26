@@ -1,6 +1,39 @@
 #!/usr/bin/env bash
 
-# 
+# Simple search prompt with browser choice functionality 
+
+has() {
+    case "$(command -v "$1" 2>/dev/null)" in
+        alias*|"") return 1
+    esac
+}
+# check for installed browsers
+browser_count=1
+for prog in librewolf firefox icecat palemoon; do
+    if has "$prog" ; then
+        browser_count=$((browser_count+1))
+        installed_browsers[$browser_count]="$prog	: $(command -v $prog)"
+        browser_count=$((browser_count+1))
+        installed_browsers[$browser_count]="$prog-Private   : $(command -v $prog) --private-window"
+    fi
+done
+for prog in chromium brave vivaldi-stable opera; do
+    if has "$prog" ; then
+        browser_count=$((browser_count+1))
+        installed_browsers[$browser_count]="$prog	: $(command -v $prog)"
+        browser_count=$((browser_count+1))
+        installed_browsers[$browser_count]="$prog-Private   : $(command -v $prog) --incognito"
+    fi
+done
+for prog in badwolf qutebrowser ephemeral ; do
+    if has "$prog" ; then
+        browser_count=$((browser_count+1))
+        installed_browsers[$browser_count]="$prog	: $(command -v $prog)"
+    fi
+done
+
+touch /tmp/browsers
+printf "%s\n" "${installed_browsers[@]}" > /tmp/browsers
 
 declare -a searchengs=(
 "$(cat $HOME/.config/searchengs.txt)"
@@ -8,14 +41,13 @@ declare -a searchengs=(
 )
 
 choice=$(printf '%s\n' "${searchengs[@]}" | awk -F '-' '{print $1}' | rofi -dmenu -i -l 17 -p "Choose a search engine ")
+option=$(cat $HOME/.config/searchengs.txt | grep "$choice" | awk -F ' - ' '{print $NF}')
+browser=$(cat /tmp/browsers | grep "$option" | awk -F ': ' '{print $NF}')
 
 if [[ "$choice" == Quit ]]; then
     exit 1
-elif [[ "$choice" == Youtube ]]; then
-    browser="/usr/bin/qutebrowser"
 elif [ "$choice" ]; then
-    engine=$(cat $HOME/.config/searchengs.txt | grep "$choice" | awk -F '-' '{print $NF}')
-    browser="/usr/bin/librewolf --private-window"
+    engine=$(cat $HOME/.config/searchengs.txt | grep "$choice" | awk -F '-' '{print $2}')
 else
     exit 1
 fi
@@ -27,5 +59,4 @@ query="$(sed 's/ /+/g' <<<$query)"
 [ -z $query ] && exit 1
 link="$(sed "s/\%s/${query}/g" <<<$engine)"
 
-echo $choice
-echo "$browser $link"
+$browser $link

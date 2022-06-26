@@ -222,6 +222,7 @@ myKeys =
         , ("M-S-v"          , spawn "launcher emoji")                               -- Emoji selector
         , ("M-n"            , spawn "networkmanager_dmenu")                         -- NM_dmenu
         , ("M-b"            , spawn "bookman")                                      -- Bookmark list
+        , ("M-S-b"          , spawn "searchman")                                    -- Search prompt
         , ("M-S-d"          , spawn "torr")                                         -- Torrent search
         , ("M-C-x"          , spawn "powermenu")                                    -- Powermenu
 
