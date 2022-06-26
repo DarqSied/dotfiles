@@ -4,12 +4,7 @@
 
 mkdir -p $HOME/.cache/torrent
 
-if [ -z $1 ]; then
-    query=$(rofi -dmenu -i -p "Search Torrent ")
-else
-    query=$1
-fi
-
+query=$(rofi -dmenu -i -p "Search Torrent ")
 # Exit the program in case of zero length query
 [ -z $query ] && exit 1
 

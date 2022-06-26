@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+# 
+
+declare -a searchengs=(
+"$(cat $HOME/.config/searchengs.txt)"
+"Quit"
+)
+
+choice=$(printf '%s\n' "${searchengs[@]}" | awk -F '-' '{print $1}' | rofi -dmenu -i -l 17 -p "Choose a search engine ")
+
+if [[ "$choice" == Quit ]]; then
+    exit 1
+elif [[ "$choice" == Youtube ]]; then
+    browser="/usr/bin/qutebrowser"
+elif [ "$choice" ]; then
+    engine=$(cat $HOME/.config/searchengs.txt | grep "$choice" | awk -F '-' '{print $NF}')
+    browser="/usr/bin/librewolf --private-window"
+else
+    exit 1
+fi
+
+
+query=$(rofi -dmenu -i -p "Search Query ")
+query="$(sed 's/ /+/g' <<<$query)"
+
+[ -z $query ] && exit 1
+link="$(sed "s/\%s/${query}/g" <<<$engine)"
+
+echo $choice
+echo "$browser $link"

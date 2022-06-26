@@ -1,16 +1,16 @@
 [Configuration]
-LastActiveMode=THUNAR_RENAMER_MODE_NAME
-LastActiveRenamer=ThunarSbrReplaceRenamer
-
-[ThunarSbrRemoveRenamer]
-StartOffset=16
-EndOffset=0
-EndOffsetMode=THUNAR_SBR_OFFSET_MODE_RIGHT
-StartOffsetMode=THUNAR_SBR_OFFSET_MODE_LEFT
+LastActiveMode=THUNAR_RENAMER_MODE_BOTH
+LastActiveRenamer=ThunarSbrRemoveRenamer
 
 [ThunarSbrReplaceRenamer]
 CaseSensitive=FALSE
 Replacement=\ 
 Pattern=.
 Regexp=FALSE
+
+[ThunarSbrRemoveRenamer]
+StartOffset=14
+EndOffset=0
+EndOffsetMode=THUNAR_SBR_OFFSET_MODE_RIGHT
+StartOffsetMode=THUNAR_SBR_OFFSET_MODE_LEFT
 
