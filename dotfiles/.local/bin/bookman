@@ -39,7 +39,7 @@ declare -a bookmarks=(
 "Quit"
 )
 
-choice=$(printf '%s\n' "${bookmarks[@]}" | awk -F '-' '{print $1}' | rofi -dmenu -i -l 17 -p "Choose a bookmark")
+choice=$(printf '%s\n' "${bookmarks[@]}" | awk -F '-' '{print $1}' | rofi -dmenu -i -l 17 -p "Choose a bookmark" -matching fuzzy)
 
 if [[ "$choice" == Quit ]]; then
     exit 1
