@@ -88,16 +88,16 @@ alias \
 	addall="git add ." \
 	branch="git branch" \
 	checkout="git checkout" \
-	clone="git clone" \
+	gc="git clone" \
 	commit="git commit -m" \
 	fetch="git fetch" \
-	pull="git pull origin" \
+	gpl="git pull origin" \
 	push="git push origin" \
-	stat="git status" \
+	gs="git status" \
 	tag="git tag" \
 	newtag="git tag -a" \
-	m="git checkout master" \
-	s="git checkout stable" \
+	gcm="git checkout master" \
+	gcs="git checkout stable" \
     wget='wget --hsts-file="$XDG_CACHE_HOME/wget-hsts"'
 
 
