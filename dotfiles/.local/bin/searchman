@@ -31,7 +31,6 @@ for prog in badwolf qutebrowser ephemeral ; do
         installed_browsers[$browser_count]="$prog	: $(command -v $prog)"
     fi
 done
-
 touch /tmp/browsers
 printf "%s\n" "${installed_browsers[@]}" > /tmp/browsers
 
