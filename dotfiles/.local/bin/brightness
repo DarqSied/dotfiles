@@ -18,7 +18,7 @@ case $1 in
         send_notification $1
         ;;
     toggle)
-        if [[ $(brightnessctl g) == $(brightnessctl m) ]]; then
+        if [[ $(brightnessctl g) -ge 5000 ]]; then
             brightnessctl s 10%
         else
             brightnessctl s 100%
