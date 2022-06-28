@@ -54,10 +54,10 @@ traf() {
 ## INTERNET
     if [[ $(nmcli d | grep -w "connected  ") ]]; then
         int=$(echo "Connected to $con_type : $con $vpn\nNet Traffic      Up:$(numfmt --to=iec $tx)B   Down:$(numfmt --to=iec $rx)B")
-        dur="1600"
+        dur="2000"
     else
         int=$(echo "You are currently offline.")
-        dur="7000"
+        dur="8000"
     fi
 }
 
