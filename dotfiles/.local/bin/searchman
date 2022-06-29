@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 # Simple search prompt with browser choice function
+# Requires a file named searchengs.txt in ~/.config/ in this format
+#
+# Name      - Search link(contains %s)          - browser/browser-Private (refer /tmp/browsers)
 
 has() {
     case "$(command -v "$1" 2>/dev/null)" in
