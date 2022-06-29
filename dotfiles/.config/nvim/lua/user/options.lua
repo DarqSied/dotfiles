@@ -12,7 +12,7 @@ local options = {
     pumheight = 10,
     showmode = false,
     showtabline = 2,
-    smartcase = false,
+    smartcase = true,
     errorbells = false,
     smartindent = true,
     splitbelow = true,
@@ -35,7 +35,7 @@ local options = {
     signcolumn = "no",
     wrap = false,
     scrolloff = 10,
-    sidescrolloff = 10,
+    sidescrolloff = 5,
     guifont = "Hack:h18",
 }
 
