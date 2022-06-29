@@ -44,8 +44,15 @@ choice=$(printf '%s\n' "${bookmarks[@]}" | awk -F '-' '{print $1}' | rofi -dmenu
 if [[ "$choice" == Quit ]]; then
     exit 1
 elif [ "$choice" ]; then
-    link=$(cat $HOME/.config/bookmarks.txt | grep "$choice" | awk -F '-' '{print $NF}')
-    options=$(cat /tmp/browsers | awk -F ':' '{print $1}' | rofi -dmenu -i -p "Open with")
+    link=$(cat $HOME/.config/bookmarks.txt | grep "$choice" | awk -F ' - ' '{print $2}')
+    given=$(cat $HOME/.config/bookmarks.txt | grep "$choice" | awk -F ' - ' '{print $NF}')
+    echo $given
+    if [[ $given = X ]]; then
+        options=$(cat /tmp/browsers | awk -F ':' '{print $1}' | rofi -dmenu -i -p "Open with ")
+    else
+        options=$given
+    fi
+
     if [[ $options ]]; then
         browser=$(cat /tmp/browsers | grep "$options" | awk -F ': ' '{print $NF}')
         $browser $link
