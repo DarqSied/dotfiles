@@ -20,7 +20,7 @@ grep -o '<a href="/torrent/.*</a>' $cachedir/tmp.html |
 
 result_count=$(wc -l $cachedir/titles.bw | awk '{print $1}')
 if [ "$result_count" -lt 1 ] && [ "$query" ] ; then
-    notify-send "Torrent" "No result found."
+    notify-send "Transmission-daemon" "No result found."
     exit 0
 elif [ "$query" == "" ] ; then
     exit 0
@@ -63,7 +63,7 @@ magnet=$(grep -Po "magnet:\?xt=urn:btih:[[:alnum:][:punct:]]*" $cachedir/tmp.htm
 if [ $magnet ] ; then
     pgrep -x transmission-daemon > /dev/null || transmission-daemon &
     transmission-remote --add "$magnet"
-    notify-send "Torrent" "Downloading File"
+    notify-send "Transmission-daemon" "Downloading File"
 else
     exit 1
 fi
