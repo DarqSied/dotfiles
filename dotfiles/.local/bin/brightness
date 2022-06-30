@@ -19,7 +19,7 @@ case $1 in
         ;;
     toggle)
         if [[ $(brightnessctl g) -ge 5000 ]]; then
-            brightnessctl s 20%
+            brightnessctl s 15%
         else
             brightnessctl s 100%
         fi
