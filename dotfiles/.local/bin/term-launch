@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-export WINIT_HIDPI_FACTOR=1
-if [ -z "$*" ]; then
-    usr/bin/alacritty
-else
-    usr/bin/alacritty -e $@
-fi
