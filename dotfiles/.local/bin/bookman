@@ -38,8 +38,11 @@ done
 touch /tmp/browsers
 printf "%s\n" "${installed_browsers[@]}" > /tmp/browsers
 
+file="$HOME/.config/bookmarks.txt"
+sort --output=$file $file
+
 declare -a bookmarks=(
-"$(cat $HOME/.config/bookmarks.txt)"
+"$(cat $file)"
 "Quit"
 )
 
@@ -48,9 +51,8 @@ choice=$(printf '%s\n' "${bookmarks[@]}" | awk -F '-' '{print $1}' | rofi -dmenu
 if [[ "$choice" == Quit ]]; then
     exit 1
 elif [ "$choice" ]; then
-    link=$(cat $HOME/.config/bookmarks.txt | grep "$choice" | awk -F ' - ' '{print $2}')
-    given=$(cat $HOME/.config/bookmarks.txt | grep "$choice" | awk -F ' - ' '{print $NF}')
-    echo $given
+    link=$(cat $file | grep "$choice" | awk -F ' - ' '{print $2}')
+    given=$(cat $file | grep "$choice" | awk -F ' - ' '{print $NF}')
     if [[ $given = X ]]; then
         options=$(cat /tmp/browsers | awk -F ':' '{print $1}' | rofi -dmenu -i -p "Open with ")
     else
