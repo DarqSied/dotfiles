@@ -52,7 +52,7 @@ if [[ "$choice" == Quit ]]; then
     exit 1
 elif [ "$choice" ]; then
     link=$(cat $file | grep "$choice" | awk -F '|' '{print $2}')
-    given=$(cat $file | grep "$choice" | awk -F '|' '{print $NF}')
+    given=$(cat $file | grep "$choice" | awk -F '| ' '{print $NF}')
     if [[ $given = X ]]; then
         options=$(cat /tmp/browsers | awk -F ':' '{print $1}' | rofi -dmenu -i -p "Open with ")
     else
