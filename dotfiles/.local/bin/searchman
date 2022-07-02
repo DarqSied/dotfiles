@@ -3,7 +3,7 @@
 # Simple search prompt with browser choice function
 # Requires a file named searchengs.txt in ~/.config/ in this format
 #
-# Name      - Search link(contains %s)          - browser/browser-Private (refer /tmp/browsers)
+# Name      | Search link(contains %s)          | browser/browser-Private (refer /tmp/browsers)
 
 has() {
     case "$(command -v "$1" 2>/dev/null)" in
@@ -45,14 +45,14 @@ declare -a searchengs=(
 "Quit"
 )
 
-choice=$(printf '%s\n' "${searchengs[@]}" | awk -F '-' '{print $1}' | rofi -dmenu -i -l 17 -p "Choose a search engine " -matching fuzzy)
-option=$(cat $file | grep "$choice" | awk -F ' - ' '{print $NF}')
+choice=$(printf '%s\n' "${searchengs[@]}" | awk -F '|' '{print $1}' | rofi -dmenu -i -l 17 -p "Choose a search engine " -matching fuzzy)
+option=$(cat $file | grep "$choice" | awk -F '| ' '{print $NF}')
 browser=$(cat /tmp/browsers | grep "$option" | awk -F ': ' '{print $NF}')
 
 if [[ "$choice" == Quit ]]; then
     exit 1
 elif [ "$choice" ]; then
-    engine=$(cat $file | grep "$choice" | awk -F '-' '{print $2}')
+    engine=$(cat $file | grep "$choice" | awk -F '|' '{print $2}')
 else
     exit 1
 fi
@@ -64,4 +64,8 @@ query="$(sed 's/ /+/g' <<<$query)"
 [ -z $query ] && exit 1
 link="$(sed "s/\%s/${query}/g" <<<$engine)"
 
-$browser $link
+if [[ $link ]]; then
+    $browser $link
+else
+    exit 1    
+fi

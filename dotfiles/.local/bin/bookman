@@ -3,8 +3,8 @@
 # An easy bookmark-manager with browser choice function
 # Requires a file named bookmarks.txt in ~/.config/ in this format
 #
-# Name      - Link          - X (For browser choice)
-# Name      - Link          - browser/browser-Private (refer /tmp/browsers)
+# Name      | Link          | X (For browser choice)
+# Name      | Link          | browser/browser-Private (refer /tmp/browsers)
 
 has() {
     case "$(command -v "$1" 2>/dev/null)" in
@@ -46,13 +46,13 @@ declare -a bookmarks=(
 "Quit"
 )
 
-choice=$(printf '%s\n' "${bookmarks[@]}" | awk -F '-' '{print $1}' | rofi -dmenu -i -l 17 -p "Choose a bookmark" -matching fuzzy)
+choice=$(printf '%s\n' "${bookmarks[@]}" | awk -F '|' '{print $1}' | rofi -dmenu -i -l 17 -p "Choose a bookmark" -matching fuzzy)
 
 if [[ "$choice" == Quit ]]; then
     exit 1
 elif [ "$choice" ]; then
-    link=$(cat $file | grep "$choice" | awk -F ' - ' '{print $2}')
-    given=$(cat $file | grep "$choice" | awk -F ' - ' '{print $NF}')
+    link=$(cat $file | grep "$choice" | awk -F '|' '{print $2}')
+    given=$(cat $file | grep "$choice" | awk -F '|' '{print $NF}')
     if [[ $given = X ]]; then
         options=$(cat /tmp/browsers | awk -F ':' '{print $1}' | rofi -dmenu -i -p "Open with ")
     else
