@@ -2,5 +2,5 @@
 
 # Starts transmission-daemon before launching tremc
 
-pgrep -x transmission-daemon > /dev/null || transmission-daemon &
+pgrep -x transmission-da > /dev/null || transmission-daemon &
 tremc
