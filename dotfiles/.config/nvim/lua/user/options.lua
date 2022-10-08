@@ -1,5 +1,5 @@
 local options = {
-  backup = false,
+    backup = false,
     exrc = true,
     hidden = true,
     completeopt = { "menuone", "noinsert", "noselect" },
@@ -42,7 +42,7 @@ local options = {
 vim.opt.shortmess:append "c"
 
 for k, v in pairs(options) do
-  vim.opt[k] = v
+    vim.opt[k] = v
 end
 
 vim.cmd "set whichwrap+=<,>,[,],h,l"
