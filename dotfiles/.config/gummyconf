@@ -12,7 +12,7 @@
             "brt_mode": 0,
             "brt_step": 500,
             "temp_auto": true,
-            "temp_step": 0
+            "temp_step": 500
         }
     ],
     "temp_auto": true,
