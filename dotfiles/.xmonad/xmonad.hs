@@ -200,6 +200,7 @@ myManageHook = composeAll
      , className =? "toolbar"         --> doFloat
      , className =? "Yad"             --> doFloat
      , className =? "mpv"             --> doCenterFloat
+     , title =? "File Operation Progress"          --> doCenterFloat
      , className =? "Signal"          --> doShift ( myWorkspaces !! 6 )
      , className =? "TelegramDesktop" --> doShift ( myWorkspaces !! 6 )
      , className =? "mpv"             --> doShift ( myWorkspaces !! 7 )
