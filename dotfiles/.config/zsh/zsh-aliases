@@ -109,7 +109,8 @@ alias \
     dip="dunstctl is-paused" \
     lf="lfrun" \
     ani="ani-cli -q 1080" \
-    sxiv="nsxiv"
+    sxiv="nsxiv" \
+    vpn="sudo surfshark-vpn"
 
 # switch between shells
 # I do not recommend switching default SHELL from bash.
