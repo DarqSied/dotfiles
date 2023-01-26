@@ -23,7 +23,7 @@ case $1 in
         ;;
     mute)
         pamixer --toggle-mute
-        if [ $(pamixer --get-mute) = 1 ]; then
+        if [ $(pamixer --get-mute) = true ]; then
             dunstify -i volume-mute -r 9993 -u low "Muted"
         else
             send_notification up
