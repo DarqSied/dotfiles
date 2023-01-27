@@ -200,6 +200,7 @@ myManageHook = composeAll
      , className =? "toolbar"         --> doFloat
      , className =? "Yad"             --> doFloat
      , className =? "mpv"             --> doCenterFloat
+     , title =? "Picture-in-Picture"               --> doFloat
      , title =? "File Operation Progress"          --> doCenterFloat
      , className =? "Signal"          --> doShift ( myWorkspaces !! 6 )
      , className =? "TelegramDesktop" --> doShift ( myWorkspaces !! 6 )
@@ -240,6 +241,7 @@ myKeys =
         , ("M-c"            , spawn "clock")                                        -- Time & date
         , ("M-S-c"          , spawn "cal-popup")                                    -- Launch calender
         , ("M-o"            , spawn "overview")                                     -- System overview
+        , ("M-<F5>"         , spawn "bthp")                                         -- Connect to bt-headphones
         , ("M-<F10>"        , spawn "wall")                                         -- Shuffle desktop background
         , ("M-C-<F10>"      , spawn "nsxiv -bt ~/.config/backgrounds/*")            -- Select desktop background from collection
 

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+#Simple script to connect to bt-headphones without gui fluf
+
+mac="2C:FD:B4:7E:56:E1"
+
+bluetoothctl power on
+bluetoothctl connect $mac

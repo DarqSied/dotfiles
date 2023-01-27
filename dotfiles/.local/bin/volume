@@ -5,7 +5,7 @@
 
 function send_notification() {
     volume=$(pamixer --get-volume)
-    output=$(pacmd list | grep 'active port:' | grep 'output' | sed -e 's/^.*output-\([^&]*\)>.*/\1/' -e "s/\b\(.\)/\u\1/g")
+    output=$(pacmd list | grep 'active port:' | grep 'output' | sed -e 's/^.*<\([^&]*\)>.*/\1/' -e "s/-output//g" -e 's/-/ /g' -e "s/\b\(.\)/\u\1/g" | tail -n 1)
     dunstify -u low -r 9993 -h int:value:"$volume" -i "volume-$1" "$output: ${volume}%"
 }
 
