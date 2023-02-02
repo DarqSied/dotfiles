@@ -11,14 +11,16 @@ if [ "$key" == "Device" ] ; then
     bluetoothctl power off
     # systemctl --user stop pulseaudio
     if [ "$status" == "on" ] ; then
-        sudo rfkill block bluetooth
+        rfkill block bluetooth
     fi
+    dunstify -u low -r 9995 "Bluetooth" "Bluetooth headphones have been disconnected" 
 else
     if [ "$status" == "off" ] ; then
-        sudo rfkill unblock bluetooth
+        rfkill unblock bluetooth
     fi
     # systemctl --user start pulseaudio
     bluetoothctl power on
     bluetoothctl connect $mac
+    dunstify -u low -r 9995 "Bluetooth" "Bluetooth headphones are now connected" 
 fi
 
