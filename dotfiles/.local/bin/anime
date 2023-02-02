@@ -1,0 +1,8 @@
+#!/bin/sh
+if [ -d ~/Himanshu/Media/Pool/Anime ];then
+	fusermount -uz ~/Himanshu/Media/Pool/Anime
+	rmdir ~/Himanshu/Media/Pool/Anime 
+else
+	mkdir ~/Himanshu/Media/Pool/Anime 
+	rclone -v mount "Anime:" ~/Himanshu/Media/Pool/Anime --vfs-cache-mode full &
+fi
