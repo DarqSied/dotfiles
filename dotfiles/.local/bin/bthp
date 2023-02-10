@@ -24,6 +24,7 @@ else
     while [ $? -ne 0 ]; do
         bluetoothctl connect $mac
     done
+    amixer sset Master 50%
     dunstify -u low -r 9995 "Bluetooth" "Bluetooth headphones are now connected" 
 fi
 
