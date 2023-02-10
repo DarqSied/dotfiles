@@ -21,6 +21,9 @@ else
     # systemctl --user start pulseaudio
     bluetoothctl power on
     bluetoothctl connect $mac
+    while [ $? -ne 0 ]; do
+        bluetoothctl connect $mac
+    done
     dunstify -u low -r 9995 "Bluetooth" "Bluetooth headphones are now connected" 
 fi
 
