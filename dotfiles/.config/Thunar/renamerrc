@@ -15,7 +15,7 @@ Pattern=.
 Regexp=FALSE
 
 [ThunarSbrRemoveRenamer]
-StartOffset=11
+StartOffset=31
 EndOffset=0
 EndOffsetMode=THUNAR_SBR_OFFSET_MODE_RIGHT
 StartOffsetMode=THUNAR_SBR_OFFSET_MODE_RIGHT
