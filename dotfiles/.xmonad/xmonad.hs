@@ -234,8 +234,8 @@ myKeys =
         , ("M-<Return>"     , spawn (myTerminal))                                   -- Launch terminal
         , ("M-S-<Return>"   , spawn (myTerminal ++ " -e atmux"))                    -- Launch tmux
         , ("M-w"            , spawn "qutebrowser")                                  -- Launch qutebrowser
-        , ("M-M1-w"         , spawn "librewolf")                                    -- Launch librewolf
-        , ("M-S-w"          , spawn "librewolf --private-window")                   -- Launch librewolf-private
+        , ("M-M1-w"         , spawn "brave")                                        -- Launch brave
+        , ("M-S-w"          , spawn "brave --incognito")                            -- Launch brave-private
         , ("M-e"            , spawn (myTerminal ++ " -e lfrun"))                    -- Launch lf
         , ("M-S-e"          , spawn "thunar")                                       -- Launch thunar
         , ("M-c"            , spawn "clock")                                        -- Time & date
