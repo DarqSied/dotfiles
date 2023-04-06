@@ -242,6 +242,7 @@ myKeys =
         , ("M-S-c"          , spawn "cal-popup")                                    -- Launch calender
         , ("M-o"            , spawn "overview")                                     -- System overview
         , ("M-<F5>"         , spawn "bthp")                                         -- Connect to bt-headphones
+        , ("M-<F7>"         , spawn "tptoggle")                                     -- Toggle touchpad off-on
         , ("M-<F10>"        , spawn "wall")                                         -- Shuffle desktop background
         , ("M-C-<F10>"      , spawn "nsxiv -bt ~/.config/backgrounds/*")            -- Select desktop background from collection
 
