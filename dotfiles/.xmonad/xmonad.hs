@@ -233,9 +233,9 @@ myKeys =
     -- KB_GROUP Useful programs to have a keybinding for launch
         , ("M-<Return>"     , spawn (myTerminal))                                   -- Launch terminal
         , ("M-S-<Return>"   , spawn (myTerminal ++ " -e atmux"))                    -- Launch tmux
-        , ("M-w"            , spawn "qutebrowser")                                  -- Launch qutebrowser
-        , ("M-M1-w"         , spawn "brave")                                        -- Launch brave
+        , ("M-w"            , spawn "brave")                                        -- Launch brave
         , ("M-S-w"          , spawn "brave --incognito")                            -- Launch brave-private
+        , ("M-M1-w"         , spawn "qutebrowser")                                  -- Launch qutebrowser
         , ("M-e"            , spawn (myTerminal ++ " -e lfrun"))                    -- Launch lf
         , ("M-S-e"          , spawn "thunar")                                       -- Launch thunar
         , ("M-c"            , spawn "clock")                                        -- Time & date
