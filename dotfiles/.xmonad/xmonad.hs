@@ -91,7 +91,6 @@ myScratchPads :: [NamedScratchpad]
 myScratchPads = [ NS "term" spawnTerm findTerm manageTerm
                 , NS "torr" spawnTorr findTorr manageTorr
                 , NS "sysmon" spawnMon findMon manageMon
-                , NS "spot" spawnSpot findSpot manageSpot
                 , NS "mixer" spawnMix findMix manageMix
                 ]
   where
@@ -114,14 +113,6 @@ myScratchPads = [ NS "term" spawnTerm findTerm manageTerm
     spawnMon  = myTerminal ++ " -t sysmon -e btop"
     findMon   = title =? "sysmon"
     manageMon = customFloating $ W.RationalRect l t w h
-               where
-                 h = 0.9
-                 w = 0.9
-                 t = 0.95 -h
-                 l = 0.95 -w
-    spawnSpot  = myTerminal ++ " -t spot -e ncspot"
-    findSpot   = title =? "spot"
-    manageSpot = customFloating $ W.RationalRect l t w h
                where
                  h = 0.9
                  w = 0.9
