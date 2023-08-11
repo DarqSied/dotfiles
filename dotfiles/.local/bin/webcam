@@ -1,0 +1,1 @@
+ffplay -fast /dev/video0

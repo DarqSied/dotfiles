@@ -5,8 +5,23 @@
 
 function send_notification() {
     volume=$(pamixer --get-volume)
-    output=$(pacmd list | grep 'active port:' | grep 'output' | sed -e 's/^.*<\([^&]*\)>.*/\1/' -e "s/-output//g" -e 's/-/ /g' -e "s/\b\(.\)/\u\1/g" | tail -n 1)
-    dunstify -u low -r 9993 -h int:value:"$volume" -i "volume-$1" "$output: ${volume}%"
+
+    if [[ $(pactl list short sinks | grep RUNNING) ]]; then
+        output=$(pactl list short sinks | grep RUNNING | awk '{print $2}')
+    else
+        output=$(pactl list short sinks | tail -n 1 | awk '{print $2}')
+    fi
+
+    case "$output" in
+        bluez_output.2C_FD_B4_7E_56_E1.1) device='BT Neckband'
+        ;;
+        alsa_output.pci-0000_00_1f.3.analog-stereo) device='Analog Speakers'
+        ;;
+        *) device='*New Device*'
+        ;;
+    esac
+
+    dunstify -u low -r 9993 -h int:value:"$volume" -i "volume-$1" "$device: ${volume}%"
 }
 
 case $1 in

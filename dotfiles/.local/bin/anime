@@ -1,9 +1,13 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+# Sync anime folder from the drive
+
 if [ -d ~/Himanshu/Media/Pool/Anime ];then
 	fusermount -uz ~/Himanshu/Media/Pool/Anime
 	rmdir ~/Himanshu/Media/Pool/Anime 
-    dunstify -u low -r 9988 "Drive" "Folder has been unmounted." else
+    dunstify -u low -r 9988 "Drive" "Folder has been unmounted."
+else
 	mkdir ~/Himanshu/Media/Pool/Anime 
 	rclone -v mount "Anime:" ~/Himanshu/Media/Pool/Anime --vfs-cache-mode full &
     dunstify -u low -r 9988 "Drive" "Folder has been mounted."
- fi
+fi
