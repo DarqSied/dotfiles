@@ -1,0 +1,5 @@
+feeds:
+  - url: https://subsplease.org/rss/?t&r=1080
+    regexp: One\ Piece
+    download_path: /home/darksied/Himanshu/Media/Pool/One Piece/1068-/
+    seed_ratio_limit: 0
