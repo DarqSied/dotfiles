@@ -229,6 +229,7 @@ myKeys =
         , ("M-M1-w"         , spawn "qutebrowser")                                  -- Launch qutebrowser
         , ("M-e"            , spawn (myTerminal ++ " -e lfrun"))                    -- Launch lf
         , ("M-S-e"          , spawn "thunar")                                       -- Launch thunar
+        , ("M-M1-e"         , spawn "thunar ~/Himanshu/Media/Pool")                 -- Launch thunar at media pool
         , ("M-c"            , spawn "clock")                                        -- Time & date
         , ("M-S-c"          , spawn "cal-popup")                                    -- Launch calender
         , ("M-o"            , spawn "overview")                                     -- System overview

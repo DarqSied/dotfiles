@@ -3,13 +3,13 @@ LastActiveMode=THUNAR_RENAMER_MODE_NAME
 LastActiveRenamer=ThunarSbrReplaceRenamer
 
 [ThunarSbrInsertRenamer]
-Offset=11
-Text=\ -
+Offset=0
+Text=Hell's Parad
 Mode=THUNAR_SBR_INSERT_MODE_INSERT
 OffsetMode=THUNAR_SBR_OFFSET_MODE_LEFT
 
 [ThunarSbrRemoveRenamer]
-StartOffset=39
+StartOffset=57
 EndOffset=0
 EndOffsetMode=THUNAR_SBR_OFFSET_MODE_RIGHT
 StartOffsetMode=THUNAR_SBR_OFFSET_MODE_RIGHT
