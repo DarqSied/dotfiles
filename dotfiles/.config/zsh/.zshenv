@@ -13,7 +13,7 @@ export PATH
 unsetopt PROMPT_SP
 
 # Default programs:
-export BROWSER="librewolf"
+export BROWSER="brave"
 export COLORTERM="truecolor"
 export EDITOR="nvim"
 export OPENER="xdg-open"

@@ -1,7 +1,7 @@
 {
     "als": {
         "adaptation_ms": 5000,
-        "poll_ms": 5000,
+        "poll_ms": 5000000,
         "scale": 1.0
     },
     "screenlight": {
@@ -18,7 +18,7 @@
                 "val": 1000
             },
             "brightness": {
-                "max": 500,
+                "max: 500,
                 "min": 250,
                 "mode": 0,
                 "val": 1000
