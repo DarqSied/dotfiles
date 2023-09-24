@@ -1,5 +1,5 @@
 [Added Associations]
-application/json=userapp-nvim-launch-HBZDH1.desktop;
+application/json=leafpad.desktop;userapp-nvim-launch-HBZDH1.desktop;
 application/pdf=org.pwmt.zathura-pdf-poppler.desktop;
 application/toml=userapp-nvim-launch-HBZDH1.desktop
 application/x-csh=userapp-nvim-launch-HBZDH1.desktop
@@ -9,13 +9,13 @@ application/x-extension-html=librewolf.desktop;
 application/x-extension-shtml=librewolf.desktop;
 application/x-extension-xht=librewolf.desktop;
 application/x-extension-xhtml=librewolf.desktop;
-application/x-shellscript=userapp-nvim-launch-HBZDH1.desktop
+application/x-shellscript=leafpad.desktop;userapp-nvim-launch-HBZDH1.desktop;
 application/xhtml+xml=librewolf.desktop;
 image/png=nsxiv.desktop;
 text/html=userapp-nvim-launch-HBZDH1.desktop;librewolf.desktop;
-text/plain=userapp-nvim-launch-HBZDH1.desktop;
+text/plain=leafpad.desktop;userapp-nvim-launch-HBZDH1.desktop;
 text/x-chdr=userapp-nvim-launch-HBZDH1.desktop;
-text/x-lua=userapp-nvim-launch-HBZDH1.desktop;
+text/x-lua=leafpad.desktop;userapp-nvim-launch-HBZDH1.desktop;
 text/x-matlab=userapp-nvim-launch-HBZDH1.desktop;
 text/x-ooc=userapp-nvim-launch-HBZDH1.desktop
 text/x-opencl-src=userapp-nvim-launch-HBZDH1.desktop
@@ -27,7 +27,7 @@ text/x-vala=userapp-nvim-launch-HBZDH1.desktop
 x-scheme-handler/chrome=librewolf.desktop;
 x-scheme-handler/http=librewolf.desktop;
 x-scheme-handler/https=librewolf.desktop;
-x-scheme-handler/tg=userapp-Telegram Desktop-MY0YM1.desktop;
+x-scheme-handler/tg=userapp-Telegram Desktop-MY0YM1.desktop;org.telegram.desktop.desktop;
 text/csv=userapp-nvim-launch-HBZDH1.desktop;
 
 [Default Applications]
@@ -68,4 +68,4 @@ x-scheme-handler/ftp=librewolf.desktop
 x-scheme-handler/http=librewolf.desktop
 x-scheme-handler/https=librewolf.desktop
 x-scheme-handler/magnet=userapp-transadd-R34CJ1.desktop
-x-scheme-handler/tg=userapp-Telegram Desktop-MY0YM1.desktop
+x-scheme-handler/tg=org.telegram.desktop.desktop
