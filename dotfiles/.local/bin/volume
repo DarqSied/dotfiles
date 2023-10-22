@@ -19,6 +19,9 @@ function send_notification() {
         alsa_output.pci-0000_00_1f.3.analog-stereo)
             device='Analog Speakers'
             ;;
+        bluez_output.24_CF_24_10_2E_AB.1)
+            device='Attic Speaker'
+            ;;
         *)
             device='*New Device*'
             ;;
