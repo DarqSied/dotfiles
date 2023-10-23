@@ -233,7 +233,7 @@ myKeys =
         , ("M-c"            , spawn "clock")                                        -- Time & date
         , ("M-S-c"          , spawn "cal-popup")                                    -- Launch calender
         , ("M-o"            , spawn "overview")                                     -- System overview
-        , ("M-<F5>"         , spawn "bthp")                                         -- Connect to bt-headphones
+        , ("M-<F5>"         , spawn "btdevices")                                    -- Connect to known bt-devices
         , ("M-<F7>"         , spawn "tptoggle")                                     -- Toggle touchpad off-on
         , ("M-<F10>"        , spawn "wall")                                         -- Shuffle desktop background
         , ("M-C-<F10>"      , spawn "nsxiv -bt ~/.config/backgrounds/*")            -- Select desktop background from collection

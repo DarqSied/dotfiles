@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+#Simple script to connect to bt-devices without gui fluf
+
+device=$(bluetoothctl info | head -1 | awk '{print $2}')
+status=$(bluetooth | awk '{print $3}')
+key=$(bluetoothctl info | head -1 | awk '{print $1}')
+
+if [ "$key" == "Device" ] ; then
+    bluetoothctl disconnect $device
+    bluetoothctl power off
+    # systemctl --user stop pulseaudio
+    if [ "$status" == "on" ] ; then
+        rfkill block bluetooth
+    fi
+    dunstify -u low -r 9995 "Bluetooth" "Bluetooth devices have been disconnected" 
+else
+    menu=$(printf '%s\n' "BT Neckband" "Attic Speaker" | rofi -dmenu -i -p "Paired Devices ")
+
+    case "$menu" in
+      "BT Neckband") 
+        mac="2C:FD:B4:7E:56:E1"
+        ;;
+      "Attic Speaker")
+        mac="24:CF:24:10:2E:AB"
+        ;;
+    esac
+
+    if [ "$status" == "off" ] ; then
+        rfkill unblock bluetooth
+    fi
+    # systemctl --user start pulseaudio
+    bluetoothctl power on
+    bluetoothctl connect $mac
+    while [ $? -ne 0 ]; do
+        bluetoothctl connect $mac
+    done
+    amixer sset Master 50%
+    dunstify -u low -r 9995 "Bluetooth" "Bluetooth devices are now connected" 
+fi
+
