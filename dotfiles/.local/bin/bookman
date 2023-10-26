@@ -21,7 +21,7 @@ for prog in librewolf firefox icecat palemoon; do
         installed_browsers[$browser_count]="$prog-Private   : $(command -v $prog) --private-window"
     fi
 done
-for prog in chromium brave vivaldi-stable opera; do
+for prog in chromium thorium-browser brave vivaldi-stable opera; do
     if has "$prog" ; then
         browser_count=$((browser_count+1))
         installed_browsers[$browser_count]="$prog	: $(command -v $prog)"

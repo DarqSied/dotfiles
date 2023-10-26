@@ -1,1 +1,5 @@
+#!/usr/bin/env bash
+
+#Simple webcam program
+
 ffplay -fast /dev/video0
