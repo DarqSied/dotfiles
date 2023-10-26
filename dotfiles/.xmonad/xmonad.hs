@@ -227,7 +227,7 @@ myKeys =
         , ("M-w"            , spawn "brave")                                        -- Launch brave
         , ("M-S-w"          , spawn "brave --incognito")                            -- Launch brave-private
         , ("M-M1-w"         , spawn "qutebrowser")                                  -- Launch qutebrowser
-        , ("M-e"            , spawn (myTerminal ++ " -e lfrun"))                    -- Launch lf
+        , ("M-e"            , spawn (myTerminal ++ " -e ranger"))                   -- Launch ranger
         , ("M-S-e"          , spawn "thunar")                                       -- Launch thunar
         , ("M-M1-e"         , spawn "thunar ~/Himanshu/Media/Pool")                 -- Launch thunar at media pool
         , ("M-c"            , spawn "clock")                                        -- Time & date
