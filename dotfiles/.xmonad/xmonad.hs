@@ -84,7 +84,10 @@ windowCount :: X (Maybe String)
 windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace . W.current . windowset
 
 myStartupHook :: X ()
-myStartupHook = setWMName "LG3D"
+myStartupHook = do
+  spawn "killall stalonetray"
+  spawn "sleep 1 && stalonetray --fuzzy-edges=3"
+  setWMName "LG3D"
 
 
 myScratchPads :: [NamedScratchpad]
@@ -196,6 +199,7 @@ myManageHook = composeAll
      , className =? "Signal"          --> doShift ( myWorkspaces !! 6 )
      , className =? "TelegramDesktop" --> doShift ( myWorkspaces !! 6 )
      , className =? "mpv"             --> doShift ( myWorkspaces !! 7 )
+     , className =? "stalonetray"     --> doIgnore
      , (className =? "librewolf" <&&> resource =? "Dialog") --> doFloat  -- Float Librewolf Dialog
      , isFullscreen -->  doFullFloat
      ] <+> namedScratchpadManageHook myScratchPads
@@ -224,10 +228,11 @@ myKeys =
     -- KB_GROUP Useful programs to have a keybinding for launch
         , ("M-<Return>"     , spawn (myTerminal))                                   -- Launch terminal
         , ("M-S-<Return>"   , spawn (myTerminal ++ " -e atmux"))                    -- Launch tmux
-        , ("M-w"            , spawn "thorium-browser")                              -- Launch thorium-browser
-        , ("M-S-w"          , spawn "thorium-browser --incognito")                  -- Launch thorium-browser-private
+        , ("M-w"            , spawn "thorium-browser")                              -- Launch browser
+        , ("M-S-w"          , spawn "thorium-browser --incognito")                  -- Launch browser-private
         , ("M-M1-w"         , spawn "qutebrowser")                                  -- Launch qutebrowser
         , ("M-e"            , spawn (myTerminal ++ " -e ranger"))                   -- Launch ranger
+        , ("M-s"            , spawn "spotify-launcher")                             -- Launch spotify
         , ("M-S-e"          , spawn "thunar")                                       -- Launch thunar
         , ("M-M1-e"         , spawn "thunar ~/Himanshu/Media/Pool")                 -- Launch thunar at media pool
         , ("M-c"            , spawn "clock")                                        -- Time & date
