@@ -85,8 +85,8 @@ windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace
 
 myStartupHook :: X ()
 myStartupHook = do
-  spawn "killall stalonetray"
-  spawn "sleep 1 && stalonetray --fuzzy-edges=3"
+  -- spawn "killall stalonetray"
+  -- spawn "sleep 1 && stalonetray --fuzzy-edges=3"
   setWMName "LG3D"
 
 
@@ -199,7 +199,7 @@ myManageHook = composeAll
      , className =? "Signal"          --> doShift ( myWorkspaces !! 6 )
      , className =? "TelegramDesktop" --> doShift ( myWorkspaces !! 6 )
      , className =? "mpv"             --> doShift ( myWorkspaces !! 7 )
-     , className =? "stalonetray"     --> doIgnore
+     -- , className =? "stalonetray"     --> doIgnore
      , (className =? "librewolf" <&&> resource =? "Dialog") --> doFloat  -- Float Librewolf Dialog
      , isFullscreen -->  doFullFloat
      ] <+> namedScratchpadManageHook myScratchPads

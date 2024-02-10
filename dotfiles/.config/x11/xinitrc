@@ -52,7 +52,7 @@ flameshot &
 gummy start &
 
 #Bluetooth manager
-blueberry-tray &
+#blueberry-tray &
 
 # Power manager
 ~/.local/bin/bat_state &

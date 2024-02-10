@@ -22,6 +22,9 @@ function send_notification() {
         bluez_output.24_CF_24_10_2E_AB.1)
             device='Attic Speaker'
             ;;
+        bluez_output.34_F0_43_4F_F5_6E.1)
+            device='Buds 2'
+            ;;
         *)
             device='*New Device*'
             ;;

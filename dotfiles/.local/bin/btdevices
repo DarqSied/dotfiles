@@ -15,7 +15,7 @@ if [ "$key" == "Device" ] ; then
     fi
     dunstify -u low -r 9995 "Bluetooth" "Bluetooth devices have been disconnected" 
 else
-    menu=$(printf '%s\n' "BT Neckband" "Attic Speaker" | rofi -dmenu -i -p "Paired Devices ")
+    menu=$(printf '%s\n' "BT Neckband" "Attic Speaker" "Buds 2" | rofi -dmenu -i -p "Paired Devices ")
 
     case "$menu" in
       "BT Neckband") 
@@ -23,6 +23,9 @@ else
         ;;
       "Attic Speaker")
         mac="24:CF:24:10:2E:AB"
+        ;;
+      "Buds 2")
+        mac="34:F0:43:4F:F5:6E"
         ;;
     esac
 
