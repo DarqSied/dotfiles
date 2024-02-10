@@ -304,7 +304,6 @@ myKeys =
     -- When you toggle them to show, it brings them to your current workspace.
     -- Toggle them to hide and it sends them back to hidden workspace (NSP).
         , ("M-x"            , namedScratchpadAction myScratchPads "term")           -- Launch terminal in SP
-        , ("M-s"            , namedScratchpadAction myScratchPads "spot")           -- Launch ncspot in SP
         , ("M-p"            , namedScratchpadAction myScratchPads "mixer")          -- Launch pulsemixer in SP
         , ("M-a"            , namedScratchpadAction myScratchPads "sysmon")         -- Launch system monitor in SP
         , ("M-d"            , namedScratchpadAction myScratchPads "torr")           -- Launch transmission in SP
