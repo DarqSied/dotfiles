@@ -51,6 +51,9 @@ flameshot &
 # Screen temperature
 gummy start &
 
+#Bluetooth manager
+blueberry-tray &
+
 # Power manager
 ~/.local/bin/bat_state &
 
