@@ -10,7 +10,7 @@ Regexp=FALSE
 
 [ThunarSbrRemoveRenamer]
 StartOffset=0
-EndOffset=23
+EndOffset=8
 EndOffsetMode=THUNAR_SBR_OFFSET_MODE_LEFT
 StartOffsetMode=THUNAR_SBR_OFFSET_MODE_LEFT
 
