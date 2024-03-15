@@ -8,7 +8,7 @@
   <property name="last-window-maximized" type="bool" value="false"/>
   <property name="last-details-view-zoom-level" type="string" value="THUNAR_ZOOM_LEVEL_25_PERCENT"/>
   <property name="last-details-view-column-widths" type="string" value="50,136,147,50,1320,50,50,72,1421,207,50,71,50,67"/>
-  <property name="last-show-hidden" type="bool" value="true"/>
+  <property name="last-show-hidden" type="bool" value="false"/>
   <property name="last-separator-position" type="int" value="201"/>
   <property name="misc-single-click" type="bool" value="false"/>
   <property name="shortcuts-icon-size" type="string" value="THUNAR_ICON_SIZE_24"/>
@@ -32,4 +32,5 @@
   <property name="last-toolbar-visible-buttons" type="string" value="0,1,1,1,0,1,1,0,0,0,0,0,0,0,1,1,1,1"/>
   <property name="misc-full-path-in-tab-title" type="bool" value="false"/>
   <property name="last-splitview-separator-position" type="int" value="853"/>
+  <property name="misc-confirm-close-multiple-tabs" type="bool" value="false"/>
 </channel>
