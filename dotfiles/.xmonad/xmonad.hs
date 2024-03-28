@@ -27,8 +27,8 @@ import XMonad.Hooks.DynamicLog (dynamicLogWithPP, wrap, shorten, PP(..))
 import XMonad.Hooks.EwmhDesktops  -- for some fullscreen events, also for xcomposite in obs.
 -- import XMonad.Hooks.ManageDocks (avoidStruts, docks, manageDocks, ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat, doCenterFloat)
-import XMonad.Hooks.StatusBar 
-import XMonad.Hooks.StatusBar.PP
+-- import XMonad.Hooks.StatusBar 
+-- import XMonad.Hooks.StatusBar.PP
 import XMonad.Hooks.ServerMode
 import XMonad.Hooks.SetWMName
 import XMonad.Hooks.WorkspaceHistory
