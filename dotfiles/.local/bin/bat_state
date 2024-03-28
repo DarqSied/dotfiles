@@ -1,42 +1,82 @@
 #!/usr/bin/env bash
 
 # A script to notify about the current battery state and warnings 
-# in a simple way instead of using complex programs and daemons
+# in a simple way instead of using complex programs.
 
-# Loop through all attached batteries and format the info
-while [[ ! -d /sys/class/power_supply/BAT?* ]]; do
+# Function to send notification
+send_notification() {
+    local message="$1"
+    local urgency="$2"
+    dunstify -r 9990 -u "$urgency" "Battery Monitor" "$message"
+}
+
+# Function to handle errors and send notification
+handle_error() {
+    local error_message="$1"
+    send_notification "$error_message" "critical"
+}
+
+# Function to check battery status
+check_battery_status() {
+    local battery="$1"
+    local status_file="$battery/status"
+    local capacity_file="$battery/capacity"
+    
+    # Check if status file exists
+    if [[ ! -f "$status_file" ]]; then
+        handle_error "Error: Battery status file not found for $battery"
+        return 1
+    fi
+
+    # Check if capacity file exists
+    if [[ ! -f "$capacity_file" ]]; then
+        handle_error "Error: Battery capacity file not found for $battery"
+        return 1
+    fi
+
+    # Read battery status and capacity
+    local status=$(< "$status_file")
+    local capacity=$(< "$capacity_file")
+
+    # Handle battery status
+    case "$status" in
+        "Discharging")
+            if (( capacity <= 30 )); then
+                if (( capacity > 15 )); then
+                    if [[ ! -f /tmp/bat-low ]]; then
+                        send_notification "Battery low, connect to power." "normal"
+                        touch /tmp/bat-low
+                    fi
+                else
+                    if [[ ! -f /tmp/bat-crit ]]; then
+                        send_notification "Battery critically low, connect to power now." "critical"
+                        touch /tmp/bat-crit
+                    fi
+                fi
+            fi
+            ;;
+        "Full")
+            if [[ ! -f /tmp/bat-full ]]; then
+                send_notification "Battery full, disconnect from power." "normal"
+                touch /tmp/bat-full
+            fi
+            ;;
+        "Charging")
+            rm -f /tmp/bat-low /tmp/bat-crit
+            send_notification ""  # Clear existing notifications
+            ;;
+        *)
+            rm -f /tmp/bat-full
+            ;;
+    esac
+}
+
+# Loop through all attached batteries
+while true; do
     for battery in /sys/class/power_supply/BAT?*; do
-        # If non-first battery, print a space separator.
-        [ -n "${capacity+x}" ] && printf " "
-        # Prints battery percentage
-        capacity="$(cat "$battery/capacity" 2>&1)"
-
-        # Sets up the status and capacity
-        status="$(cat "$battery/status" 2>&1)"
-
-        # Notify about the battery status
-        if [ "$status" = "Discharging" ] && [ "$capacity" -le 30 ] && [ "$capacity" -gt 15 ] ; then
-            if [ ! -f /tmp/bat-low ] ; then
-                dunstify -r 9990 -t 60000 "Battery Monitor" "Battery low, connect to power."
-            fi
-            touch /tmp/bat-low
-        elif [ "$status" = "Discharging" ] && [ "$capacity" -le 15 ] ; then
-            if [ ! -f /tmp/bat-crit ] ; then
-                dunstify -r 9990 -u critical "Battery Monitor" "Battery critically low, connect to power now."
-            fi
-            touch /tmp/bat-crit
-        elif [ "$status" = "Full" ] ; then
-            if [ ! -f /tmp/bat-full ] ; then
-                dunstify -r 9990 -t 60000 "Battery Monitor" "Battery full, disconnect from power."
-            fi
-            touch /tmp/bat-full
-        elif [ "$status" = "Charging" ] ; then
-            rm /tmp/bat-low /tmp/bat-crit
-            dunstify --close=9990
-        else 
-            rm /tmp/bat-full
-        fi
+        check_battery_status "$battery"
     done
     sleep 30
 done
+
 
