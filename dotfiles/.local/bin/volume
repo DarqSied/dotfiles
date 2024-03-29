@@ -6,13 +6,11 @@
 function send_notification() {
     volume=$(pamixer --get-volume)
 
-    if [[ $(pactl list short sinks | grep RUNNING) ]]; then
-        output=$(pactl list short sinks | grep RUNNING | awk '{print $2}')
-    else
-        output=$(pactl list short sinks | tail -n 1 | awk '{print $2}')
-    fi
+    sinks=$(pactl list short sinks)
+    output=$(echo "$sinks" | grep RUNNING || echo "$sinks" | tail -n 1)
+    device=$(echo "$output" | awk '{print $2}')
 
-    case "$output" in
+    case "$device" in
         bluez_output.2C_FD_B4_7E_56_E1.1)
             device='BT Neckband'
             ;;
@@ -35,23 +33,22 @@ function send_notification() {
 
 case $1 in
     up)
-        # Set the volume on (if it was muted)
         pamixer --unmute
-        amixer set Master 5%+
+        pamixer --increase 5
         send_notification $1
         ;;
     down)
         pamixer --unmute
-        amixer set Master 5%-
+        pamixer --decrease 5
         send_notification $1
         ;;
     mute)
         pamixer --toggle-mute
-        if [ $(pamixer --get-mute) = true ]; then
+        is_muted=$(pamixer --get-mute)
+        if [ "$is_muted" = true ]; then
             dunstify -i volume-mute -r 9993 -u low "Muted"
         else
             send_notification up
         fi
         ;;
 esac
-
