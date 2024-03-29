@@ -76,46 +76,6 @@ myStartupHook = do
   setWMName "LG3D"
 
 
-myScratchPads :: [NamedScratchpad]
-myScratchPads = [ NS "term" spawnTerm findTerm manageTerm
-                , NS "torr" spawnTorr findTorr manageTorr
-                , NS "sysmon" spawnMon findMon manageMon
-                , NS "mixer" spawnMix findMix manageMix
-                ]
-  where
-    spawnTerm  = myTerminal ++ " -t scratchpad"
-    findTerm   = title =? "scratchpad"
-    manageTerm = customFloating $ W.RationalRect l t w h
-               where
-                 h = 0.9
-                 w = 0.9
-                 t = 0.95 -h
-                 l = 0.95 -w
-    spawnTorr  = myTerminal ++ " -t torr -e transcli"
-    findTorr   = title =? "torr"
-    manageTorr = customFloating $ W.RationalRect l t w h
-               where
-                 h = 0.9
-                 w = 0.9
-                 t = 0.95 -h
-                 l = 0.95 -w
-    spawnMon  = myTerminal ++ " -t sysmon -e btop"
-    findMon   = title =? "sysmon"
-    manageMon = customFloating $ W.RationalRect l t w h
-               where
-                 h = 0.9
-                 w = 0.9
-                 t = 0.95 -h
-                 l = 0.95 -w
-    spawnMix  = myTerminal ++ " -t mixer -e pulsemixer"
-    findMix   = title =? "mixer"
-    manageMix = customFloating $ W.RationalRect l t w h
-               where
-                 h = 0.9
-                 w = 0.9
-                 t = 0.95 -h
-                 l = 0.95 -w
-
 --Makes setting the spacingRaw simpler to write. The spacingRaw module adds a configurable amount of space around windows.
 mySpacing :: Integer -> l a -> XMonad.Layout.LayoutModifier.ModifiedLayout Spacing l a
 mySpacing i = spacingRaw True (Border i i i i) True (Border i i i i) True
@@ -138,6 +98,37 @@ monocle  = renamed [Replace "monocle"]
 floats   = renamed [Replace "floats"]
            $ smartBorders
            $ limitWindows 20 simplestFloat
+
+
+myScratchPads :: [NamedScratchpad]
+myScratchPads =
+  [ createScratchPad "term" "scratchpad" spawnTerm findTerm manageTerm
+  , createScratchPad "torr" "torr" spawnTorr findTorr manageTorr
+  , createScratchPad "sysmon" "sysmon" spawnMon findMon manageMon
+  , createScratchPad "mixer" "mixer" spawnMix findMix manageMix
+  ]
+  where
+    spawnTerm = myTerminal ++ " -t scratchpad"
+    findTerm = title =? "scratchpad"
+    manageTerm = customFloating $ rationalRect 0.05 0.05 0.9 0.9
+
+    spawnTorr = myTerminal ++ " -t torr -e transcli"
+    findTorr = title =? "torr"
+    manageTorr = customFloating $ rationalRect 0.05 0.05 0.9 0.9
+
+    spawnMon = myTerminal ++ " -t sysmon -e btop"
+    findMon = title =? "sysmon"
+    manageMon = customFloating $ rationalRect 0.05 0.05 0.9 0.9
+
+    spawnMix = myTerminal ++ " -t mixer -e pulsemixer"
+    findMix = title =? "mixer"
+    manageMix = customFloating $ rationalRect 0.05 0.05 0.9 0.9
+
+    createScratchPad name title spawnFn findFn manageFn =
+      NS name spawnFn findFn manageFn
+      where
+        rationalRect x y w h = W.RationalRect x y w h
+
 
 -- Theme for showWName which prints current workspace when you change workspaces.
 myShowWNameTheme :: SWNConfig
