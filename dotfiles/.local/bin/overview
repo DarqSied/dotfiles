@@ -3,16 +3,12 @@
 # A script to move the whole functionality of a bar(polybar,lemonbar,etc) away
 # thus eliminating its need and saving screen real estate using notifications
 
+
 ## BATTERY
-# Loop through all attached batteries and format the info
-for battery in /sys/class/power_supply/BAT?*; do
-    # If non-first battery, print a space separator.
-    [ -n "${capacity+x}" ] && printf " "
-    # Prints battery percentage
-    capacity="$(cat "$battery/capacity" 2>&1)"
-    # Sets up the status
-    status="$(cat "$battery/status" 2>&1)"
-done
+# Read battery information
+battery="/sys/class/power_supply/BAT0"
+capacity=$(cat "$battery/capacity" 2>/dev/null)
+status=$(cat "$battery/status" 2>/dev/null)
 
 
 
