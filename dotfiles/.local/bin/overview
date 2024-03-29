@@ -20,6 +20,7 @@ cpu=${cpu%.*}  # Round off to nearest integer
 ## MEMORY
 mem=$(free -h | awk '/Mem:/ {print $3}')
 
+
 traf() {
 ## CONNECTION
     con_type=$(nmcli d | grep -w "connected  " | awk '{print $2}')
@@ -31,14 +32,19 @@ traf() {
     fi
 
 ## NET TRAFFIC
-    if [[ $(nmcli d | grep -w "connected  ") ]]; then
-        GET="cat /proc/net/dev"
-        IF=$(nmcli d | grep -w "connected  " | awk '{print $1}')
-        RX1=`$GET | grep $IF | awk '{print $2}'`; TX1=`$GET | grep $IF | awk '{print $10}'`
-        sleep 1
-        RX2=`$GET | grep $IF | awk '{print $2}'`; TX2=`$GET | grep $IF | awk '{print $10}'`
-        rx=$((($RX2 - $RX1) * 1)); tx=$((($TX2 - $TX1) * 1))
-    fi
+if [[ $(nmcli d | grep -w "connected") ]]; then
+    IF=$(nmcli d | awk '/connected/ {print $1}')
+    rx=$(cat "/sys/class/net/$IF/statistics/rx_bytes")
+    tx=$(cat "/sys/class/net/$IF/statistics/tx_bytes")
+    sleep 1
+    rx=$((($(cat "/sys/class/net/$IF/statistics/rx_bytes") - $rx) / 1024))
+    tx=$((($(cat "/sys/class/net/$IF/statistics/tx_bytes") - $tx) / 1024))
+    int="Connected to $con_type : $con $vpn\nNet Traffic      Up: ${tx}KB   Down: ${rx}KB"
+    dur="2000"
+else
+    int="You are currently offline."
+    dur="8000"
+fi
 
 ## INTERNET
     if [[ $(nmcli d | grep -w "connected  ") ]]; then
