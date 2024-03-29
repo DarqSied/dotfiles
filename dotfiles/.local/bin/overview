@@ -4,73 +4,62 @@
 # thus eliminating its need and saving screen real estate using notifications
 
 
-## BATTERY
-# Read battery information
+# Battery Information
 battery="/sys/class/power_supply/BAT0"
-capacity=$(cat "$battery/capacity" 2>/dev/null)
-status=$(cat "$battery/status" 2>/dev/null)
+read -r capacity status < <(awk '/^POWER_SUPPLY_CAPACITY=/ {print $2}' "$battery/uevent" 2>/dev/null) "$battery/status" 2>/dev/null || capacity="N/A" status="N/A"
 
+# CPU Usage
+cpu_stats_file="/proc/stat"
+cpu_usage() {
+    local user nice system idle iowait irq softirq steal guest guest_nice
+    read -r user nice system idle iowait irq softirq steal guest guest_nice <<<"$(grep '^cpu ' "$cpu_stats_file")"
+    prev_idle=$((idle + iowait))
+    prev_total=$((user + nice + system + idle + iowait + irq + softirq + steal))
+    sleep 0.5
+    read -r user nice system idle iowait irq softirq steal guest guest_nice <<<"$(grep '^cpu ' "$cpu_stats_file")"
+    idle=$((idle + iowait))
+    total=$((user + nice + system + idle + iowait + irq + softirq + steal))
+    echo $((100 * ( (total-prev_total) - (idle-prev_idle) ) / (total-prev_total) ))
+}
 
+# Memory Usage
+mem_info_file="/proc/meminfo"
+mem_usage() {
+    local total free used
+    read -r total free < <(awk '/MemTotal/ {total=$2} /MemFree/ {free=$2} END {print total, free}' "$mem_info_file")
+    echo "${used}KiB / ${total}KiB"
+}
 
-## CPU
-cpu=$(awk '/^cpu / {print ($2+$4)*100/($2+$4+$5)}' /proc/stat)
-cpu=${cpu%.*}  # Round off to nearest integer
-
-
-## MEMORY
-mem=$(free -h | awk '/Mem:/ {print $3}')
-
-
-traf() {
-## CONNECTION
-    con_type=$(nmcli d | grep -w "connected  " | awk '{print $2}')
-    con=$(nmcli d | grep -w "connected  " | awk '{print $NF}')
-    if [[ $(nmcli d | grep -w tun) ]]; then
-        vpn=[V]
-    else
-        vpn=[-]
-    fi
-
-## NET TRAFFIC
-if [[ $(nmcli d | grep -w "connected") ]]; then
-    IF=$(nmcli d | awk '/connected/ {print $1}')
-    rx=$(cat "/sys/class/net/$IF/statistics/rx_bytes")
-    tx=$(cat "/sys/class/net/$IF/statistics/tx_bytes")
-    sleep 1
-    rx=$((($(cat "/sys/class/net/$IF/statistics/rx_bytes") - $rx) / 1024))
-    tx=$((($(cat "/sys/class/net/$IF/statistics/tx_bytes") - $tx) / 1024))
-    int="Connected to $con_type : $con $vpn\nNet Traffic      Up: ${tx}KB   Down: ${rx}KB"
-    dur="2000"
-else
-    int="You are currently offline."
-    dur="8000"
-fi
-
-## INTERNET
-    if [[ $(nmcli d | grep -w "connected  ") ]]; then
-        int=$(echo "Connected to $con_type : $con $vpn\nNet Traffic      Up:$(numfmt --to=iec $tx)B   Down:$(numfmt --to=iec $rx)B")
+# Network Traffic
+net_traffic() {
+    local IF rx tx con_type con vpn int dur
+    if [[ $(nmcli d | grep -w "connected") ]]; then
+        IF=$(nmcli d | awk '/connected/ {print $1}')
+        rx=$(cat "/sys/class/net/$IF/statistics/rx_bytes")
+        tx=$(cat "/sys/class/net/$IF/statistics/tx_bytes")
+        sleep 1
+        rx=$((($(cat "/sys/class/net/$IF/statistics/rx_bytes") - $rx) / 1024))
+        tx=$((($(cat "/sys/class/net/$IF/statistics/tx_bytes") - $tx) / 1024))
+        con_type=$(nmcli d | awk '/connected/ {print $2}')
+        con=$(nmcli d | awk '/connected/ {print $NF}')
+        vpn=$(nmcli d | grep -w tun && echo "[V]" || echo "[-]")
+        int="Connected to $con_type : $con $vpn\nNet Traffic      Up: ${tx}KB   Down: ${rx}KB"
         dur="2000"
     else
-        int=$(echo "You are currently offline.")
+        int="You are currently offline."
         dur="8000"
     fi
+    echo "$int"
 }
 
-
-
-
-run(){
-traf
-dunstify -r 9992 -t $dur "System Overview" "Battery is at $capacity%[$status].
+# Notification
+while true; do
+    cpu=$(cpu_usage)
+    mem=$(mem_usage)
+    int=$(net_traffic)
+    dunstify -r 9992 -t $dur "System Overview" "Battery is at $capacity% [$status].
 CPU usage is $cpu%.
-Memory is at $mem utilization.
-$int
-"
-}
-
-var=0
-while [[ $var -le 5 ]]; do
-    run
-    ((var++))
+Memory is at $mem.
+$int"
+    sleep 1
 done
-exit 1
