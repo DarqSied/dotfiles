@@ -18,9 +18,7 @@ cpu=${cpu%.*}  # Round off to nearest integer
 
 
 ## MEMORY
-mem=$(free --mebi | sed -n '2{p;q}' | awk '{printf ("%.2fGB\n", $3 / 1024)}')
-
-
+mem=$(free -h | awk '/Mem:/ {print $3}')
 
 traf() {
 ## CONNECTION
