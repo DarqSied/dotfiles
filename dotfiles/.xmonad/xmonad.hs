@@ -157,8 +157,11 @@ myLayoutHook = smartBorders $ mouseResize $ windowArrange $ T.toggleLayouts floa
                                                           ||| floats
 
 -- myWorkspaces = [" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", " 9 "]
+myWorkspaces :: [String]
 myWorkspaces = map show [1..6] ++ ["chat", "vid", "vbox" ]
-myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] -- (,) == \x y -> (x,y)
+
+myWorkspaceIndices :: M.Map WorkspaceId (WorkspaceId, Int)
+myWorkspaceIndices = M.fromList $ zipWith (\idx workspace -> (workspace, (workspace, idx))) [1..] myWorkspaces
 
 -- clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
 --     where i = fromJust $ M.lookup ws myWorkspaceIndices
