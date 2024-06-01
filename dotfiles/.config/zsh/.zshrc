@@ -9,7 +9,7 @@ stty stop undef		# Disable ctrl-s to freeze terminal.
 zle_highlight=('paste:none')
 
 # completions
-autoload -Uz compinit
+#autoload -Uz compinit
 zstyle ':completion:*' menu select=2 list-colors
 # zstyle ':completion::complete:lsof:*' menu yes select
 zmodload zsh/complist
