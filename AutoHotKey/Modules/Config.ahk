@@ -1,0 +1,71 @@
+﻿; ==============================================================================
+; [ MODULE: CONFIGURATION AND SETUP ] - GLOBAL CONSTANTS & PATHS
+; ==============================================================================
+
+; --- VDA & System Variables ---
+global VDA_PATH := A_ScriptDir "\VirtualDesktopAccessor.dll"
+global hVDA := 0
+global LastDriveInsertTime := 0
+global TargetDesktopCount := 9
+global TaskbarShouldBeHidden := true
+global GlobalTitleBarsHidden := true
+global IsAwake := false
+
+; --- Window Classes ---
+global TASKBAR_WND := "ahk_class Shell_TrayWnd"
+global SECONDARY_TASKBAR_WND := "ahk_class Shell_SecondaryTrayWnd"
+
+; --- Hot Corner Configurations ---
+global CornerTolerance := 15  ; Pixels from the absolute corner to trigger action
+global CornerInterval := 100  ; Milliseconds between mouse position checks
+global LastCorner := "None"   ; Tracks current corner to prevent spamming
+
+; --- PWA Exclusion List ---
+global PWATitles := ["YouTube", "Netflix", "Crunchyroll", "Hotstar", "Prime Video", "Spotify"]
+
+; --- Smart Auto-Routing Dictionary ---
+global AppRoutingMap := Map(
+    "vscodium.exe", 1,
+    "githubdesktop.exe", 1,
+    "windowsterminal.exe", 1,
+    "pwsh.exe", 1,
+    "cmd.exe", 1,
+    "sumatrapdf.exe", 1,
+    "discord.exe", 2,
+    "whatsapp.exe", 2,
+    "applicationframehost.exe", {desk: "SKIP", titleRules: Map("WhatsApp", 2)},
+    "steam.exe", 3,
+    "riotclientux.exe", 3,
+    "upc.exe", 3,
+    "eadesktop.exe", 3,
+    "playnite.desktopapp.exe", 3,
+    "playnite.fullscreenapp.exe", 3,
+    "bmaac.exe", 3,
+    "batmanak.exe", 3,
+    "farcry6.exe", 3,
+    "cs2.exe", 3,
+    "csgo.exe", 3,
+    "re8.exe", 3,
+    "bfv.exe", 3,
+    "among us.exe", 3,
+    "leagueclientux.exe", 3,
+    "league of legends.exe", 3,
+    "valorant.exe", 3,
+    "valorant-win64-shipping.exe", 3,
+    "zen.exe", {desk: 4, titleRules: Map("Private", 6, "Incognito", 6)},
+    "vivaldi.exe", {desk: 4, titleRules: Map("Private", 6, "Incognito", 6)},
+    "deluge.exe", 7,
+    "syncthing.exe", 7,
+    "potplayer64.exe", 8,
+    "foobar2000.exe", 8
+)
+
+; ------------------------------------------------------------------------------
+; THE PWA VAULT & MEDIA PWA TARGETS
+; ------------------------------------------------------------------------------
+global PWAVault := Map()
+
+for title in PWATitles {
+    GroupAdd("MediaPWAs", title)
+}
+
