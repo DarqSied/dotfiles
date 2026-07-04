@@ -1,11 +1,8 @@
-    -- Base
+-- Base
 import XMonad
-import System.Directory
-import System.IO (hPutStrLn)
-import System.Exit (exitSuccess)
 import qualified XMonad.StackSet as W
 
-    -- Actions
+-- Actions
 import XMonad.Actions.CopyWindow (kill1)
 import XMonad.Actions.CycleWS (Direction1D(..), moveTo, shiftTo, WSType(..), nextScreen, prevScreen)
 import XMonad.Actions.MouseResize
@@ -14,30 +11,19 @@ import XMonad.Actions.RotSlaves (rotSlavesDown, rotAllDown)
 import XMonad.Actions.WindowGo (runOrRaise)
 import XMonad.Actions.WithAll (sinkAll, killAll)
 
-    -- Data
-import Data.Char (isSpace, toUpper)
-import Data.Maybe (fromJust)
-import Data.Monoid
-import Data.Maybe (isJust)
-import Data.Tree
-import qualified Data.Map as M
-
-    -- Hooks
-import XMonad.Hooks.DynamicLog (dynamicLogWithPP, wrap, shorten, PP(..))
-import XMonad.Hooks.EwmhDesktops  -- for some fullscreen events, also for xcomposite in obs.
--- import XMonad.Hooks.ManageDocks (avoidStruts, docks, manageDocks, ToggleStruts(..))
+-- Hooks
+import XMonad.Hooks.DynamicLog (dynamicLogWithPP, PP(..))
+import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat, doCenterFloat)
--- import XMonad.Hooks.StatusBar 
--- import XMonad.Hooks.StatusBar.PP
 import XMonad.Hooks.ServerMode
 import XMonad.Hooks.SetWMName
 import XMonad.Hooks.WorkspaceHistory
 
-    -- Layouts
+-- Layouts
 import XMonad.Layout.SimplestFloat
 import XMonad.Layout.ResizableTile
 
-    -- Layouts modifiers
+-- Layouts modifiers
 import XMonad.Layout.LayoutModifier
 import XMonad.Layout.LimitWindows (limitWindows, increaseLimit, decreaseLimit)
 import XMonad.Layout.MultiToggle (mkToggle, single, EOT(EOT), (??))
@@ -53,10 +39,10 @@ import XMonad.Layout.WindowNavigation
 import qualified XMonad.Layout.ToggleLayouts as T (toggleLayouts, ToggleLayout(Toggle))
 import qualified XMonad.Layout.MultiToggle as MT (Toggle(..))
 
-   -- Utilities
+-- Utilities
 import XMonad.Util.EZConfig (additionalKeysP)
 import XMonad.Util.NamedScratchpad
-import XMonad.Util.Run (runProcessWithInput, safeSpawn, spawnPipe)
+import XMonad.Util.Run (spawnPipe)
 import XMonad.Util.SpawnOnce
 
 myFont :: String
@@ -90,46 +76,6 @@ myStartupHook = do
   setWMName "LG3D"
 
 
-myScratchPads :: [NamedScratchpad]
-myScratchPads = [ NS "term" spawnTerm findTerm manageTerm
-                , NS "torr" spawnTorr findTorr manageTorr
-                , NS "sysmon" spawnMon findMon manageMon
-                , NS "mixer" spawnMix findMix manageMix
-                ]
-  where
-    spawnTerm  = myTerminal ++ " -t scratchpad"
-    findTerm   = title =? "scratchpad"
-    manageTerm = customFloating $ W.RationalRect l t w h
-               where
-                 h = 0.9
-                 w = 0.9
-                 t = 0.95 -h
-                 l = 0.95 -w
-    spawnTorr  = myTerminal ++ " -t torr -e transcli"
-    findTorr   = title =? "torr"
-    manageTorr = customFloating $ W.RationalRect l t w h
-               where
-                 h = 0.9
-                 w = 0.9
-                 t = 0.95 -h
-                 l = 0.95 -w
-    spawnMon  = myTerminal ++ " -t sysmon -e btop"
-    findMon   = title =? "sysmon"
-    manageMon = customFloating $ W.RationalRect l t w h
-               where
-                 h = 0.9
-                 w = 0.9
-                 t = 0.95 -h
-                 l = 0.95 -w
-    spawnMix  = myTerminal ++ " -t mixer -e pulsemixer"
-    findMix   = title =? "mixer"
-    manageMix = customFloating $ W.RationalRect l t w h
-               where
-                 h = 0.9
-                 w = 0.9
-                 t = 0.95 -h
-                 l = 0.95 -w
-
 --Makes setting the spacingRaw simpler to write. The spacingRaw module adds a configurable amount of space around windows.
 mySpacing :: Integer -> l a -> XMonad.Layout.LayoutModifier.ModifiedLayout Spacing l a
 mySpacing i = spacingRaw True (Border i i i i) True (Border i i i i) True
@@ -153,6 +99,37 @@ floats   = renamed [Replace "floats"]
            $ smartBorders
            $ limitWindows 20 simplestFloat
 
+
+myScratchPads :: [NamedScratchpad]
+myScratchPads =
+  [ createScratchPad "term" "scratchpad" spawnTerm findTerm manageTerm
+  , createScratchPad "torr" "torr" spawnTorr findTorr manageTorr
+  , createScratchPad "sysmon" "sysmon" spawnMon findMon manageMon
+  , createScratchPad "mixer" "mixer" spawnMix findMix manageMix
+  ]
+  where
+    spawnTerm = myTerminal ++ " -t scratchpad"
+    findTerm = title =? "scratchpad"
+    manageTerm = customFloating $ rationalRect 0.05 0.05 0.9 0.9
+
+    spawnTorr = myTerminal ++ " -t torr -e transcli"
+    findTorr = title =? "torr"
+    manageTorr = customFloating $ rationalRect 0.05 0.05 0.9 0.9
+
+    spawnMon = myTerminal ++ " -t sysmon -e btop"
+    findMon = title =? "sysmon"
+    manageMon = customFloating $ rationalRect 0.05 0.05 0.9 0.9
+
+    spawnMix = myTerminal ++ " -t mixer -e pulsemixer"
+    findMix = title =? "mixer"
+    manageMix = customFloating $ rationalRect 0.05 0.05 0.9 0.9
+
+    createScratchPad name title spawnFn findFn manageFn =
+      NS name spawnFn findFn manageFn
+      where
+        rationalRect x y w h = W.RationalRect x y w h
+
+
 -- Theme for showWName which prints current workspace when you change workspaces.
 myShowWNameTheme :: SWNConfig
 myShowWNameTheme = def
@@ -171,8 +148,11 @@ myLayoutHook = smartBorders $ mouseResize $ windowArrange $ T.toggleLayouts floa
                                                           ||| floats
 
 -- myWorkspaces = [" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", " 9 "]
+myWorkspaces :: [String]
 myWorkspaces = map show [1..6] ++ ["chat", "vid", "vbox" ]
-myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] -- (,) == \x y -> (x,y)
+
+myWorkspaceIndices :: M.Map WorkspaceId (WorkspaceId, Int)
+myWorkspaceIndices = M.fromList $ zipWith (\idx workspace -> (workspace, (workspace, idx))) [1..] myWorkspaces
 
 -- clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
 --     where i = fromJust $ M.lookup ws myWorkspaceIndices
