@@ -14,4 +14,9 @@ dotfiles/.config/transmission-daemon/dht.dat
 dotfiles/.config/transmission-daemon/stats.json
 dotfiles/.config/transmission/seen
 
+# --- C Build Artifacts ---
+*.o
+dotfiles/.config/dwm/dwm
+dotfiles/.config/dwmblocks/dwmblocks
+
 dotfiles/.config/spotify
