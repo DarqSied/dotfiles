@@ -9,7 +9,7 @@ stty stop undef		# Disable ctrl-s to freeze terminal.
 zle_highlight=('paste:none')
 
 # completions
-autoload -Uz compinit
+#autoload -Uz compinit
 zstyle ':completion:*' menu select=2 list-colors
 # zstyle ':completion::complete:lsof:*' menu yes select
 zmodload zsh/complist
@@ -34,11 +34,12 @@ zsh_add_file "zsh-aliases"
 zsh_add_file "zsh-prompt"
 
 # Plugins
-zsh_add_plugin "zsh-users/zsh-autosuggestions"
+#zsh_add_plugin "zsh-users/zsh-autosuggestions"
 zsh_add_plugin "zsh-users/zsh-syntax-highlighting"
 zsh_add_plugin "zsh-users/zsh-completions"
 zsh_add_plugin "hlissner/zsh-autopair"
 zsh_add_plugin "MichaelAquilina/zsh-you-should-use"
+zsh_add_plugin "marlonrichert/zsh-autocomplete"
 
 # For more plugins: https://github.com/unixorn/awesome-zsh-plugins
 # More completions https://github.com/zsh-users/zsh-completions

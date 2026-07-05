@@ -1,44 +1,54 @@
 #!/usr/bin/env bash
 
-#Simple script to connect to bt-devices without gui fluf
+#Simple script to connect to bt-devices without gui fluff.
 
-device=$(bluetoothctl info | head -1 | awk '{print $2}')
-status=$(bluetooth | awk '{print $3}')
-key=$(bluetoothctl info | head -1 | awk '{print $1}')
+# Function to retrieve Bluetooth device information
+get_bluetooth_info() {
+    bluetooth_info=$(bluetoothctl info)
+    device=$(echo "$bluetooth_info" | awk '/Device/ {print $2}')
+    status=$(echo "$bluetooth_info" | awk '/Powered/ {print $2}')
+}
 
-if [ "$key" == "Device" ] ; then
-    bluetoothctl disconnect $device
-    bluetoothctl power off
-    # systemctl --user stop pulseaudio
-    if [ "$status" == "on" ] ; then
-        rfkill block bluetooth
+# Function to connect to a Bluetooth device
+connect_device() {
+    mac=$1
+    bluetoothctl connect "$mac"
+    return $?
+}
+
+# Function to display a menu and select a Bluetooth device
+select_device() {
+    devices=("BT Neckband:2C:FD:B4:7E:56:E1" "Attic Speaker:24:CF:24:10:2E:AB" "Buds 2:34:F0:43:4F:F5:6E")
+    menu=$(printf '%s\n' "${devices[@]}" | rofi -dmenu -i -p "Paired Devices ")
+    selected_device=$(echo "$menu" | cut -d ':' -f 2)
+    echo "$selected_device"
+}
+
+# Main function
+main() {
+    get_bluetooth_info
+
+    if [ "$device" == "Device" ]; then
+        bluetoothctl disconnect "$device"
+        bluetoothctl power off
+        if [ "$status" == "yes" ]; then
+            rfkill block bluetooth
+        fi
+        dunstify -u low -r 9995 "Bluetooth" "Bluetooth devices have been disconnected"
+    else
+        mac=$(select_device)
+        if [ "$status" == "no" ]; then
+            rfkill unblock bluetooth
+        fi
+        bluetoothctl power on
+        connect_device "$mac"
+        while [ $? -ne 0 ]; do
+            connect_device "$mac"
+        done
+        amixer sset Master 50%
+        dunstify -u low -r 9995 "Bluetooth" "Bluetooth devices are now connected"
     fi
-    dunstify -u low -r 9995 "Bluetooth" "Bluetooth devices have been disconnected" 
-else
-    menu=$(printf '%s\n' "BT Neckband" "Attic Speaker" "Buds 2" | rofi -dmenu -i -p "Paired Devices ")
+}
 
-    case "$menu" in
-      "BT Neckband") 
-        mac="2C:FD:B4:7E:56:E1"
-        ;;
-      "Attic Speaker")
-        mac="24:CF:24:10:2E:AB"
-        ;;
-      "Buds 2")
-        mac="34:F0:43:4F:F5:6E"
-        ;;
-    esac
-
-    if [ "$status" == "off" ] ; then
-        rfkill unblock bluetooth
-    fi
-    # systemctl --user start pulseaudio
-    bluetoothctl power on
-    bluetoothctl connect $mac
-    while [ $? -ne 0 ]; do
-        bluetoothctl connect $mac
-    done
-    amixer sset Master 50%
-    dunstify -u low -r 9995 "Bluetooth" "Bluetooth devices are now connected" 
-fi
-
+# Execute main function
+main
