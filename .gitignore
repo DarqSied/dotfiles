@@ -1,2 +1,16 @@
 dotfiles/.config/ncspot/userstate.cbor
 
+# --- Xmonad Junk ---
+dotfiles/.xmonad/*.hi
+dotfiles/.xmonad/build-x86_64-linux/
+dotfiles/.xmonad/xmonad.errors
+
+# --- Spotify Private Data ---
+dotfiles/.config/spotify/Users/
+
+# --- Transmission State & Torrents ---
+dotfiles/.config/transmission-daemon/resume/
+dotfiles/.config/transmission-daemon/dht.dat
+dotfiles/.config/transmission-daemon/stats.json
+dotfiles/.config/transmission/seen
+
