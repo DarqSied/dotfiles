@@ -174,7 +174,6 @@ $^!PrintScreen::PerformCapture("Scrolling")   ; Ctrl + Alt + PrintScreen -> Shar
     switch GetLeaderInput() {
         case "s": ToggleScratchpad("taskmgr.exe", "ahk_exe Taskmgr.exe")                                ; S: SysMon
         case "m": ToggleScratchpad("sndvol.exe", "ahk_exe sndvol.exe")                                  ; M: Mixer
-        case "d": ToggleScratchpad("explorer.exe shell:Downloads", "Downloads ahk_class CabinetWClass") ; D: Downloads
     }
 }
 
