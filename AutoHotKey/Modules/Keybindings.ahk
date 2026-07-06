@@ -6,7 +6,11 @@
 ; [ HOTKEYS: INSTANT ACTIONS & WINDOW/DESKTOP MANAGEMENT ]
 ; ------------------------------------------------------------------------------
 ; --- Window & Workspace Destruction ---
-#q::Send("!{F4}")                                                                 ; Win+Q: Close Current App
+#q::                                                                              ; Win+Q: Close Current App
+{
+    Send("{Blind}{vkE8}")
+    Send("!{F4}")
+}
 #+q::KillAllOnCurrentDesktop()                                                    ; Win+Shift+Q: Kill Entire Workspace
 
 ; --- Terminals & Command Line ---

@@ -35,7 +35,7 @@ ProcessSetPriority("High") ; Give AHK enough CPU priority to beat the DWM render
     if (!activeHwnd)
         return
         
-    Send("{Blind}{LWin up}{RWin up}{Alt up}{Ctrl up}{Shift up}")
+    Send("{Blind}{vkE8}{LWin up}{RWin up}{Alt up}{Ctrl up}{Shift up}")
     Sleep(50) 
     
     Send("^!x")

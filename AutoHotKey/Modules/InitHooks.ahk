@@ -110,3 +110,44 @@ EnforceTitleBarState(hwnd) {
 }
 
 ForceWindowRecalculation(hwnd) => DllCall("SetWindowPos", "Ptr", hwnd, "Ptr", 0, "Int", 0, "Int", 0, "Int", 0, "Int", 0, "UInt", 0x0027)
+
+
+; ------------------------------------------------------------------------------
+; GLOBAL FOCUS TRACKER (KERNEL-LEVEL WINEVENT HOOK)
+; ------------------------------------------------------------------------------
+; Shell Hooks are blind to custom docks (Tool Windows). This kernel hook tracks 
+; literal foreground changes at the OS level, meaning nothing can hide from it.
+
+Global FocusHookProc := CallbackCreate(OnForegroundChange, "F")
+
+Global hWinEventHook := DllCall("SetWinEventHook"
+    , "UInt", 0x0003, "UInt", 0x0003
+    , "Ptr", 0, "Ptr", FocusHookProc
+    , "UInt", 0, "UInt", 0, "UInt", 0)
+
+OnForegroundChange(hHook, event, hwnd, idObject, idChild, idEventThread, dwmsEventTime) {
+    try {
+        activeExe := WinGetProcessName("ahk_id " hwnd)
+        activeClass := WinGetClass("ahk_id " hwnd)
+        
+        if (activeExe = "Microsoft.CmdPal.UI.exe" || activeClass = "Shell_TrayWnd") {
+            SetTimer(ForceDesktopFocus, -50) ; Asynchronous bounce
+        }
+    }
+}
+
+ForceDesktopFocus() {
+    try {
+        WinActivate("ahk_class WorkerW")
+        ControlFocus("SysListView321", "ahk_class WorkerW")
+    } catch {
+        try {
+            WinActivate("ahk_class Progman")
+            ControlFocus("SysListView321", "ahk_class Progman")
+        }
+    }
+    
+    if (WinActive("ahk_exe Microsoft.CmdPal.UI.exe")) {
+        Send("!{Esc}")
+    }
+}
