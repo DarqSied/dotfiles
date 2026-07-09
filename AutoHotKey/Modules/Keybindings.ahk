@@ -202,6 +202,7 @@ $#s:: {
         case "k": FlowSearch("kill")         ; K: Process Killer
         case "u": FlowSearch("up")           ; U: AppUpgrader
         case "s": FlowSearch(">")            ; S: Shell
+        case "v": FlowSearch("cb")           ; V: Clipboard History
         case "p": FlowSearch("pm")           ; P: Plugins Manager
         case "x": FlowSearch("uni")          ; X: Uninstaller+
         case "w": FlowSearch("ww")           ; W: Window Walker
