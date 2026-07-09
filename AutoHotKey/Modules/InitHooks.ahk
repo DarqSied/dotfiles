@@ -66,15 +66,27 @@ EnforceTaskbarVisibility() {
     if (TaskbarShouldBeHidden) {
         try WinHide(TASKBAR_WND)
         try WinHide(SECONDARY_TASKBAR_WND)
+        if ProcessExist("translucenttb.exe") {
+            ProcessClose("translucenttb.exe")
+        }
     } else {
         try WinShow(TASKBAR_WND)
         try WinShow(SECONDARY_TASKBAR_WND)
+        if !ProcessExist("translucenttb.exe") {
+            try {
+                Run('cmd.exe /c start "" "ttb.exe"', "", "Hide")
+            } catch {
+            }
+        }
     }
 }
 
 RestoreTaskbar(ExitReason, ExitCode) {
     try WinShow(TASKBAR_WND)
     try WinShow(SECONDARY_TASKBAR_WND)
+    if !ProcessExist("translucenttb.exe") {
+        try Run('cmd.exe /c start "" "ttb.exe"', "", "Hide")
+    }
 }
 
 ToggleAllTitleBars() {
