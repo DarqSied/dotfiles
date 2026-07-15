@@ -31,7 +31,7 @@ The `dwm` source code is embedded directly in `.config/dwm/`[cite: 1]. It featur
 | :--- | :--- | :--- |
 | **Emulator** | `alacritty` | GPU-accelerated terminal configured via `.config/alacritty/`[cite: 1]. |
 | **Shell** | `zsh` | Core aliases, exports, and functions split into modular files in `.config/zsh/`[cite: 1]. |
-| **Prompt** | `Oh My Posh` | Uses the custom `capr4n.omp.json` theme for a fast, informative prompt[cite: 1]. |
+| **Prompt** | `Oh My Zsh` | Uses a custom theme for a fast, informative prompt[cite: 1]. |
 | **Plugins** | Custom | Includes `zsh-autosuggestions`, `zsh-syntax-highlighting`, and `zsh-you-should-use`[cite: 1]. |
 
 ---
