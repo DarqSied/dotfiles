@@ -180,3 +180,18 @@ SortSyncthingFiles() {
         }
     }
 }
+
+; ------------------------------------------------------------------------------
+; Current Screenshots folder Access
+; ------------------------------------------------------------------------------
+OpenMonthlyScreenshots(*) {
+    currentMonth := FormatTime(, "yyyy-MM")
+    targetDir := "C:\Users\himan\Downloads\Synced\Screenshots\" currentMonth
+    
+    if DirExist(targetDir) {
+        Run('explore "' targetDir '"')
+    } else {
+        ; Assuming your Notify() function is globally accessible via Utilities.ahk
+        Notify("Directory Missing", "No screenshots folder exists for " currentMonth " yet.")
+    }
+}

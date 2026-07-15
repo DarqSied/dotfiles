@@ -127,17 +127,7 @@
 #!f::Run('explore "C:\Users\himan\Downloads\Synced"') ; Win + Alt + F -> Open Root Syncthing Folder
 #!a::Run('explore "' A_ScriptDir '"')                 ; Win + Alt + A -> Open AutoHotkey Script Directory
 
-#!s::                                                 ; Win + Alt + S -> Open Current Month's Screenshots
-{
-    currentMonth := FormatTime(, "yyyy-MM")
-    targetDir := "C:\Users\himan\Downloads\Synced\Screenshots\" currentMonth
-    
-    if DirExist(targetDir) {
-        Run('explore "' targetDir '"')
-    } else {
-        Notify("Directory Missing", "No screenshots folder exists for " currentMonth " yet.")
-    }
-}
+#!s::OpenMonthlyScreenshots()                         ; Win + Alt + S -> Open Current Month's Screenshots
 
 ; ------------------------------------------------------------------------------
 ; [ HYBRID SCREENSHOT ENGINE TRIGGERS ]

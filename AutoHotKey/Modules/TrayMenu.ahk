@@ -21,7 +21,7 @@ BuildTrayMenu() {
     A_TrayMenu.Add() ; Separator line
 
     ; 4. Add Quick Directories (Update path to match your screenshots folder)
-    A_TrayMenu.Add("📸 Open Screenshots", (*) => Run(A_MyDocuments "\Screenshots"))
+    A_TrayMenu.Add("📸 Open Screenshots", OpenMonthlyScreenshots)
     
     A_TrayMenu.Add() ; Separator line
 

@@ -56,9 +56,14 @@ AutoRouteWindow(hwnd) {
         
         ; 4. Map Routing
         if (processName == "explorer.exe" and windowClass == "CabinetWClass") {
+            ; A. Standard USB Drive insertion
             if (A_TickCount - LastDriveInsertTime < 5000) {
                 targetDesk := 6 
                 LastDriveInsertTime := 0 
+            }
+            ; B. Android Storage Share (MTP or Network)
+            else if (InStr(windowTitle, "Internal shared storage") || InStr(windowTitle, "Himanshu's S25+")) {
+                targetDesk := 6
             }
         }
         else if (AppRoutingMap.Has(processName)) {
