@@ -69,11 +69,11 @@ stow -t ~ dotfiles
 
 #Recompiling Suckless Binaries
 #Whenever changes are made to the config.def.h or source .c files in dwm or dwmblocks, they must be recompiled[cite: 1].
-#Bash
 
+#Bash
 ## Compile and install dwm
-#cd ~/.config/dwm
-#sudo make clean install
+cd ~/.config/dwm
+sudo make clean install
 ## Compile and install dwmblocks
-#cd ~/.config/dwmblocks
-#sudo make clean install
+cd ~/.config/dwmblocks
+sudo make clean install
