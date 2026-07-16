@@ -52,6 +52,20 @@ OnDeviceArrival(wParam, lParam, msg, hwnd) {
 }
 
 ; ------------------------------------------------------------------------------
+; Modernize UI & Force Dark Mode for Native Menus (AHK v2)
+; ------------------------------------------------------------------------------
+; 1. Get the memory handle for the uxtheme library
+hTheme := DllCall("GetModuleHandle", "Str", "uxtheme", "Ptr")
+
+; 2. Extract the specific memory pointers for the undocumented ordinals
+SetAppMode := DllCall("GetProcAddress", "Ptr", hTheme, "Ptr", 135, "Ptr")
+FlushMenu  := DllCall("GetProcAddress", "Ptr", hTheme, "Ptr", 136, "Ptr")
+
+; 3. Execute the pointers
+DllCall(SetAppMode, "Int", 2) ; 2 = Force Dark Mode
+DllCall(FlushMenu)
+
+; ------------------------------------------------------------------------------
 ; System Styling & Hooks (Taskbar, Titlebars)
 ; ------------------------------------------------------------------------------
 ToggleTaskbar() {
@@ -163,3 +177,31 @@ ForceDesktopFocus() {
         Send("!{Esc}")
     }
 }
+
+; ------------------------------------------------------------------------------
+; UWP Startup Sniper (Background Apps)
+; ------------------------------------------------------------------------------
+SnipeUWPApps() {
+    ; Negative timers (-10) fire exactly once, asynchronously. 
+    ; This ensures WinWait doesn't freeze your hotkeys while waiting for the apps to boot.
+    SetTimer(HideWhatsApp, -10)
+    SetTimer(HidePhoneLink, -10)
+}
+
+HideWhatsApp() {
+    ; Wait up to 20 seconds for the app to appear
+    if WinWait("WhatsApp",, 20) {
+        Sleep(800) ; Wait for the XAML engine to replace the splash screen
+        WinClose("WhatsApp") ; Dismiss to the system tray
+    }
+}
+
+HidePhoneLink() {
+    if WinWait("Phone Link",, 20) {
+        Sleep(800)
+        WinClose("Phone Link") 
+    }
+}
+
+; Engage the sniper on engine startup
+SnipeUWPApps()

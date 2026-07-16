@@ -38,7 +38,7 @@ AutoRouteWindow(hwnd) {
         windowTitle := WinGetTitle(hwnd)
         
         if (windowTitle = "Picture in picture" or windowTitle = "Picture-in-Picture") {
-            WinSetAlwaysOnTop(-1, hwnd)
+            WinSetAlwaysOnTop(1, hwnd)
             DllCall(VDA_PATH "\PinWindow", "Ptr", hwnd)
             return 
         }
@@ -101,55 +101,172 @@ AutoRouteWindow(hwnd) {
 ; ------------------------------------------------------------------------------
 LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "vivaldi.exe") {
     global hVDA, PWAVault
-    
+    if !IsSet(PWAVault)
+        PWAVault := Map()
+        
     savedTitleMode := A_TitleMatchMode
     savedHiddenMode := A_DetectHiddenWindows 
-    
     SetTitleMatchMode(1) 
     searchString := appName . " ahk_class Chrome_WidgetWin_1"
-    
     DetectHiddenWindows(true) 
     
+    targetHwnd := 0
+    
     if (PWAVault.Has(appName) && WinExist("ahk_id " . PWAVault[appName])) {
-        tH := PWAVault[appName]
-        
-        WinSetExStyle("-0x80", tH)
-        WinShow(tH)
-        DllCall("ShowWindow", "Ptr", tH, "Int", 9) ; SW_RESTORE
-        WinActivate(tH)
-        
+        targetHwnd := PWAVault[appName]
+        WinSetExStyle("-0x80", targetHwnd)
+        WinShow(targetHwnd)
+        DllCall("ShowWindow", "Ptr", targetHwnd, "Int", 9) ; SW_RESTORE
+        WinActivate(targetHwnd)
         Notify("Media Resumed", appName " ready.")
+        Run(browser ' --app="' url '"') 
     }
     else {
-        targetHwnd := WinExist(searchString)
-        
-        if (targetHwnd) {
+        if (foundHwnd := WinExist(searchString)) {
+            targetHwnd := foundHwnd
             WinSetExStyle("-0x80", targetHwnd)
             WinShow(targetHwnd)
             DllCall("ShowWindow", "Ptr", targetHwnd, "Int", 9)
             WinActivate(targetHwnd)
             Notify("Media Recovered", appName " found in background.")
+            Run(browser ' --app="' url '"') 
         }
         else {
-            Run(browser ' ' url ' --start-maximized')
+            ; Record the currently active window
+            oldActive := WinActive("A")
+            Run(browser ' --app="' url '" --start-maximized')
             
-            if not WinWait(searchString, , 6) {
+            ; THE FIX: Dynamically wait for a completely NEW window to take focus
+            Loop 60 {
+                Sleep(100)
+                active := WinActive("ahk_class Chrome_WidgetWin_1")
+                if (active && active != oldActive) {
+                    targetHwnd := active
+                    break
+                }
+            }
+            
+            if (!targetHwnd) {
                 Notify("Launch Error", appName " took too long.", true)
                 SetTitleMatchMode(savedTitleMode)
                 DetectHiddenWindows(savedHiddenMode)
                 return
             }
-            targetHwnd := WinExist(searchString)
         }
         
         PWAVault[appName] := targetHwnd
-        if (hVDA && targetHwnd) {
+    }
+    
+    if (targetHwnd) {
+        Sleep(200) ; Give the PWA frame a fraction of a second to render
+        if (IsSet(hVDA) && hVDA) {
             MoveAndGoToDesktop(targetHwnd, targetDesktop)
         }
     }
     
     SetTitleMatchMode(savedTitleMode)
     DetectHiddenWindows(savedHiddenMode)
+}
+
+; ------------------------------------------------------------------------------
+; PWA Auto-Interceptor (Media Only)
+; ------------------------------------------------------------------------------
+GroupAdd("MediaPWAs", "Crunchyroll - Vivaldi")
+GroupAdd("MediaPWAs", "JioHotstar - Vivaldi")
+GroupAdd("MediaPWAs", "Netflix - Vivaldi")
+GroupAdd("MediaPWAs", "Prime Video - Vivaldi")
+GroupAdd("MediaPWAs", "Spotify - Vivaldi")
+GroupAdd("MediaPWAs", "YouTube - Vivaldi")
+
+SetTimer(CatchAndEject, 400)
+global PwaBlacklist := Map() ; Keeps track of stubborn PWA windows
+
+CatchAndEject() {
+    if (activeHwnd := WinActive("ahk_group MediaPWAs")) {
+        global PWAVault, PwaBlacklist
+        
+        ; 1. Abort instantly if this window is in the Blacklist
+        if (IsSet(PwaBlacklist) && PwaBlacklist.Has(activeHwnd))
+            return
+            
+        ; 2. Abort if this window is safely tracked in the Vault
+        if IsSet(PWAVault) {
+            for app, vaultHwnd in PWAVault {
+                if (activeHwnd == vaultHwnd)
+                    return
+            }
+        }
+
+        SetTimer(CatchAndEject, 0)
+        Sleep(800) 
+        
+        ; Make sure the user didn't Alt+Tab away while we waited
+        if !WinActive("ahk_id " . activeHwnd) {
+            SetTimer(CatchAndEject, 400)
+            return
+        }
+        
+        SavedClip := A_Clipboard
+        TargetURL := ""
+        
+        Loop 3 {
+            A_Clipboard := ""
+            Send("!{Space}") 
+            Sleep(50)
+            Send("{Esc}")    
+            Sleep(50)
+            Send("^l")
+            Sleep(150)
+            Send("^c")
+            
+            if ClipWait(0.8) {
+                TargetURL := Trim(A_Clipboard, " `t`r`n")
+                if InStr(TargetURL, "http") 
+                    break
+            }
+        }
+        
+        ; THE FIX: If it failed, this is a PWA! Blacklist it and abort silently.
+        if (TargetURL = "" || !InStr(TargetURL, "http")) {
+            if !IsSet(PwaBlacklist)
+                PwaBlacklist := Map()
+            PwaBlacklist[activeHwnd] := true 
+            
+            A_Clipboard := SavedClip
+            SetTimer(CatchAndEject, 400)
+            return
+        }
+        
+        Send("^w")
+        A_Clipboard := SavedClip
+        Sleep(400) 
+        
+        if RegExMatch(TargetURL, "^(https?://|www\.)[^\s]+") {
+            static pwaMap := Map(
+                "youtube.com", "YouTube", "youtu.be", "YouTube",
+                "spotify.com", "Spotify", "netflix.com", "Netflix",
+                "crunchyroll.com", "Crunchyroll", "hotstar.com", "Hotstar",
+                "primevideo.com", "Prime Video"
+            )
+            
+            targetTitle := ""
+            for domain, title in pwaMap {
+                if InStr(TargetURL, domain) {
+                    targetTitle := title
+                    break
+                }
+            }
+            
+            if (targetTitle != "") {
+                LaunchWebAppToDesktop(TargetURL, targetTitle, 8)
+            } else {
+                Notify("Interceptor Failed", "Media domain not found in map.", true)
+            }
+        }
+        
+        Sleep(1000)
+        SetTimer(CatchAndEject, 400)
+    }
 }
 
 ; ------------------------------------------------------------------------------

@@ -195,3 +195,40 @@ OpenMonthlyScreenshots(*) {
         Notify("Directory Missing", "No screenshots folder exists for " currentMonth " yet.")
     }
 }
+
+; ------------------------------------------------------------------------------
+; Search Engine Menu
+; ------------------------------------------------------------------------------
+ShowSearchEngineMenu() {
+    SearchMenu := Menu()
+    
+    ; --- General & AI ---
+    SearchMenu.Add("&G. Google", (*) => FlowSearch("g"))
+    SearchMenu.Add("&A. Gemini", (*) => FlowSearch("gem"))
+    SearchMenu.Add("D&u. DuckDuckGo", (*) => FlowSearch("duckduckgo"))
+    SearchMenu.Add("&W. Wikipedia", (*) => FlowSearch("wiki"))
+    SearchMenu.Add() ; Separator
+    
+    ; --- Dev & Design ---
+    SearchMenu.Add("&H. GitHub", (*) => FlowSearch("gh"))
+    SearchMenu.Add("G&i. GitHub Gist", (*) => FlowSearch("gist"))
+    SearchMenu.Add("S&v. SVG Repo", (*) => FlowSearch("svg"))
+    SearchMenu.Add() ; Separator
+    
+    ; --- Media & Community ---
+    SearchMenu.Add("&Y. YouTube", (*) => FlowSearch("yt"))
+    SearchMenu.Add("&R. Reddit", (*) => FlowSearch("re"))
+    SearchMenu.Add("&J. JustWatch", (*) => FlowSearch("jw"))
+    SearchMenu.Add() ; Separator
+    
+    ; --- Google Suite ---
+    SearchMenu.Add("&M. Google Maps", (*) => FlowSearch("maps"))
+    SearchMenu.Add("&D. Google Drive", (*) => FlowSearch("gd"))
+    SearchMenu.Add("&E. Gmail", (*) => FlowSearch("gm")) ; E for Email
+    SearchMenu.Add("&I. Google Images", (*) => FlowSearch("gi"))
+    SearchMenu.Add("&T. Google Translate", (*) => FlowSearch("translate"))
+    SearchMenu.Add("S&c. Google Scholar", (*) => FlowSearch("sc"))
+    
+    ; Show the menu at the current mouse cursor position
+    SearchMenu.Show()
+}

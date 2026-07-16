@@ -189,19 +189,26 @@ $#s:: {
 ; ------------------------------------------------------------------------------
 #f:: {
     switch GetLeaderInput() {
-        case "k": FlowSearch("kill")         ; K: Process Killer
-        case "u": FlowSearch("up")           ; U: AppUpgrader
-        case "s": FlowSearch(">")            ; S: Shell
-        case "v": FlowSearch("cb")           ; V: Clipboard History
-        case "p": FlowSearch("pm")           ; P: Plugins Manager
-        case "x": FlowSearch("uni")          ; X: Uninstaller+
-        case "w": FlowSearch("ww")           ; W: Window Walker
-        case "b": FlowSearch("b")            ; B: Browser Bookmarks
-        case "g": FlowSearch("g")            ; G: Web Searches
-        case "y": FlowSearch("pn")           ; Y: Playnite
-        case "a": FlowSearch("al")           ; A: AniList
-        case "d": FlowSearch("d")            ; D: Dictionary
-        case "c": FlowSearch("dc")           ; C: Date Calculator
+        ; --- System & OS Management ---
+        case "w": FlowSearch("ww")       ; W: Window Walker
+        case "k": FlowSearch("kill")     ; K: Process Killer
+        case "s": FlowSearch(">")        ; S: Shell Commands
+        case "x": FlowSearch("uni")      ; X: Uninstaller+
+        case "u": FlowSearch("up")       ; U: AppUpgrader
+        case "i": FlowSearch("ws")       ; I: Windows Settings
+        case "t": FlowSearch("startup")  ; T: Windows Startup
+        case "p": FlowSearch("pm")       ; P: Plugins Manager
+
+        ; --- Web, Media & Gaming ---
+        case "g": ShowSearchEngineMenu() ; G: Web Searches
+        case "b": FlowSearch("b")        ; B: Browser Bookmarks
+        case "y": FlowSearch("pn")       ; Y: Playnite
+
+        ; --- Utilities & AI ---
+        case "c": FlowSearch("dc")       ; C: Date Calculator
+        case "d": FlowSearch("d")        ; D: Dictionary
+        case "r": FlowSearch("ud")       ; R: Urban Dictionary 
+        case "l": FlowSearch("lm")       ; L: LM Studio Assistant
     }
 }
 
