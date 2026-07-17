@@ -112,6 +112,9 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "vivaldi.exe") {
     
     targetHwnd := 0
     
+    ; SMART CHECK: Is this a raw web link from the Interceptor, or a local hotkey shortcut?
+    isWebLink := RegExMatch(url, "^(https?://|www\.)")
+    
     if (PWAVault.Has(appName) && WinExist("ahk_id " . PWAVault[appName])) {
         targetHwnd := PWAVault[appName]
         WinSetExStyle("-0x80", targetHwnd)
@@ -119,7 +122,11 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "vivaldi.exe") {
         DllCall("ShowWindow", "Ptr", targetHwnd, "Int", 9) ; SW_RESTORE
         WinActivate(targetHwnd)
         Notify("Media Resumed", appName " ready.")
-        Run(browser ' --app="' url '"') 
+        
+        ; THE FIX: Only force navigation if we intercepted a new movie link!
+        if (isWebLink) {
+            Run(browser ' --app="' url '"') 
+        }
     }
     else {
         if (foundHwnd := WinExist(searchString)) {
@@ -129,14 +136,22 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "vivaldi.exe") {
             DllCall("ShowWindow", "Ptr", targetHwnd, "Int", 9)
             WinActivate(targetHwnd)
             Notify("Media Recovered", appName " found in background.")
-            Run(browser ' --app="' url '"') 
+            
+            if (isWebLink) {
+                Run(browser ' --app="' url '"') 
+            }
         }
         else {
-            ; Record the currently active window
             oldActive := WinActive("A")
-            Run(browser ' --app="' url '" --start-maximized')
             
-            ; THE FIX: Dynamically wait for a completely NEW window to take focus
+            ; THE FIX: If it's a web link, force PWA mode. If it's a hotkey shortcut, run normally.
+            if (isWebLink) {
+                Run(browser ' --app="' url '" --start-maximized')
+            } else {
+                Run(browser ' ' url ' --start-maximized')
+            }
+            
+            ; Dynamically wait for a completely NEW window to take focus
             Loop 60 {
                 Sleep(100)
                 active := WinActive("ahk_class Chrome_WidgetWin_1")
