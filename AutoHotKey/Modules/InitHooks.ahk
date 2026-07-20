@@ -179,6 +179,46 @@ ForceDesktopFocus() {
 }
 
 ; ------------------------------------------------------------------------------
+; YouTube PWA Auto-Focus Clear (Phantom Focus & Cursor Fix)
+; ------------------------------------------------------------------------------
+global LastYouTubeTitle := ""
+
+SetTimer(ClearYouTubeFocus, 1000)
+
+ClearYouTubeFocus() {
+    global LastYouTubeTitle
+    
+    if (activeHwnd := WinActive("ahk_class Chrome_WidgetWin_1")) {
+        currentTitle := WinGetTitle(activeHwnd)
+        
+        if InStr(currentTitle, "YouTube") {
+            
+            if (LastYouTubeTitle != "" && currentTitle != LastYouTubeTitle) {
+                
+                ; Give YouTube 2 seconds to render the new player UI
+                Sleep(2000)
+                
+                ; --- THE FIX: The Center Wiggle ---
+                ; Move to dead center, wiggle by 1 pixel to force the browser 
+                ; to register active movement, then completely stop. 
+                ; The cursor will fade naturally 3 seconds later.
+                CoordMode("Mouse", "Screen")
+                centerX := A_ScreenWidth / 2
+                centerY := A_ScreenHeight / 2
+                
+                MouseMove(centerX, centerY, 0)
+                Sleep(50)
+                MouseMove(centerX + 1, centerY + 1, 0)
+            }
+            
+            LastYouTubeTitle := currentTitle
+        }
+    } else {
+        LastYouTubeTitle := ""
+    }
+}
+
+; ------------------------------------------------------------------------------
 ; UWP Startup Sniper (Background Apps)
 ; ------------------------------------------------------------------------------
 SnipeUWPApps() {

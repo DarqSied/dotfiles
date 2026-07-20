@@ -193,13 +193,46 @@ GroupAdd("MediaPWAs", "Prime Video - Vivaldi")
 GroupAdd("MediaPWAs", "Spotify - Vivaldi")
 GroupAdd("MediaPWAs", "YouTube - Vivaldi")
 
+global PwaBlacklist := Map() 
+global PrivateHwnds := Map() ; Permanent memory for Private Window IDs
+
+; ------------------------------------------------------------------------------
+; THE FIX: OS-Level Shell Hook (Tracks Private Windows automatically)
+; ------------------------------------------------------------------------------
+DllCall("RegisterShellHookWindow", "Ptr", A_ScriptHwnd)
+OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), TrackPrivateWindows)
+
+; Catch any private windows that are currently open on their Start Page
+for hwnd in WinGetList("ahk_exe vivaldi.exe") {
+    try {
+        if InStr(WinGetTitle(hwnd), "Private") || InStr(WinGetTitle(hwnd), "Incognito")
+            PrivateHwnds[hwnd] := true
+    }
+}
+
+TrackPrivateWindows(wParam, lParam, msg, hwnd) {
+    ; wParam 1 = Window Created | wParam 6 = Window Title Redrawn
+    if (wParam == 1 || wParam == 6) {
+        try {
+            title := WinGetTitle("ahk_id " lParam)
+            if InStr(title, "Private") || InStr(title, "Incognito") {
+                global PrivateHwnds
+                PrivateHwnds[lParam] := true ; Tag this unique window ID permanently
+            }
+        }
+    }
+}
+
 SetTimer(CatchAndEject, 400)
-global PwaBlacklist := Map() ; Keeps track of stubborn PWA windows
 
 CatchAndEject() {
     if (activeHwnd := WinActive("ahk_group MediaPWAs")) {
-        global PWAVault, PwaBlacklist
+        global PWAVault, PwaBlacklist, PrivateHwnds
         
+        ; 0. Exempt tracked Private Windows instantly
+        if (IsSet(PrivateHwnds) && PrivateHwnds.Has(activeHwnd))
+            return
+            
         ; 1. Abort instantly if this window is in the Blacklist
         if (IsSet(PwaBlacklist) && PwaBlacklist.Has(activeHwnd))
             return
@@ -241,7 +274,7 @@ CatchAndEject() {
             }
         }
         
-        ; THE FIX: If it failed, this is a PWA! Blacklist it and abort silently.
+        ; If it failed, this is a PWA! Blacklist it and abort silently.
         if (TargetURL = "" || !InStr(TargetURL, "http")) {
             if !IsSet(PwaBlacklist)
                 PwaBlacklist := Map()
