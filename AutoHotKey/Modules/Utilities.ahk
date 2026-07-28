@@ -46,7 +46,9 @@ GetLeaderInput() {
 
 PasteAsPlain() {
     savedClip := ClipboardAll() 
-    A_Clipboard := A_Clipboard  
+    plainText := A_Clipboard
+    A_Clipboard := ""
+    A_Clipboard := plainText
     
     if ClipWait(1, 1) {
         Send("^v")
@@ -224,7 +226,7 @@ ShowSearchEngineMenu() {
     ; --- Google Suite ---
     SearchMenu.Add("&M. Google Maps", (*) => FlowSearch("maps"))
     SearchMenu.Add("&D. Google Drive", (*) => FlowSearch("gd"))
-    SearchMenu.Add("&E. Gmail", (*) => FlowSearch("gm")) ; E for Email
+    SearchMenu.Add("&E. Gmail", (*) => FlowSearch("gm"))
     SearchMenu.Add("&I. Google Images", (*) => FlowSearch("gi"))
     SearchMenu.Add("&T. Google Translate", (*) => FlowSearch("translate"))
     SearchMenu.Add("S&c. Google Scholar", (*) => FlowSearch("sc"))

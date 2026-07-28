@@ -25,11 +25,9 @@ Initialize() {
     }
     
     hVDA := DllCall("LoadLibrary", "Str", VDA_PATH, "Ptr")
-    WinWait(TASKBAR_WND, , 10) 
-    Sleep(1000)
     
-    try WinHide TASKBAR_WND
-    try WinHide SECONDARY_TASKBAR_WND
+    ApplyTaskbarProcesses()
+    
     SetTimer(EnforceTaskbarVisibility, 500)
     SetTimer(SortSyncthingFiles, 10000)
 
@@ -70,29 +68,39 @@ DllCall(FlushMenu)
 ; ------------------------------------------------------------------------------
 ToggleTaskbar() {
     global TaskbarShouldBeHidden := !TaskbarShouldBeHidden
+    ApplyTaskbarProcesses()
+}
+
+ApplyTaskbarProcesses() {
+    global TaskbarShouldBeHidden
+    
+    if (TaskbarShouldBeHidden) {
+        if ProcessExist("translucenttb.exe")
+            ProcessClose("translucenttb.exe")
+    } else {
+        if !ProcessExist("translucenttb.exe") {
+            try Run('cmd.exe /c start "" "ttb.exe"', "", "Hide")
+        }
+    }
+    
     EnforceTaskbarVisibility()
 }
 
 EnforceTaskbarVisibility() {
     global TaskbarShouldBeHidden, TASKBAR_WND, SECONDARY_TASKBAR_WND
+    
+    prevDetectTaskbar := A_DetectHiddenWindows
     DetectHiddenWindows(true)
     
     if (TaskbarShouldBeHidden) {
         try WinHide(TASKBAR_WND)
         try WinHide(SECONDARY_TASKBAR_WND)
-        if ProcessExist("translucenttb.exe") {
-            ProcessClose("translucenttb.exe")
-        }
     } else {
         try WinShow(TASKBAR_WND)
         try WinShow(SECONDARY_TASKBAR_WND)
-        if !ProcessExist("translucenttb.exe") {
-            try {
-                Run('cmd.exe /c start "" "ttb.exe"', "", "Hide")
-            } catch {
-            }
-        }
     }
+    
+    DetectHiddenWindows(prevDetectTaskbar)
 }
 
 RestoreTaskbar(ExitReason, ExitCode) {
@@ -153,11 +161,17 @@ Global hWinEventHook := DllCall("SetWinEventHook"
 
 OnForegroundChange(hHook, event, hwnd, idObject, idChild, idEventThread, dwmsEventTime) {
     try {
-        activeExe := WinGetProcessName("ahk_id " hwnd)
         activeClass := WinGetClass("ahk_id " hwnd)
         
-        if (activeExe = "Microsoft.CmdPal.UI.exe" || activeClass = "Shell_TrayWnd") {
-            SetTimer(ForceDesktopFocus, -50) ; Asynchronous bounce
+        if (activeClass = "Shell_TrayWnd") {
+            SetTimer(ForceDesktopFocus, -50)
+            return
+        }
+        
+        activeExe := WinGetProcessName("ahk_id " hwnd)
+        
+        if (activeExe = "Microsoft.CmdPal.UI.exe") {
+            SetTimer(ForceDesktopFocus, -50)
         }
     }
 }
@@ -188,31 +202,22 @@ SetTimer(ClearYouTubeFocus, 1000)
 ClearYouTubeFocus() {
     global LastYouTubeTitle
     
-    if (activeHwnd := WinActive("ahk_class Chrome_WidgetWin_1")) {
+    if (activeHwnd := WinActive("YouTube ahk_class Chrome_WidgetWin_1")) {
         currentTitle := WinGetTitle(activeHwnd)
         
-        if InStr(currentTitle, "YouTube") {
+        if (LastYouTubeTitle != "" && currentTitle != LastYouTubeTitle) {
             
-            if (LastYouTubeTitle != "" && currentTitle != LastYouTubeTitle) {
-                
-                ; Give YouTube 2 seconds to render the new player UI
-                Sleep(2000)
-                
-                ; --- THE FIX: The Center Wiggle ---
-                ; Move to dead center, wiggle by 1 pixel to force the browser 
-                ; to register active movement, then completely stop. 
-                ; The cursor will fade naturally 3 seconds later.
-                CoordMode("Mouse", "Screen")
-                centerX := A_ScreenWidth / 2
-                centerY := A_ScreenHeight / 2
-                
-                MouseMove(centerX, centerY, 0)
-                Sleep(50)
-                MouseMove(centerX + 1, centerY + 1, 0)
-            }
+            Sleep(2000)
+            CoordMode("Mouse", "Screen")
+            centerX := A_ScreenWidth / 2
+            centerY := A_ScreenHeight / 2
             
-            LastYouTubeTitle := currentTitle
+            MouseMove(centerX, centerY, 0)
+            Sleep(50)
+            MouseMove(centerX + 1, centerY + 1, 0)
         }
+        
+        LastYouTubeTitle := currentTitle
     } else {
         LastYouTubeTitle := ""
     }
@@ -222,24 +227,35 @@ ClearYouTubeFocus() {
 ; UWP Startup Sniper (Background Apps)
 ; ------------------------------------------------------------------------------
 SnipeUWPApps() {
-    ; Negative timers (-10) fire exactly once, asynchronously. 
-    ; This ensures WinWait doesn't freeze your hotkeys while waiting for the apps to boot.
-    SetTimer(HideWhatsApp, -10)
-    SetTimer(HidePhoneLink, -10)
+    SetTimer(HideWhatsApp, 1000)
+    SetTimer(HidePhoneLink, 1000)
 }
 
 HideWhatsApp() {
-    ; Wait up to 20 seconds for the app to appear
-    if WinWait("WhatsApp",, 20) {
-        Sleep(800) ; Wait for the XAML engine to replace the splash screen
-        WinClose("WhatsApp") ; Dismiss to the system tray
+    static attemptsWA := 0
+    attemptsWA++
+    
+    if WinExist("WhatsApp") {
+        Sleep(800) 
+        WinClose("WhatsApp") 
+        SetTimer(HideWhatsApp, 0)
+    } 
+    else if (attemptsWA >= 20) {
+        SetTimer(HideWhatsApp, 0)
     }
 }
 
 HidePhoneLink() {
-    if WinWait("Phone Link",, 20) {
+    static attemptsPL := 0
+    attemptsPL++
+    
+    if WinExist("Phone Link") {
         Sleep(800)
         WinClose("Phone Link") 
+        SetTimer(HidePhoneLink, 0) 
+    } 
+    else if (attemptsPL >= 20) {
+        SetTimer(HidePhoneLink, 0) 
     }
 }
 

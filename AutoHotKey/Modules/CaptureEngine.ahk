@@ -26,7 +26,7 @@ PerformCapture(mode) {
     }
     
     ; 3. The Watchdog: Wait up to 120 seconds for clipboard data
-    if ClipWait(120, 1) {
+    if ClipWait(10, 1) {
         
         Sleep(300) ; Brief buffer to let the clipboard finalize the image data
         

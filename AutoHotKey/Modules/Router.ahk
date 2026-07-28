@@ -15,19 +15,12 @@ AutoRouteWindow(hwnd) {
         processName := StrLower(WinGetProcessName(hwnd))
         windowClass := WinGetClass(hwnd)
         
-        ; 1. Browser Polling Loop
+        ; 1. Asynchronous Browser Polling 
         if (processName == "vivaldi.exe" || processName == "zen.exe") {
-            Loop 25 { 
-                if (!WinExist(hwnd)) {
-                    return 
-                }
-                
-                windowTitle := WinGetTitle(hwnd)
-                
-                if (InStr(windowTitle, "Private") || InStr(windowTitle, "Incognito")) {
-                    break
-                }
-                Sleep(40) ; 25 loops * 40ms = 1000ms max wait for normal windows
+            windowTitle := WinGetTitle(hwnd)
+            if (!InStr(windowTitle, "Private") && !InStr(windowTitle, "Incognito") && !InStr(windowTitle, "- Vivaldi") && !InStr(windowTitle, "- Zen Browser")) {
+                SetTimer(AutoRouteWindow.Bind(hwnd), -50) 
+                return
             }
         }
         
