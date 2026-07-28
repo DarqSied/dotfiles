@@ -70,6 +70,20 @@
 #p::ToggleAlwaysOnTop()                                    ; Win+P: Toggle Always-on-Top
 #+g::ToggleGhostMode()                                     ; Win+Shift+G: Semi-transparent & click-through
 
+; --- Status Bar Show Desktop Fix ---
+~#d:: {                                                    ; Win+D: Show Desktop Status Bar Fix
+    static desktopToggled := false
+    desktopToggled := !desktopToggled
+    
+    if (desktopToggled) {
+        Sleep(150) ; Buffer for the DWM animation
+        if WinExist("PowerDock ahk_exe Microsoft.CmdPal.UI.exe") {
+            WinShow("PowerDock ahk_exe Microsoft.CmdPal.UI.exe")
+            WinMoveTop("PowerDock ahk_exe Microsoft.CmdPal.UI.exe")
+        }
+    }
+}
+
 ; --- Desktop Creation & Deletion (System Level) ---
 #^n::Send("#^d")                                           ; Win+Ctrl+N: Create new virtual desktop
 #^q::Send("#^{F4}")                                        ; Win+Ctrl+Q: Delete current virtual desktop
@@ -144,7 +158,7 @@ $^!PrintScreen::PerformCapture("Scrolling")   ; Ctrl + Alt + PrintScreen -> Shar
 #a:: {
     switch GetLeaderInput() {
         case "f": Run('"C:\Users\himan\Desktop\Files\foobar2000\foobar2000.exe"')        ; F: foobar2000
-        case "c": LaunchWebAppToDesktop("--app-id=hjlhbeffadgkonmpnblkfmhckmocohah", "Crunchyroll - Watch Popular Anime", 8) ; C: Crunchyroll
+        case "c": LaunchWebAppToDesktop("--app-id=hjlhbeffadgkonmpnblkfmhckmocohah", "Crunchyroll", 8) ; C: Crunchyroll
         case "j": LaunchWebAppToDesktop("--app-id=bhelhlfglkopjlgmhjfejnkibbfgemcf", "JioHotstar", 8)                        ; J: JioHotstar
         case "n": LaunchWebAppToDesktop("--app-id=eppojlglocelodeimnohnlnionkobfln", "Netflix", 8)                           ; N: Netflix
         case "p": LaunchWebAppToDesktop("--app-id=igpjbmoihojghddcmflmgeeadjkanlij", "Prime Video", 8)                       ; P: Prime Video

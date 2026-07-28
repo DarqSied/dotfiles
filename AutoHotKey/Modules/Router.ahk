@@ -104,6 +104,16 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "vivaldi.exe") {
     if !IsSet(PWAVault)
         PWAVault := Map()
         
+    ; Maps your exact app names to their installed Chromium IDs
+    static AppIdMap := Map(
+        "Crunchyroll", "--app-id=hjlhbeffadgkonmpnblkfmhckmocohah",
+        "JioHotstar", "--app-id=bhelhlfglkopjlgmhjfejnkibbfgemcf",
+        "Netflix", "--app-id=eppojlglocelodeimnohnlnionkobfln",
+        "Prime Video", "--app-id=igpjbmoihojghddcmflmgeeadjkanlij",
+        "Spotify", "--app-id=pjibgclleladliembfgfagdaldikeohf",
+        "YouTube", "--app-id=agimnkijcaahngcdmfeangaknmldooml"
+    )
+        
     savedTitleMode := A_TitleMatchMode
     savedHiddenMode := A_DetectHiddenWindows 
     SetTitleMatchMode(1) 
@@ -112,23 +122,45 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "vivaldi.exe") {
     
     targetHwnd := 0
     
-    ; SMART CHECK: Is this a raw web link from the Interceptor, or a local hotkey shortcut?
+    ; Determine if this is an intercepted video or just a standard hotkey launch
     isWebLink := RegExMatch(url, "^(https?://|www\.)")
     
+    ; ==========================================================================
+    ; SCENARIO 1: The App is already running in the background
+    ; ==========================================================================
     if (PWAVault.Has(appName) && WinExist("ahk_id " . PWAVault[appName])) {
         targetHwnd := PWAVault[appName]
+        
+        if (isWebLink) {
+            ; --- THE VISUAL PROMPT ---
+            SwitchConfirm := MsgBox("A new link was intercepted.`n`nSwitch to this new video instead of the one currently playing in " appName "?", "Confirm Switch", "YesNo IconQuestion")
+            
+            if (SwitchConfirm == "No") {
+                SetTitleMatchMode(savedTitleMode)
+                DetectHiddenWindows(savedHiddenMode)
+                return ; Abort the switch entirely
+            }
+        }
+        
+        ; Bring the existing PWA to the front
         WinSetExStyle("-0x80", targetHwnd)
         WinShow(targetHwnd)
         DllCall("ShowWindow", "Ptr", targetHwnd, "Int", 9) ; SW_RESTORE
         WinActivate(targetHwnd)
+        WinWaitActive(targetHwnd, , 2)
         Notify("Media Resumed", appName " ready.")
         
-        ; THE FIX: Only force navigation if we intercepted a new movie link!
+        ; Force the window to navigate to the new video
         if (isWebLink) {
-            Run(browser ' --app="' url '"') 
+            Sleep(200) 
+            InjectURL(url)
         }
-    }
+    } 
+    ; ==========================================================================
+    ; SCENARIO 2: The App is NOT running (Cold Boot)
+    ; ==========================================================================
     else {
+        ; Check if it exists untracked
         if (foundHwnd := WinExist(searchString)) {
             targetHwnd := foundHwnd
             WinSetExStyle("-0x80", targetHwnd)
@@ -138,20 +170,22 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "vivaldi.exe") {
             Notify("Media Recovered", appName " found in background.")
             
             if (isWebLink) {
-                Run(browser ' --app="' url '"') 
+                Sleep(200)
+                InjectURL(url)
             }
         }
         else {
             oldActive := WinActive("A")
             
-            ; THE FIX: If it's a web link, force PWA mode. If it's a hotkey shortcut, run normally.
-            if (isWebLink) {
-                Run(browser ' --app="' url '" --start-maximized')
+            ; Launch using the App ID to preserve the Vivaldi UI
+            if (AppIdMap.Has(appName)) {
+                Run(browser ' ' AppIdMap[appName] ' --start-maximized')
             } else {
+                ; Fallback (Hotkeys pass the ID as the URL natively)
                 Run(browser ' ' url ' --start-maximized')
             }
             
-            ; Dynamically wait for a completely NEW window to take focus
+            ; Dynamically wait for the NEW window to take focus
             Loop 60 {
                 Sleep(100)
                 active := WinActive("ahk_class Chrome_WidgetWin_1")
@@ -167,13 +201,20 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "vivaldi.exe") {
                 DetectHiddenWindows(savedHiddenMode)
                 return
             }
+            
+            ; Wait for the UI to fully render, then push the specific video URL
+            if (isWebLink && AppIdMap.Has(appName)) {
+                Sleep(1200) ; Extra buffer for cold boots
+                InjectURL(url)
+            }
         }
         
         PWAVault[appName] := targetHwnd
     }
     
+    ; 3. Desktop Routing Execution
     if (targetHwnd) {
-        Sleep(200) ; Give the PWA frame a fraction of a second to render
+        Sleep(200) 
         if (IsSet(hVDA) && hVDA) {
             MoveAndGoToDesktop(targetHwnd, targetDesktop)
         }
@@ -181,6 +222,25 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "vivaldi.exe") {
     
     SetTitleMatchMode(savedTitleMode)
     DetectHiddenWindows(savedHiddenMode)
+}
+
+; ------------------------------------------------------------------------------
+; Helper: Forces a chromeless/PWA window to navigate using keyboard injection
+; ------------------------------------------------------------------------------
+InjectURL(targetUrl) {
+    savedClip := ClipboardAll()
+    A_Clipboard := targetUrl
+    
+    if ClipWait(1) {
+        ; Ctrl+L is the universal Chromium shortcut to focus the address bar. 
+        ; Even if the bar is hidden, Chromium will catch this and prep for input!
+        Send("^l")    
+        Sleep(150)
+        Send("^v")    ; Paste the new link
+        Sleep(50)
+        Send("{Enter}") ; Go!
+    }
+    A_Clipboard := savedClip
 }
 
 ; ------------------------------------------------------------------------------
@@ -197,7 +257,7 @@ global PwaBlacklist := Map()
 global PrivateHwnds := Map() ; Permanent memory for Private Window IDs
 
 ; ------------------------------------------------------------------------------
-; THE FIX: OS-Level Shell Hook (Tracks Private Windows automatically)
+; OS-Level Shell Hook (Tracks Private Windows automatically)
 ; ------------------------------------------------------------------------------
 DllCall("RegisterShellHookWindow", "Ptr", A_ScriptHwnd)
 OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), TrackPrivateWindows)
@@ -209,6 +269,28 @@ for hwnd in WinGetList("ahk_exe vivaldi.exe") {
             PrivateHwnds[hwnd] := true
     }
 }
+
+; Catch any PWAs already running when the script starts to prevent friendly-fire
+; Save the old state and turn on X-Ray vision to see other Virtual Desktops
+prevDetectMode := A_DetectHiddenWindows
+DetectHiddenWindows(true) 
+
+if IsSet(PWAVault) && IsSet(PWATitles) {
+    for hwnd in WinGetList("ahk_group MediaPWAs") {
+        try {
+            title := WinGetTitle(hwnd)
+            for _, appName in PWATitles {
+                if InStr(title, appName) {
+                    PWAVault[appName] := hwnd
+                    break
+                }
+            }
+        }
+    }
+}
+
+; Restore standard vision so we don't break other scripts
+DetectHiddenWindows(prevDetectMode)
 
 TrackPrivateWindows(wParam, lParam, msg, hwnd) {
     ; wParam 1 = Window Created | wParam 6 = Window Title Redrawn
