@@ -302,6 +302,25 @@ SetTimer(CatchAndEject, 400)
 
 CatchAndEject() {
     if (activeHwnd := WinActive("ahk_group MediaPWAs")) {
+        
+        ; --- THE FIX: STRICT TITLE SANITY CHECK ---
+        ; Prevents AI chats and Google searches from triggering the URL extraction
+        windowTitle := WinGetTitle(activeHwnd)
+        isValidMedia := false
+        
+        global PWATitles
+        if IsSet(PWATitles) {
+            for _, appName in PWATitles {
+                if RegExMatch(windowTitle, "i)(^| - )" appName "($| - )") {
+                    isValidMedia := true
+                    break
+                }
+            }
+        }
+        
+        if (!isValidMedia)
+            return
+            
         global PWAVault, PwaBlacklist, PrivateHwnds
         
         ; 0. Exempt tracked Private Windows instantly

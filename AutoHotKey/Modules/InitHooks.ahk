@@ -135,10 +135,10 @@ EnforceTitleBarState(hwnd) {
         return
 
     try {
-        if (WinGetTitle(hwnd) = "" || WinGetClass(hwnd) ~= "^(Progman|WorkerW|Shell_TrayWnd|CabinetWClass|Chrome_WidgetWin_1)$")
+        if (WinGetTitle(hwnd) = "" || WinGetClass(hwnd) ~= "^(Progman|WorkerW|Shell_TrayWnd|CabinetWClass|Chrome_WidgetWin_1|Notepad|ApplicationFrameWindow)$")
              return
          
-        WinSetStyle(GlobalTitleBarsHidden ? "-0xC00000" : "+0xC00000", hwnd)
+        WinSetStyle(GlobalTitleBarsHidden ? "-0xC40000" : "+0xC40000", hwnd)
         ForceWindowRecalculation(hwnd)
     }
 }

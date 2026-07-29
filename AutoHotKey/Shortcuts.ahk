@@ -7,25 +7,23 @@
 A_MenuMaskKey := "vkE8"
 ProcessSetPriority("High") ; Give AHK enough CPU priority to beat the DWM render delay
 
-; --- 1. Load Configurations & Core Engine ---
+; Load Configurations & Core Engine
 #Include "%A_ScriptDir%\Modules\Config.ahk"
 #Include "%A_ScriptDir%\Modules\InitHooks.ahk"
 #Include "%A_ScriptDir%\Modules\Utilities.ahk"
 #Include "%A_ScriptDir%\Modules\TrayMenu.ahk"
 
-; --- 2. Load Function Libraries ---
+; Load Function Libraries
 #Include "%A_ScriptDir%\Modules\CaptureEngine.ahk"
 #Include "%A_ScriptDir%\Modules\Router.ahk"
 #Include "%A_ScriptDir%\Modules\WindowManager.ahk"
 #Include "%A_ScriptDir%\Modules\Cheatsheet.ahk"
 
-; --- 3. Load Triggers (Hotstrings & Keybindings) ---
+; Load Triggers (Hotstrings & Keybindings)
 #Include "%A_ScriptDir%\Modules\Hotstrings.ahk"
 #Include "%A_ScriptDir%\Modules\Keybindings.ahk"
 
-; ------------------------------------------------------------------------------
 ; Helper: Verify if the active window is an officially launched PWA
-; ------------------------------------------------------------------------------
 IsVaultedPWA(hwnd) {
     global PWAVault
     if IsSet(PWAVault) {
@@ -37,10 +35,8 @@ IsVaultedPWA(hwnd) {
     return false
 }
 
-; ------------------------------------------------------------------------------
 ; SUSPEND & HIDE INTERCEPTOR
-; ------------------------------------------------------------------------------
-; Now only triggers if the window is in the MediaPWAs group AND inside the Vault
+; Only triggers if the window is in the MediaPWAs group AND inside the Vault
 #HotIf WinActive("ahk_group MediaPWAs") && IsVaultedPWA(WinExist("A"))
 
 $#q::  ; The '$' forces AHK to only respond to physical key presses
@@ -63,7 +59,5 @@ $^w::
 }
 #HotIf
 
-; ------------------------------------------------------------------------------
 ; BOOT SEQUENCE
-; ------------------------------------------------------------------------------
 Initialize()
