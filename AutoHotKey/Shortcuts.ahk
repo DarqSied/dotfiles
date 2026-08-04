@@ -23,6 +23,10 @@ ProcessSetPriority("High") ; Give AHK enough CPU priority to beat the DWM render
 #Include "%A_ScriptDir%\Modules\Hotstrings.ahk"
 #Include "%A_ScriptDir%\Modules\Keybindings.ahk"
 
+; Load Automations
+#Include "%A_ScriptDir%\Modules\FocusEngine.ahk"
+#Include "%A_ScriptDir%\Modules\BatteryMonitor.ahk"
+
 ; Helper: Verify if the active window is an officially launched PWA
 IsVaultedPWA(hwnd) {
     global PWAVault

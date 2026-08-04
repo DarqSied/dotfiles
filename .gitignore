@@ -20,3 +20,6 @@ dotfiles/.config/dwm/dwm
 dotfiles/.config/dwmblocks/dwmblocks
 
 dotfiles/.config/spotify
+
+AutoHotKey/Modules/FocusEngine.ahk
+AutoHotKey/CAT_State.ini
