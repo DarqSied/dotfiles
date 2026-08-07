@@ -30,6 +30,9 @@ Initialize() {
     
     SetTimer(EnforceTaskbarVisibility, 500)
     SetTimer(SortSyncthingFiles, 10000)
+    SetTimer(CheckSystemUptime, 3600000) 
+    SetTimer(ClearYouTubeFocus, 1000)    
+    SnipeUWPApps()
 
     DllCall("RegisterShellHookWindow", "Ptr", A_ScriptHwnd)
     OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), OnWindowCreated)
@@ -148,9 +151,6 @@ ForceWindowRecalculation(hwnd) => DllCall("SetWindowPos", "Ptr", hwnd, "Ptr", 0,
 ; ------------------------------------------------------------------------------
 ; SYSTEM UPTIME WATCHDOG
 ; ------------------------------------------------------------------------------
-; Check the system uptime every 1 hour (3,600,000 milliseconds)
-SetTimer(CheckSystemUptime, 3600000)
-
 CheckSystemUptime() {
     ; Set your maximum allowed uptime (e.g., 72 hours)
     ; 48 hours = 72 * 60 * 60 * 1000 = 259,200,000 ms
@@ -228,8 +228,6 @@ ForceDesktopFocus() {
 ; ------------------------------------------------------------------------------
 global LastYouTubeTitle := ""
 
-SetTimer(ClearYouTubeFocus, 1000)
-
 ClearYouTubeFocus() {
     global LastYouTubeTitle
     
@@ -289,6 +287,3 @@ HidePhoneLink() {
         SetTimer(HidePhoneLink, 0) 
     }
 }
-
-; Engage the sniper on engine startup
-SnipeUWPApps()

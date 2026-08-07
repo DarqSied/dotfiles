@@ -237,54 +237,62 @@ InjectURL(targetUrl) {
 }
 
 ; ------------------------------------------------------------------------------
-; PWA Auto-Interceptor (Media Only)
+; PWA Auto-Interceptor & Router Initialization
 ; ------------------------------------------------------------------------------
-GroupAdd("MediaPWAs", "Crunchyroll - Vivaldi")
-GroupAdd("MediaPWAs", "JioHotstar - Vivaldi")
-GroupAdd("MediaPWAs", "Netflix - Vivaldi")
-GroupAdd("MediaPWAs", "Prime Video - Vivaldi")
-GroupAdd("MediaPWAs", "Spotify - Vivaldi")
-GroupAdd("MediaPWAs", "YouTube - Vivaldi")
-
 global PwaBlacklist := Map() 
 global PrivateHwnds := Map() ; Permanent memory for Private Window IDs
 
-; ------------------------------------------------------------------------------
-; OS-Level Shell Hook (Tracks Private Windows automatically)
-; ------------------------------------------------------------------------------
-DllCall("RegisterShellHookWindow", "Ptr", A_ScriptHwnd)
-OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), TrackPrivateWindows)
+InitRouter() ; Execute the boot sequence
 
-; Catch any private windows that are currently open on their Start Page
-for hwnd in WinGetList("ahk_exe vivaldi.exe") {
-    try {
-        if InStr(WinGetTitle(hwnd), "Private") || InStr(WinGetTitle(hwnd), "Incognito")
-            PrivateHwnds[hwnd] := true
+InitRouter() {
+    global PWATitles, PWAVault, PrivateHwnds
+
+    ; 1. Dynamically build the MediaPWAs group based on your Config array
+    if IsSet(PWATitles) {
+        for _, appName in PWATitles {
+            GroupAdd("MediaPWAs", appName " - Vivaldi")
+        }
     }
-}
-
-; Catch any PWAs already running when the script starts to prevent friendly-fire
-; Save the old state and turn on X-Ray vision to see other Virtual Desktops
-prevDetectMode := A_DetectHiddenWindows
-DetectHiddenWindows(true) 
-
-if IsSet(PWAVault) && IsSet(PWATitles) {
-    for hwnd in WinGetList("ahk_group MediaPWAs") {
+    
+    ; 2. Register OS-Level Shell Hook for Private Windows
+    DllCall("RegisterShellHookWindow", "Ptr", A_ScriptHwnd)
+    OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), TrackPrivateWindows)
+    
+    ; 3. Catch any private windows already open on boot
+    for hwnd in WinGetList("ahk_exe vivaldi.exe") {
         try {
-            title := WinGetTitle(hwnd)
-            for _, appName in PWATitles {
-                if InStr(title, appName) {
-                    PWAVault[appName] := hwnd
-                    break
+            if InStr(WinGetTitle(hwnd), "Private") || InStr(WinGetTitle(hwnd), "Incognito")
+                PrivateHwnds[hwnd] := true
+        }
+    }
+    
+    ; 4. Catch any PWAs already running (X-Ray Vision)
+    prevDetectMode := A_DetectHiddenWindows
+    DetectHiddenWindows(true) 
+    
+    if IsSet(PWAVault) && IsSet(PWATitles) {
+        for hwnd in WinGetList("ahk_group MediaPWAs") {
+            try {
+                title := WinGetTitle(hwnd)
+                for _, appName in PWATitles {
+                    if InStr(title, appName) {
+                        PWAVault[appName] := hwnd
+                        break
+                    }
                 }
             }
         }
     }
+    
+    DetectHiddenWindows(prevDetectMode)
+    
+    ; 5. Engage the Interceptor Watchdog
+    SetTimer(CatchAndEject, 400)
 }
 
-; Restore standard vision so we don't break other scripts
-DetectHiddenWindows(prevDetectMode)
-
+; ------------------------------------------------------------------------------
+; OS-Level Shell Hook (Tracks Private Windows automatically)
+; ------------------------------------------------------------------------------
 TrackPrivateWindows(wParam, lParam, msg, hwnd) {
     ; wParam 1 = Window Created | wParam 6 = Window Title Redrawn
     if (wParam == 1 || wParam == 6) {

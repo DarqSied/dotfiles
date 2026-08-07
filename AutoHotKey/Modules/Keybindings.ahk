@@ -63,6 +63,8 @@
 #t::WinRestore("A")                                        ; Win+T: Sink/tile a floating window
 #+t::CenterActiveWindow()                                  ; Win+Shift+T: Shrink and center window
 #+f::ActivateFocusMode()                                   ; Win+Shift+F: Minimize all but active window
+#h::Send("#{Left}")                                        ; Push window to the previous zone (simulating Win+Left)
+#l::Send("#{Right}")                                       ; Push window to the next zone (simulating Win+Right)
 
 ; --- Z-Order & Visibility States ---
 #Up::PushWindowDownStack()                                 ; Win+Up: Focus next window down stack
@@ -206,6 +208,9 @@ $#s:: {
         case "t": ToggleTaskbar()                                                                           ; T: Toggle Taskbar
         case "b": ToggleAllTitleBars()                                                                      ; B: Toggle Borders
         case "m": SmartMaximize(30)                                                                         ; M: Maximize active window perfectly
+        case "1": Send("^#!1")                                                                              ; 1: Switch to Master/Stack
+        case "2": Send("^#!2")                                                                              ; 2: Switch to T-Split Lecture Mode
+        case "3": Send("^#!3")                                                                              ; 3: Switch to 3-Pane Mode
     }
 }
 
