@@ -145,6 +145,37 @@ EnforceTitleBarState(hwnd) {
 
 ForceWindowRecalculation(hwnd) => DllCall("SetWindowPos", "Ptr", hwnd, "Ptr", 0, "Int", 0, "Int", 0, "Int", 0, "Int", 0, "UInt", 0x0027)
 
+; ------------------------------------------------------------------------------
+; SYSTEM UPTIME WATCHDOG
+; ------------------------------------------------------------------------------
+; Check the system uptime every 1 hour (3,600,000 milliseconds)
+SetTimer(CheckSystemUptime, 3600000)
+
+CheckSystemUptime() {
+    ; Set your maximum allowed uptime (e.g., 72 hours)
+    ; 48 hours = 72 * 60 * 60 * 1000 = 259,200,000 ms
+    maxUptime := 259200000 
+    
+    if (A_TickCount >= maxUptime) {
+        ; Calculate actual hours for the prompt
+        currentHours := Round(A_TickCount / 3600000)
+        
+        ; Show a warning prompt that automatically times out after 2 minutes (T120)
+        msg := "System uptime has reached " . currentHours . " hours.`n`n"
+             . "To maintain low CPU uptime and clear memory leaks, a reboot is recommended.`n`n"
+             . "Reboot now?"
+             
+        result := MsgBox(msg, "Maintenance: High Uptime Detected", "YesNo Icon! T120")
+        
+        ; If you click Yes, or if you are asleep and the prompt times out, it reboots
+        if (result == "Yes" || result == "Timeout") {
+            ; AutoHotkey native shutdown command:
+            ; 2 = Reboot
+            ; 6 = Force Reboot (Forces apps to close)
+            Shutdown(6) 
+        }
+    }
+}
 
 ; ------------------------------------------------------------------------------
 ; GLOBAL FOCUS TRACKER (KERNEL-LEVEL WINEVENT HOOK)

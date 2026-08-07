@@ -72,14 +72,25 @@
 
 ; --- Status Bar Show Desktop Fix ---
 ~#d:: {                                                    ; Win+D: Show Desktop Status Bar Fix
-    static desktopToggled := false
-    desktopToggled := !desktopToggled
+    ; Buffer for the Windows DWM minimize animation
+    Sleep(150) 
     
-    if (desktopToggled) {
-        Sleep(150) ; Buffer for the DWM animation
-        if WinExist("PowerDock ahk_exe Microsoft.CmdPal.UI.exe") {
-            WinShow("PowerDock ahk_exe Microsoft.CmdPal.UI.exe")
-            WinMoveTop("PowerDock ahk_exe Microsoft.CmdPal.UI.exe")
+    targetWin := "PowerDock ahk_exe Microsoft.CmdPal.UI.exe"
+    
+    if WinExist(targetWin) {
+        ; 1. Standard un-hide
+        WinShow(targetWin)
+        
+        ; 2. THE UWP HACK: Violently force the OS to redraw it above the Desktop
+        ; by flashing the AlwaysOnTop attribute on and back off.
+        WinSetAlwaysOnTop(1, targetWin)
+        WinSetAlwaysOnTop(0, targetWin)
+        
+        ; 3. Ensure the CmdPal doesn't steal your keyboard focus from the desktop
+        try {
+            WinActivate("ahk_class WorkerW")
+        } catch {
+            WinActivate("ahk_class Progman")
         }
     }
 }
