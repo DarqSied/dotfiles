@@ -93,81 +93,10 @@ FlowSearch(actionKeyword) {
 }
 
 ; ------------------------------------------------------------------------------
-; Hot Corners Logic
-; ------------------------------------------------------------------------------
-global hMouseHook := 0
-global LastCorner := "None"
-global CornerTolerance := 5
-global HotCornersEnabled := true
-
-InstallMouseHook() {
-    global hMouseHook
-    if (hMouseHook)
-        return
-
-    ; WH_MOUSE_LL = 14. Bypasses AHK and registers directly into the Windows input stream.
-    hMouseHook := DllCall("SetWindowsHookEx", 
-        "Int", 14, 
-        "Ptr", CallbackCreate(MouseHookProc, "Fast"), 
-        "Ptr", DllCall("GetModuleHandle", "UInt", 0, "Ptr"), 
-        "UInt", 0, 
-        "Ptr")
-}
-
-MouseHookProc(nCode, wParam, lParam) {
-    global LastCorner, CornerTolerance
-    
-    if (!HotCornersEnabled) {
-        return DllCall("CallNextHookEx", "Ptr", 0, "Int", nCode, "Ptr", wParam, "Ptr", lParam)
-    }
-
-    if (nCode >= 0 && wParam == 0x0200) {
-        
-        mouseX := NumGet(lParam, 0, "Int")
-        mouseY := NumGet(lParam, 4, "Int")
-        
-        isTopLeft     := (mouseX <= CornerTolerance) && (mouseY <= CornerTolerance)
-        isTopRight    := (mouseX >= A_ScreenWidth - 1 - CornerTolerance) && (mouseY <= CornerTolerance)
-        isBottomLeft  := (mouseX <= CornerTolerance) && (mouseY >= A_ScreenHeight - 1 - CornerTolerance)
-        isBottomRight := (mouseX >= A_ScreenWidth - 1 - CornerTolerance) && (mouseY >= A_ScreenHeight - 1 - CornerTolerance)
-        
-        currentCorner := isTopLeft ? "TopLeft" : isTopRight ? "TopRight" : isBottomLeft ? "BottomLeft" : isBottomRight ? "BottomRight" : "None"
-        
-        if (currentCorner != LastCorner) {
-            
-            ; ==============================================================================
-            ; THE SHIELD: Only check for fullscreen IF a corner was just hit.
-            ; ==============================================================================
-            if (currentCorner != "None") {
-                try {
-                    WinGetPos(&winX, &winY, &winW, &winH, "A") ; Get active window size
-                    
-                    ; If the window covers the entire monitor (or slightly bleeds over like some borderless games)
-                    if (winX <= 0 && winY <= 0 && winW >= A_ScreenWidth && winH >= A_ScreenHeight) {
-                        LastCorner := currentCorner ; Register the corner so it doesn't spam, but DO NOT fire the action
-                        return DllCall("CallNextHookEx", "Ptr", 0, "Int", nCode, "Ptr", wParam, "Ptr", lParam)
-                    }
-                }
-            }
-            
-            LastCorner := currentCorner 
-            
-            ; --- HOT CORNER TRIGGERS ---
-            if (currentCorner == "TopLeft")
-                Send("^{Esc}")                      
-            else if (currentCorner == "TopRight")
-                Send("{LWin down}a{LWin up}")       
-        }
-    }
-    
-    return DllCall("CallNextHookEx", "Ptr", 0, "Int", nCode, "Ptr", wParam, "Ptr", lParam)
-}
-
-; ------------------------------------------------------------------------------
 ; Cross-Device Auto-Sorter (Syncthing)
 ; ------------------------------------------------------------------------------
 SortSyncthingFiles() {
-    syncDir := "C:\Users\himan\Downloads\Synced" 
+    syncDir := PATH_SYNCTHING
     
     if not DirExist(syncDir) {
         return
@@ -188,7 +117,7 @@ SortSyncthingFiles() {
 ; ------------------------------------------------------------------------------
 OpenMonthlyScreenshots(*) {
     currentMonth := FormatTime(, "yyyy-MM")
-    targetDir := "C:\Users\himan\Downloads\Synced\Screenshots\" currentMonth
+    targetDir := PATH_SCREENSHOTS "\" currentMonth
     
     if DirExist(targetDir) {
         Run('explore "' targetDir '"')
@@ -196,41 +125,4 @@ OpenMonthlyScreenshots(*) {
         ; Assuming your Notify() function is globally accessible via Utilities.ahk
         Notify("Directory Missing", "No screenshots folder exists for " currentMonth " yet.")
     }
-}
-
-; ------------------------------------------------------------------------------
-; Search Engine Menu
-; ------------------------------------------------------------------------------
-ShowSearchEngineMenu() {
-    SearchMenu := Menu()
-    
-    ; --- General & AI ---
-    SearchMenu.Add("&G. Google", (*) => FlowSearch("g"))
-    SearchMenu.Add("&A. Gemini", (*) => FlowSearch("gem"))
-    SearchMenu.Add("D&u. DuckDuckGo", (*) => FlowSearch("duckduckgo"))
-    SearchMenu.Add("&W. Wikipedia", (*) => FlowSearch("wiki"))
-    SearchMenu.Add() ; Separator
-    
-    ; --- Dev & Design ---
-    SearchMenu.Add("&H. GitHub", (*) => FlowSearch("gh"))
-    SearchMenu.Add("G&i. GitHub Gist", (*) => FlowSearch("gist"))
-    SearchMenu.Add("S&v. SVG Repo", (*) => FlowSearch("svg"))
-    SearchMenu.Add() ; Separator
-    
-    ; --- Media & Community ---
-    SearchMenu.Add("&Y. YouTube", (*) => FlowSearch("yt"))
-    SearchMenu.Add("&R. Reddit", (*) => FlowSearch("re"))
-    SearchMenu.Add("&J. JustWatch", (*) => FlowSearch("jw"))
-    SearchMenu.Add() ; Separator
-    
-    ; --- Google Suite ---
-    SearchMenu.Add("&M. Google Maps", (*) => FlowSearch("maps"))
-    SearchMenu.Add("&D. Google Drive", (*) => FlowSearch("gd"))
-    SearchMenu.Add("&E. Gmail", (*) => FlowSearch("gm"))
-    SearchMenu.Add("&I. Google Images", (*) => FlowSearch("gi"))
-    SearchMenu.Add("&T. Google Translate", (*) => FlowSearch("translate"))
-    SearchMenu.Add("S&c. Google Scholar", (*) => FlowSearch("sc"))
-    
-    ; Show the menu at the current mouse cursor position
-    SearchMenu.Show()
 }

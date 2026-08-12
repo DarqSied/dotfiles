@@ -19,9 +19,23 @@ global SECONDARY_TASKBAR_WND := "ahk_class Shell_SecondaryTrayWnd"
 global CornerTolerance := 15  ; Pixels from the absolute corner to trigger action
 global CornerInterval := 100  ; Milliseconds between mouse position checks
 global LastCorner := "None"   ; Tracks current corner to prevent spamming
+global HotCornersEnabled := true
+global hMouseHook := 0
 
 ; --- PWA Exclusion List ---
 global PWATitles := ["YouTube", "Netflix", "Crunchyroll", "Hotstar", "Prime Video", "Spotify"]
+
+; --- GLOBAL PATHS (Change these if you move to a new PC) ---
+global PATH_SYNCTHING   := "C:\Users\himan\Downloads\Synced"
+global PATH_SCREENSHOTS := PATH_SYNCTHING "\Screenshots"
+global PATH_QUICKNOTES  := PATH_SYNCTHING "\QuickNotes.txt"
+global PATH_FOOBAR      := "C:\Users\himan\Desktop\Files\foobar2000\foobar2000.exe"
+global PATH_SHAREX      := '"C:\Program Files\ShareX\ShareX.exe"'
+global PATH_VIVALDI     := '"' EnvGet("LOCALAPPDATA") '\Vivaldi\Application\vivaldi.exe"'
+global PATH_ZEN         := '"' EnvGet("LOCALAPPDATA") '\Zen Browser\zen.exe"'
+global PATH_ZEN_PRIV    := '"' EnvGet("LOCALAPPDATA") '\Zen Browser\private_browsing.exe"'
+global PATH_CAT_EXCEL   := A_Desktop "\CAT_Comprehensive_Plan.xlsx"
+global PATH_CAT_FORMULA := A_Desktop "\CAT_QA_Formula_Notebook.docx"
 
 ; --- Smart Auto-Routing Dictionary ---
 global AppRoutingMap := Map(

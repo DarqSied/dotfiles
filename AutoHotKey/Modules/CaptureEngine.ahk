@@ -2,8 +2,6 @@
 ; [ MODULE: HYBRID SCREENSHOT ENGINE ]
 ; ==============================================================================
 
-global ShareXPath := '"C:\Program Files\ShareX\ShareX.exe"' 
-
 PerformCapture(mode) {
     ; 1. Empty the clipboard for the watchdog
     A_Clipboard := ""
@@ -12,11 +10,11 @@ PerformCapture(mode) {
     if (mode = "Scrolling") {
         ; Wake ShareX for scrolling captures
         if not ProcessExist("ShareX.exe") {
-            Run(ShareXPath ' -silent')
+            Run(PATH_SHAREX ' -silent')
             WinWait("ahk_exe ShareX.exe",, 5)
             Sleep(1000) ; Buffer for cold boot
         }
-        Run(ShareXPath ' -ScrollingCapture')
+        Run(PATH_SHAREX ' -ScrollingCapture')
     } else if (mode = "Region") {
         Send("#+s") 
     } else if (mode = "FullScreen") {
@@ -32,7 +30,7 @@ PerformCapture(mode) {
         
         ; 4. Directory Setup
         currentMonth := FormatTime(, "yyyy-MM")
-        targetDir := "C:\Users\himan\Downloads\Synced\Screenshots\" currentMonth
+        targetDir := PATH_SCREENSHOTS "\" currentMonth
         
         if not DirExist(targetDir) {
             DirCreate(targetDir)

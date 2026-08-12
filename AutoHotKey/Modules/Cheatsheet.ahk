@@ -18,14 +18,11 @@ ShowCheatSheet() {
     }
     
     ; ==============================================================================
-    ; 1. DATA EXTRACTION
+    ; 1. DATA EXTRACTION (The Aesthetic Masterpiece Parser)
     ; ==============================================================================
     cheatText := ""
     currentCategory := ""
     currentSubCategory := ""
-    hasSub := false
-    inLeaderBlock := false
-    isLeaderCategory := false
     
     filesToParse := [A_ScriptDir "\Modules\Hotstrings.ahk", A_ScriptDir "\Modules\Keybindings.ahk"]
     
@@ -38,62 +35,49 @@ ShowCheatSheet() {
         
         Loop Parse, fileData, "`n", "`r"
         {
-            rawLine := A_LoopField
-            line := Trim(rawLine)
+            line := Trim(A_LoopField)
+            if (line == "" || InStr(line, "[ FUNCTION LIBRARY ]"))
+                continue
             
-            if (InStr(line, "[ FUNCTION LIBRARY ]"))
-                break
-            
-            if (RegExMatch(line, '^\s*;\s*\[(.*?)\]', &match)) {
+            ; A. Detect Categories
+            if (RegExMatch(line, 'i)^\s*;\s*\[(.*?)\]', &match)) {
                 currentCategory := Trim(match[1])
-                currentSubCategory := "" 
-                inLeaderBlock := false   
-                isLeaderCategory := InStr(StrUpper(currentCategory), "LEADER KEY") > 0
+                currentSubCategory := "" ; Reset memory for new blocks
+                cheatText .= "►CAT_TOP`n►CAT_TXT:" StrUpper(currentCategory) "`n►CAT_BOT`n"
+                continue
             }
-            else if (RegExMatch(line, '^\s*;\s*---\s*([a-zA-Z0-9].*?)\s*---', &match)) {
-                currentSubCategory := Trim(match[1])
-            }
-            else if (RegExMatch(line, '^\s*([$#\^!+<>\w]+)::\s*\{', &match)) {
-                inLeaderBlock := true
-            }
-            else if (inLeaderBlock && RegExMatch(rawLine, '^}')) {
-                inLeaderBlock := false
-            }
-            
-            hotkeyText := ""
-            
-            if (inLeaderBlock && RegExMatch(line, '^\s*case\s+"([^"]+)":', &matchCase)) {
-                if RegExMatch(line, ';\s*(.*)$', &matchComment) {
-                    desc := Trim(matchComment[1])
-                    colonPos := InStr(desc, ":")
-                    if (colonPos > 0 && colonPos <= 20)
-                        desc := Trim(SubStr(desc, colonPos + 1))
-                    char := StrUpper(matchCase[1])
-                    hotkeyText := "Press " char " -> " desc
+            ; B. Detect Sub-Categories
+            else if (RegExMatch(line, 'i)^\s*;\s*---\s*(.*?)\s*---', &match)) {
+                cleanSub := Trim(match[1], " -")
+                if (cleanSub != "") {
+                    currentSubCategory := cleanSub
+                    cheatText .= "►SUB_TXT:  ■ " currentSubCategory "`n"
                 }
-            }
-            else if (!inLeaderBlock && RegExMatch(line, '^\s*([^;]+?)::.*?;(.*)', &match)) {
-                hotkeyText := Trim(match[2])
+                continue
             }
             
-            if (hotkeyText != "") {
-                if (currentCategory != "") {
-                    cheatText .= "►CAT_TOP`n►CAT_TXT:" StrUpper(currentCategory) "`n►CAT_BOT`n"
-                    currentCategory := "" 
-                    hasSub := false
-                }
-                if (currentSubCategory != "") {
-                    if (!isLeaderCategory) {
-                        cheatText .= "►SUB_TXT:  ■ " currentSubCategory "`n"
-                        hasSub := true
+            ; C. Detect Hotkeys (::) OR Leader Keys (case) - IF THEY HAVE A COMMENT
+            if (RegExMatch(line, 'i)(?:\bcase\s+"([^"]+)"|[$#\^!+<>\w]+::).*?;\s*(.*)', &match)) {
+                isLeaderKey := (match[1] != "")
+                fullComment := Trim(match[2])
+                
+                if (isLeaderKey) {
+                    char := StrUpper(match[1])
+                    desc := Trim(RegExReplace(fullComment, "^.*?:", "")) 
+                    finalText := "Press " char " -> " desc
+                } else {
+                    ; AUTO-AESTHETIC: Convert generic "Key: Desc" into beautiful "Key -> Desc" automatically
+                    if RegExMatch(fullComment, "^(.*?):\s*(.*)", &parts) {
+                        finalText := Trim(parts[1]) " -> " Trim(parts[2])
                     } else {
-                        hasSub := false 
+                        finalText := fullComment ; Trust the user's custom formatting
                     }
-                    currentSubCategory := ""
                 }
                 
-                prefix := hasSub ? "    ├─ " : "  ├─ "
-                cheatText .= prefix . hotkeyText "`n"
+                ; SMART BRANCHING: Only use the ├─ tree branch if it belongs to a Sub-Category!
+                ; If it's directly under a Main Category (like Leader Keys), just use clean spaces.
+                prefix := (currentSubCategory != "") ? "    ├─ " : "    "
+                cheatText .= prefix . finalText . "`n"
             }
         }
     }

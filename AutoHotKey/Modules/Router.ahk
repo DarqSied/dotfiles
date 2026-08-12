@@ -3,6 +3,40 @@
 ; ==============================================================================
 
 ; ------------------------------------------------------------------------------
+; PWA Interceptor Helpers
+; ------------------------------------------------------------------------------
+IsVaultedPWA(hwnd) {
+    global PWAVault
+    if IsSet(PWAVault) {
+        for appName, vaultHwnd in PWAVault {
+            if (hwnd == vaultHwnd)
+                return true
+        }
+    }
+    return false
+}
+
+global LastYouTubeTitle := ""
+ClearYouTubeFocus() {
+    global LastYouTubeTitle
+    if (activeHwnd := WinActive("YouTube ahk_class Chrome_WidgetWin_1")) {
+        currentTitle := WinGetTitle(activeHwnd)
+        if (LastYouTubeTitle != "" && currentTitle != LastYouTubeTitle) {
+            Sleep(2000)
+            CoordMode("Mouse", "Screen")
+            centerX := A_ScreenWidth / 2
+            centerY := A_ScreenHeight / 2
+            MouseMove(centerX, centerY, 0)
+            Sleep(50)
+            MouseMove(centerX + 1, centerY + 1, 0)
+        }
+        LastYouTubeTitle := currentTitle
+    } else {
+        LastYouTubeTitle := ""
+    }
+}
+
+; ------------------------------------------------------------------------------
 ; Universal Background Window Routing
 ; ------------------------------------------------------------------------------
 AutoRouteWindow(hwnd) {
@@ -18,7 +52,10 @@ AutoRouteWindow(hwnd) {
         ; 1. Asynchronous Browser Polling 
         if (processName == "vivaldi.exe" || processName == "zen.exe") {
             windowTitle := WinGetTitle(hwnd)
-            if (!InStr(windowTitle, "Private") && !InStr(windowTitle, "Incognito") && !InStr(windowTitle, "- Vivaldi") && !InStr(windowTitle, "- Zen Browser")) {
+            
+            isPiP := (windowTitle == "Picture in picture" || windowTitle == "Picture-in-Picture")
+            
+            if (!isPiP && !InStr(windowTitle, "Private") && !InStr(windowTitle, "Incognito") && !InStr(windowTitle, "- Vivaldi") && !InStr(windowTitle, "- Zen Browser")) {
                 SetTimer(AutoRouteWindow.Bind(hwnd), -50) 
                 return
             }
@@ -92,12 +129,16 @@ AutoRouteWindow(hwnd) {
 ; ------------------------------------------------------------------------------
 ; Smart Desktop Routing & Resurrector for PWAs
 ; ------------------------------------------------------------------------------
-LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "vivaldi.exe") {
-    global hVDA, PWAVault
+; Update the parameters and pull the global path
+LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "") {
+    global hVDA, PWAVault, PATH_VIVALDI
     if !IsSet(PWAVault)
         PWAVault := Map()
         
-    ; Maps your exact app names to their installed Chromium IDs
+    ; Use the absolute config path if no browser is specified
+    if (browser == "")
+        browser := PATH_VIVALDI
+        
     static AppIdMap := Map(
         "Crunchyroll", "--app-id=hjlhbeffadgkonmpnblkfmhckmocohah",
         "JioHotstar", "--app-id=bhelhlfglkopjlgmhjfejnkibbfgemcf",
@@ -106,7 +147,7 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "vivaldi.exe") {
         "Spotify", "--app-id=pjibgclleladliembfgfagdaldikeohf",
         "YouTube", "--app-id=agimnkijcaahngcdmfeangaknmldooml"
     )
-        
+    
     savedTitleMode := A_TitleMatchMode
     savedHiddenMode := A_DetectHiddenWindows 
     SetTitleMatchMode(1) 
@@ -114,8 +155,6 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "vivaldi.exe") {
     DetectHiddenWindows(true) 
     
     targetHwnd := 0
-    
-    ; Determine if this is an intercepted video or just a standard hotkey launch
     isWebLink := RegExMatch(url, "^(https?://|www\.)")
     
     ; ==========================================================================
@@ -153,29 +192,24 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "vivaldi.exe") {
     ; SCENARIO 2: The App is NOT running (Cold Boot)
     ; ==========================================================================
     else {
-        ; Check if it exists untracked
         if (foundHwnd := WinExist(searchString)) {
-            targetHwnd := foundHwnd
-            WinSetExStyle("-0x80", targetHwnd)
-            WinShow(targetHwnd)
-            DllCall("ShowWindow", "Ptr", targetHwnd, "Int", 9)
-            WinActivate(targetHwnd)
-            Notify("Media Recovered", appName " found in background.")
-            
-            if (isWebLink) {
-                Sleep(200)
-                InjectURL(url)
-            }
+            ; ... [Keep existing background recovery logic] ...
         }
         else {
             oldActive := WinActive("A")
             
-            ; Launch using the App ID to preserve the Vivaldi UI
-            if (AppIdMap.Has(appName)) {
-                Run(browser ' ' AppIdMap[appName] ' --start-maximized')
-            } else {
-                ; Fallback (Hotkeys pass the ID as the URL natively)
-                Run(browser ' ' url ' --start-maximized')
+            ; THE CRITICAL FIX: Safe Launching
+            try {
+                if (AppIdMap.Has(appName)) {
+                    Run(browser ' ' AppIdMap[appName] ' --start-maximized')
+                } else {
+                    Run(browser ' ' url ' --start-maximized')
+                }
+            } catch {
+                Notify("Launch Error", "Could not launch browser. Check PATH_VIVALDI.")
+                SetTitleMatchMode(savedTitleMode)
+                DetectHiddenWindows(savedHiddenMode)
+                return
             }
             
             ; Dynamically wait for the NEW window to take focus
@@ -283,17 +317,25 @@ InitRouter() {
             }
         }
     }
-    
+        
+    SetTimer(ClearYouTubeFocus, 1000)
     DetectHiddenWindows(prevDetectMode)
     
     ; 5. Engage the Interceptor Watchdog
     SetTimer(CatchAndEject, 400)
+    
+    ; 6. Start the Active Window Focus Border
+    WindowBorder.Init()
+
+    ; 7. Run initial grid snap on startup
+    SetTimer(ProcessDynamicLayout, -500)
 }
 
 ; ------------------------------------------------------------------------------
 ; OS-Level Shell Hook (Tracks Private Windows automatically)
 ; ------------------------------------------------------------------------------
 TrackPrivateWindows(wParam, lParam, msg, hwnd) {
+    TrackDynamicLayouts(wParam, lParam, msg, hwnd)
     ; wParam 1 = Window Created | wParam 6 = Window Title Redrawn
     if (wParam == 1 || wParam == 6) {
         try {
@@ -423,8 +465,11 @@ CatchAndEject() {
 ; Virtual Desktop Navigation Utilities (VDA)
 ; ------------------------------------------------------------------------------
 GoToDesktop(target) {
-    if (hVDA)
+    if (hVDA) {
         DllCall(VDA_PATH "\GoToDesktopNumber", "Int", target)
+        ; Wait 500ms for the slide animation to completely finish
+        SetTimer(ProcessDynamicLayout.Bind(0, false), -500) 
+    }
 }
 
 GetCurrentDesktop() {

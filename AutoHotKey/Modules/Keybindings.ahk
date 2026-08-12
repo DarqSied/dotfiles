@@ -3,35 +3,57 @@
 ; ==============================================================================
 
 ; ------------------------------------------------------------------------------
+; SUSPEND & HIDE INTERCEPTOR
+; ------------------------------------------------------------------------------
+#HotIf WinActive("ahk_group MediaPWAs") && IsVaultedPWA(WinExist("A"))
+$#q::  
+$!F4:: 
+$^w::  
+{
+    activeHwnd := WinExist("A")
+    if (!activeHwnd)
+        return
+        
+    Send("{Blind}{vkE8}{LWin up}{RWin up}{Alt up}{Ctrl up}{Shift up}")
+    Sleep(50) 
+    Send("^!x")
+    Sleep(300) 
+    WinMinimize(activeHwnd)
+    WinHide(activeHwnd)
+    Notify("Media Stopped", "Playback paused successfully.")
+}
+#HotIf
+
+; ------------------------------------------------------------------------------
 ; [ HOTKEYS: INSTANT ACTIONS & WINDOW/DESKTOP MANAGEMENT ]
 ; ------------------------------------------------------------------------------
 ; --- Window & Workspace Destruction ---
-#q::                                                                              ; Win+Q: Close Current App
+#q::                                                                           ; Win+Q: Close Current App
 {
     Send("{Blind}{vkE8}")
     Send("!{F4}")
 }
-#+q::KillAllOnCurrentDesktop()                                                    ; Win+Shift+Q: Kill Entire Workspace
+#+q::KillAllOnCurrentDesktop()                                                 ; Win+Shift+Q: Kill Entire Workspace
 
 ; --- Terminals & Command Line ---
-#Enter::Run("wt.exe")                                                             ; Win+Enter: Launch Normal Terminal
-#+Enter::Run("*RunAs wt.exe")                                                     ; Win+Shift+Enter: Admin Terminal
+#Enter::Run("wt.exe")                                                          ; Win+Enter: Launch Normal Terminal
+#+Enter::Run("*RunAs wt.exe")                                                  ; Win+Shift+Enter: Admin Terminal
 
 ; --- Web Browsers ---
-#b::Run('"C:\Users\himan\AppData\Local\Vivaldi\Application\vivaldi.exe"')         ; Win+B: Vivaldi (Primary)
-#+b::Run('"C:\Users\himan\AppData\Local\Zen Browser\zen.exe"')                    ; Win+Shift+B: Zen (Secondary)
-#!b::Run('"C:\Users\himan\AppData\Local\Zen Browser\private_browsing.exe"')       ; Win+Alt+B: Zen Private
+#b::Run(PATH_VIVALDI)                                                          ; Win+B: Vivaldi (Primary)
+#+b::Run(PATH_ZEN)                                                             ; Win+Shift+B: Zen (Secondary)
+#!b::Run(PATH_ZEN_PRIV)                                                        ; Win+Alt+B: Zen Private
 
 ; --- Utilities & OS Toggles ---
-#c::LaunchApp("Calculator", "calc.exe")                                           ; Win+C: Calculator
-#w::LaunchApp("Clock", "ms-clock:")                                               ; Win+W: Clock/Stopwatch
-#+v::PasteAsPlain()                                                               ; Win+Shift+V: Paste plain text
-#+a::ToggleKeepAwake()                                                            ; Win+Shift+A: Toggle Keep-Awake
-#^x::ComObject("Shell.Application").ShutdownWindows()                             ; Win+Ctrl+X: Shutdown Menu
-#/::ShowCheatSheet()                                                              ; Win+/: Toggle Dynamic Cheatsheet
+#c::LaunchApp("Calculator", "calc.exe")                                        ; Win+C: Calculator
+#w::LaunchApp("Clock", "ms-clock:")                                            ; Win+W: Clock/Stopwatch
+#+v::PasteAsPlain()                                                            ; Win+Shift+V: Paste plain text
+#+a::ToggleKeepAwake()                                                         ; Win+Shift+A: Toggle Keep-Awake
+#^x::ComObject("Shell.Application").ShutdownWindows()                          ; Win+Ctrl+X: Shutdown Menu
+#/::ShowCheatSheet()                                                           ; Win+/: Toggle Dynamic Cheatsheet
 
 ; --- Virtual Desktop Navigation (Base) ---
-<#1::GoToDesktop(0)                                         ; Win+1 to 9: Jump to Desktop 1-9
+<#1::GoToDesktop(0)                                                            ; Win+1 to 9: Jump to Desktop 1-9
 <#2::GoToDesktop(1)
 <#3::GoToDesktop(2)
 <#4::GoToDesktop(3)
@@ -40,11 +62,11 @@
 <#7::GoToDesktop(6)
 <#8::GoToDesktop(7)
 <#9::GoToDesktop(8)
-^#Right::GoToNextDesktop()                                 ; Ctrl+Win+Right: Pan right one desktop
-^#Left::GoToPrevDesktop()                                  ; Ctrl+Win+Left: Pan left one desktop
+^#Right::GoToNextDesktop()                                                     ; Ctrl+Win+Right: Pan right one desktop
+^#Left::GoToPrevDesktop()                                                      ; Ctrl+Win+Left: Pan left one desktop
 
 ; --- Window Routing (Shift = Escalate) ---
-+<#1::MoveActiveWindowToDesktop(0)                         ; Win+Shift+1 to 9: Move window to Desktop 1-9
++<#1::MoveActiveWindowToDesktop(0)                                             ; Win+Shift+1 to 9: Move window to Desktop 1-9
 +<#2::MoveActiveWindowToDesktop(1)
 +<#3::MoveActiveWindowToDesktop(2)
 +<#4::MoveActiveWindowToDesktop(3)
@@ -53,60 +75,76 @@
 +<#7::MoveActiveWindowToDesktop(6)
 +<#8::MoveActiveWindowToDesktop(7)
 +<#9::MoveActiveWindowToDesktop(8)
-^+#Right::CarryActiveWindowToNextDesktop()                 ; Ctrl+Shift+Win+Right: Carry window right
-^+#Left::CarryActiveWindowToPrevDesktop()                  ; Ctrl+Shift+Win+Left: Carry window left
-#+h::Send("#+{Left}")                                      ; Win+Shift+H: Send to left monitor
-#+l::Send("#+{Right}")                                     ; Win+Shift+L: Send to right monitor
+^+#Right::CarryActiveWindowToNextDesktop()                                     ; Ctrl+Shift+Win+Right: Carry window right
+^+#Left::CarryActiveWindowToPrevDesktop()                                      ; Ctrl+Shift+Win+Left: Carry window left
+#+h::Send("#+{Left}")                                                          ; Win+Shift+H: Send to left monitor
+#+l::Send("#+{Right}")                                                         ; Win+Shift+L: Send to right monitor
 
 ; --- Layout Controls & States ---
-#Space::WinMaximize("A")                                   ; Win+Space: Monocle layout
-#t::WinRestore("A")                                        ; Win+T: Sink/tile a floating window
-#+t::CenterActiveWindow()                                  ; Win+Shift+T: Shrink and center window
-#+f::ActivateFocusMode()                                   ; Win+Shift+F: Minimize all but active window
-#h::Send("#{Left}")                                        ; Push window to the previous zone (simulating Win+Left)
-#l::Send("#{Right}")                                       ; Push window to the next zone (simulating Win+Right)
+#Space:: {                                                                     ; Win+Space: Toggle Monocle / Maximize
+    global FloatedWindows, LastWindowList
+    targetWin := WinExist("A")
+    if !targetWin
+        return
+        
+    try {
+        if (WinGetMinMax(targetWin) == 1) {
+            ; If it was maximized, snap it back into the grid
+            WinRestore(targetWin)
+            FloatedWindows.Delete(targetWin)
+            LastWindowList := ""
+            Notify("Grid Snap", "Window returned to layout.")
+        } else {
+            ; If we are maximizing it, float it first
+            FloatedWindows[targetWin] := true
+            LastWindowList := ""
+            WinMaximize(targetWin)
+        }
+    }
+}
+#t::ToggleFloatState()                                                         ; Win+T: Toggle window float / snap
+#+t::CenterActiveWindow()                                                      ; Win+Shift+T: Shrink and center window
+#+f::ActivateFocusMode()                                                       ; Win+Shift+F: Minimize all but active window
 
 ; --- Z-Order & Visibility States ---
-#Up::PushWindowDownStack()                                 ; Win+Up: Focus next window down stack
-#Down::PullWindowUpStack()                                 ; Win+Down: Focus prev window up stack
-#p::ToggleAlwaysOnTop()                                    ; Win+P: Toggle Always-on-Top
-#+g::ToggleGhostMode()                                     ; Win+Shift+G: Semi-transparent & click-through
+#Up::PushWindowDownStack()                                                     ; Win+Up: Focus next window down stack
+#Down::PullWindowUpStack()                                                     ; Win+Down: Focus prev window up stack
+#p::ToggleAlwaysOnTop()                                                        ; Win+P: Toggle Always-on-Top
+#+g::ToggleGhostMode()                                                         ; Win+Shift+G: Semi-transparent & click-through
 
 ; --- Status Bar Show Desktop Fix ---
-~#d:: {                                                    ; Win+D: Show Desktop Status Bar Fix
+~#d:: {                                                                        ; Win+D: Show Desktop Status Bar Fix
     ; Buffer for the Windows DWM minimize animation
     Sleep(150) 
     
     targetWin := "PowerDock ahk_exe Microsoft.CmdPal.UI.exe"
     
     if WinExist(targetWin) {
-        ; 1. Standard un-hide
         WinShow(targetWin)
-        
-        ; 2. THE UWP HACK: Violently force the OS to redraw it above the Desktop
-        ; by flashing the AlwaysOnTop attribute on and back off.
         WinSetAlwaysOnTop(1, targetWin)
         WinSetAlwaysOnTop(0, targetWin)
-        
-        ; 3. Ensure the CmdPal doesn't steal your keyboard focus from the desktop
-        try {
-            WinActivate("ahk_class WorkerW")
-        } catch {
+        try WinActivate("ahk_class WorkerW")
+        catch
             WinActivate("ahk_class Progman")
-        }
     }
 }
 
 ; --- Desktop Creation & Deletion (System Level) ---
-#^n::Send("#^d")                                           ; Win+Ctrl+N: Create new virtual desktop
-#^q::Send("#^{F4}")                                        ; Win+Ctrl+Q: Delete current virtual desktop
+#^n::Send("#^d")                                                               ; Win+Ctrl+N: Create new virtual desktop
+#^q::Send("#^{F4}")                                                            ; Win+Ctrl+Q: Delete current virtual desktop
 
 ; --- Mouse & Window controls ---
-; Win+Left Click: Move Window
-#LButton::
-{
+#LButton:: {                                                                   ; Win+LButton: Move Window
+    global FloatedWindows, LastWindowList
     CoordMode("Mouse", "Screen") 
     MouseGetPos(,, &targetWin)
+    
+    ; Auto-float the window the moment you grab it
+    if (!FloatedWindows.Has(targetWin)) {
+        FloatedWindows[targetWin] := true
+        LastWindowList := ""
+    }
+    
     if (WinGetMinMax(targetWin) = 1) {
         WinRestore(targetWin)
         Sleep(50)
@@ -124,11 +162,17 @@
     }
 }
 
-; Win+Right Click: Resize Window
-#RButton::
-{
+#RButton:: {                                                                   ; Win+RButton: Resize Window
+    global FloatedWindows, LastWindowList
     CoordMode("Mouse", "Screen") 
     MouseGetPos(,, &targetWin)
+    
+    ; Auto-float the window the moment you resize it
+    if (!FloatedWindows.Has(targetWin)) {
+        FloatedWindows[targetWin] := true
+        LastWindowList := ""
+    }
+    
     if (WinGetMinMax(targetWin) = 1) {
         WinRestore(targetWin)
         Sleep(50)
@@ -150,37 +194,36 @@
 ; ------------------------------------------------------------------------------
 ; [ QUICK DIRECTORY ACCESS ]
 ; ------------------------------------------------------------------------------
-#!d::Run("shell:Downloads")                           ; Win + Alt + D -> Open Downloads Folder
-#!f::Run('explore "C:\Users\himan\Downloads\Synced"') ; Win + Alt + F -> Open Root Syncthing Folder
-#!a::Run('explore "' A_ScriptDir '"')                 ; Win + Alt + A -> Open AutoHotkey Script Directory
-
-#!s::OpenMonthlyScreenshots()                         ; Win + Alt + S -> Open Current Month's Screenshots
+#!d::Run("shell:Downloads")                                                    ; Win+Alt+D: Open Downloads Folder
+#!f::Run('explore "' PATH_SYNCTHING '"')                                       ; Win+Alt+F: Open Root Syncthing Folder
+#!a::Run('explore "' A_ScriptDir '"')                                          ; Win+Alt+A: Open AutoHotkey Script Directory
+#!s::OpenMonthlyScreenshots()                                                  ; Win+Alt+S: Open Current Month's Screenshots
 
 ; ------------------------------------------------------------------------------
 ; [ HYBRID SCREENSHOT ENGINE TRIGGERS ]
 ; ------------------------------------------------------------------------------
-$^PrintScreen::PerformCapture("Region")       ; Ctrl + PrintScreen -> Native Region
-$PrintScreen::PerformCapture("FullScreen")    ; PrintScreen -> Native Full Screen
-$!PrintScreen::PerformCapture("Window")       ; Alt + PrintScreen -> Native Window
-$^!PrintScreen::PerformCapture("Scrolling")   ; Ctrl + Alt + PrintScreen -> ShareX Scrolling
-#+PrintScreen::KillShareX()                   ; Win + Shift + PrintScreen -> Force Kill ShareX
+$^PrintScreen::PerformCapture("Region")                                        ; Ctrl+PrintScreen: Native Region
+$PrintScreen::PerformCapture("FullScreen")                                     ; PrintScreen: Native Full Screen
+$!PrintScreen::PerformCapture("Window")                                        ; Alt+PrintScreen: Native Window
+$^!PrintScreen::PerformCapture("Scrolling")                                    ; Ctrl+Alt+PrintScreen: ShareX Scrolling
+#+PrintScreen::KillShareX()                                                    ; Win+Shift+PrintScreen: Force Kill ShareX
 
 ; ------------------------------------------------------------------------------
 ; [ LEADER KEY 1: APP LAUNCHER (WIN + A) ]
 ; ------------------------------------------------------------------------------
 #a:: {
     switch GetLeaderInput() {
-        case "f": Run('"C:\Users\himan\Desktop\Files\foobar2000\foobar2000.exe"')        ; F: foobar2000
-        case "c": LaunchWebAppToDesktop("--app-id=hjlhbeffadgkonmpnblkfmhckmocohah", "Crunchyroll", 8) ; C: Crunchyroll
-        case "j": LaunchWebAppToDesktop("--app-id=bhelhlfglkopjlgmhjfejnkibbfgemcf", "JioHotstar", 8)                        ; J: JioHotstar
-        case "n": LaunchWebAppToDesktop("--app-id=eppojlglocelodeimnohnlnionkobfln", "Netflix", 8)                           ; N: Netflix
-        case "p": LaunchWebAppToDesktop("--app-id=igpjbmoihojghddcmflmgeeadjkanlij", "Prime Video", 8)                       ; P: Prime Video
-        case "s": LaunchWebAppToDesktop("--app-id=pjibgclleladliembfgfagdaldikeohf", "Spotify", 8)                           ; S: Spotify
-        case "y": LaunchWebAppToDesktop("--app-id=agimnkijcaahngcdmfeangaknmldooml", "YouTube", 8)                           ; Y: YouTube
-        case "v": LaunchWebAppToDesktop("https://pass.proton.me/", "Proton Pass", 6)     ; V: Proton Pass Web Vault
-        case "l": LaunchWebAppToDesktop("https://app.simplelogin.io/dashboard/", "SimpleLogin", 6) ; L: SimpleLogin
-        case "r": LaunchWebAppToDesktop("https://app.raindrop.io/", "Raindrop.io", 6)    ; R: Raindrop.io
-        case "w": Run("whatsapp:")                                                       ; W: WhatsApp
+        case "f": Run(PATH_FOOBAR)                                                                         ; F: foobar2000
+        case "c": LaunchWebAppToDesktop("--app-id=hjlhbeffadgkonmpnblkfmhckmocohah", "Crunchyroll", 8)     ; C: Crunchyroll
+        case "j": LaunchWebAppToDesktop("--app-id=bhelhlfglkopjlgmhjfejnkibbfgemcf", "JioHotstar", 8)      ; J: JioHotstar
+        case "n": LaunchWebAppToDesktop("--app-id=eppojlglocelodeimnohnlnionkobfln", "Netflix", 8)         ; N: Netflix
+        case "p": LaunchWebAppToDesktop("--app-id=igpjbmoihojghddcmflmgeeadjkanlij", "Prime Video", 8)     ; P: Prime Video
+        case "s": LaunchWebAppToDesktop("--app-id=pjibgclleladliembfgfagdaldikeohf", "Spotify", 8)         ; S: Spotify
+        case "y": LaunchWebAppToDesktop("--app-id=agimnkijcaahngcdmfeangaknmldooml", "YouTube", 8)         ; Y: YouTube
+        case "v": LaunchWebAppToDesktop("https://pass.proton.me/", "Proton Pass", 6)                       ; V: Proton Pass Web Vault
+        case "l": LaunchWebAppToDesktop("https://app.simplelogin.io/dashboard/", "SimpleLogin", 6)         ; L: SimpleLogin
+        case "r": LaunchWebAppToDesktop("https://app.raindrop.io/", "Raindrop.io", 6)                      ; R: Raindrop.io
+        case "w": Run("whatsapp:")                                                                         ; W: WhatsApp
     }
 }
 
@@ -189,8 +232,8 @@ $^!PrintScreen::PerformCapture("Scrolling")   ; Ctrl + Alt + PrintScreen -> Shar
 ; ------------------------------------------------------------------------------
 #x:: {
     switch GetLeaderInput() {
-        case "s": ToggleScratchpad("taskmgr.exe", "ahk_exe Taskmgr.exe")                                ; S: SysMon
-        case "m": ToggleScratchpad("sndvol.exe", "ahk_exe sndvol.exe")                                  ; M: Mixer
+        case "s": ToggleScratchpad("taskmgr.exe", "ahk_exe Taskmgr.exe")                                   ; S: SysMon
+        case "m": ToggleScratchpad("sndvol.exe", "ahk_exe sndvol.exe")                                     ; M: Mixer
     }
 }
 
@@ -203,14 +246,11 @@ $#s:: {
     KeyWait("RWin")
     
     switch GetLeaderInput() {
-        case "r": Reload()                                                                                  ; R: Reload AHK
-        case "e": Run('"' EnvGet("LOCALAPPDATA") '\Programs\VSCodium\VSCodium.exe" "' A_ScriptDir '"')      ; E: Edit Script Workspace
-        case "t": ToggleTaskbar()                                                                           ; T: Toggle Taskbar
-        case "b": ToggleAllTitleBars()                                                                      ; B: Toggle Borders
-        case "m": SmartMaximize(30)                                                                         ; M: Maximize active window perfectly
-        case "1": Send("^#!1")                                                                              ; 1: Switch to Master/Stack
-        case "2": Send("^#!2")                                                                              ; 2: Switch to T-Split Lecture Mode
-        case "3": Send("^#!3")                                                                              ; 3: Switch to 3-Pane Mode
+        case "r": Reload()                                                                                 ; R: Reload AHK
+        case "e": Run('"' EnvGet("LOCALAPPDATA") '\Programs\VSCodium\VSCodium.exe" "' A_ScriptDir '"')     ; E: Edit Script Workspace
+        case "t": ToggleTaskbar()                                                                          ; T: Toggle Taskbar
+        case "b": ToggleAllTitleBars()                                                                     ; B: Toggle Borders
+        case "m": SmartMaximize(30)                                                                        ; M: Maximize active window perfectly
     }
 }
 
@@ -247,8 +287,8 @@ $#s:: {
 ; ------------------------------------------------------------------------------
 #z:: {
     switch GetLeaderInput() {
-        case "p": Run("ms-phone:")                                                     ; P: Phone Link Dashboard
-        case "c":                                                                      ; C: Open Copied Link
+        case "p": Run("ms-phone:")                                                                         ; P: Phone Link Dashboard
+        case "c":                                                                                          ; C: Open Copied Link
             static pwaMap := Map(
                 "youtube.com", "YouTube", "youtu.be", "YouTube",
                 "spotify.com", "Spotify", "netflix.com", "Netflix",
@@ -277,31 +317,31 @@ $#s:: {
             } else {
                 Notify("Launch Failed", "No valid link in the clipboard.", true)
             }
-        case "f": Run("explorer.exe C:\Users\himan\Downloads\Synced")               ; F: Syncthing Folder
-        case "s": Run("http://127.0.0.1:8384/")                                     ; S: Syncthing Web GUI
-        case "t":                                                                   ; T: Syncthing Status Ping
+        case "f": Run('explorer.exe "' PATH_SYNCTHING '"')                                                 ; F: Syncthing Folder
+        case "s": Run("http://127.0.0.1:8384/")                                                            ; S: Syncthing Web GUI
+        case "t":                                                                                          ; T: Syncthing Status Ping
             if ProcessExist("syncthing.exe") {
                 Notify("Syncthing Status", "🟢 Running in the background.")
             } else {
                 Notify("Syncthing Status", "🔴 NOT Running.")
             }
-        case "n":                                                                   ; N: Quick Sync Note
+        case "n":                                                                          ; N: Quick Sync Note
             savedNote := InputBox("Type note for phone:", "Local Sync", "w400 h100")
             if (savedNote.Result == "OK" && savedNote.Value != "") {
                 timestamp := FormatTime(, "dd-MM-yyyy h:mm tt")
-                FileAppend("[" timestamp "] " savedNote.Value "`n", "C:\Users\himan\Downloads\Synced\QuickNotes.txt")
+                FileAppend("[" timestamp "] " savedNote.Value "`n", PATH_QUICKNOTES)
                 Notify("Synced", "Note sent to Syncthing folder.")
             }
             
-        case "h":                                                                   ; H: Highlight to Sync
+        case "h":                                                                          ; H: Highlight to Sync
             savedClip := ClipboardAll() 
             A_Clipboard := ""           
             Send("^c")                  
             if ClipWait(1) {            
                 timestamp := FormatTime(, "dd-MM-yyyy h:mm tt")
-                FileAppend("[" timestamp "] " A_Clipboard "`n`n", "C:\Users\himan\Downloads\Synced\QuickNotes.txt")
+                FileAppend("[" timestamp "] " A_Clipboard "`n`n", PATH_QUICKNOTES)
                 Notify("Clipped", "Highlighted text synced to phone.")
             }
-            A_Clipboard := savedClip    
+            A_Clipboard := savedClip
     }
 }

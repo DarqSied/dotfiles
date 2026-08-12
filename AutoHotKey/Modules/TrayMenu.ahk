@@ -48,3 +48,32 @@ ToggleHotCorners(ItemName, ItemPos, MyMenu) {
         MyMenu.Rename(ItemName, "🔴 Hot Corners: OFF")
     }
 }
+
+; ------------------------------------------------------------------------------
+; Search Engine Menu (Triggered via Flow Launcher Leader Key)
+; ------------------------------------------------------------------------------
+ShowSearchEngineMenu() {
+    SearchMenu := Menu()
+    
+    SearchMenu.Add("&G. Google", (*) => FlowSearch("g"))
+    SearchMenu.Add("&A. Gemini", (*) => FlowSearch("gem"))
+    SearchMenu.Add("D&u. DuckDuckGo", (*) => FlowSearch("duckduckgo"))
+    SearchMenu.Add("&W. Wikipedia", (*) => FlowSearch("wiki"))
+    SearchMenu.Add() 
+    SearchMenu.Add("&H. GitHub", (*) => FlowSearch("gh"))
+    SearchMenu.Add("G&i. GitHub Gist", (*) => FlowSearch("gist"))
+    SearchMenu.Add("S&v. SVG Repo", (*) => FlowSearch("svg"))
+    SearchMenu.Add() 
+    SearchMenu.Add("&Y. YouTube", (*) => FlowSearch("yt"))
+    SearchMenu.Add("&R. Reddit", (*) => FlowSearch("re"))
+    SearchMenu.Add("&J. JustWatch", (*) => FlowSearch("jw"))
+    SearchMenu.Add() 
+    SearchMenu.Add("&M. Google Maps", (*) => FlowSearch("maps"))
+    SearchMenu.Add("&D. Google Drive", (*) => FlowSearch("gd"))
+    SearchMenu.Add("&E. Gmail", (*) => FlowSearch("gm"))
+    SearchMenu.Add("&I. Google Images", (*) => FlowSearch("gi"))
+    SearchMenu.Add("&T. Google Translate", (*) => FlowSearch("translate"))
+    SearchMenu.Add("S&c. Google Scholar", (*) => FlowSearch("sc"))
+    
+    SearchMenu.Show()
+}

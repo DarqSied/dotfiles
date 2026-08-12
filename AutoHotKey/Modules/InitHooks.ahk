@@ -30,9 +30,6 @@ Initialize() {
     
     SetTimer(EnforceTaskbarVisibility, 500)
     SetTimer(SortSyncthingFiles, 10000)
-    SetTimer(CheckSystemUptime, 3600000) 
-    SetTimer(ClearYouTubeFocus, 1000)    
-    SnipeUWPApps()
 
     DllCall("RegisterShellHookWindow", "Ptr", A_ScriptHwnd)
     OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), OnWindowCreated)
@@ -149,35 +146,6 @@ EnforceTitleBarState(hwnd) {
 ForceWindowRecalculation(hwnd) => DllCall("SetWindowPos", "Ptr", hwnd, "Ptr", 0, "Int", 0, "Int", 0, "Int", 0, "Int", 0, "UInt", 0x0027)
 
 ; ------------------------------------------------------------------------------
-; SYSTEM UPTIME WATCHDOG
-; ------------------------------------------------------------------------------
-CheckSystemUptime() {
-    ; Set your maximum allowed uptime (e.g., 72 hours)
-    ; 48 hours = 72 * 60 * 60 * 1000 = 259,200,000 ms
-    maxUptime := 259200000 
-    
-    if (A_TickCount >= maxUptime) {
-        ; Calculate actual hours for the prompt
-        currentHours := Round(A_TickCount / 3600000)
-        
-        ; Show a warning prompt that automatically times out after 2 minutes (T120)
-        msg := "System uptime has reached " . currentHours . " hours.`n`n"
-             . "To maintain low CPU uptime and clear memory leaks, a reboot is recommended.`n`n"
-             . "Reboot now?"
-             
-        result := MsgBox(msg, "Maintenance: High Uptime Detected", "YesNo Icon! T120")
-        
-        ; If you click Yes, or if you are asleep and the prompt times out, it reboots
-        if (result == "Yes" || result == "Timeout") {
-            ; AutoHotkey native shutdown command:
-            ; 2 = Reboot
-            ; 6 = Force Reboot (Forces apps to close)
-            Shutdown(6) 
-        }
-    }
-}
-
-; ------------------------------------------------------------------------------
 ; GLOBAL FOCUS TRACKER (KERNEL-LEVEL WINEVENT HOOK)
 ; ------------------------------------------------------------------------------
 ; Shell Hooks are blind to custom docks (Tool Windows). This kernel hook tracks 
@@ -224,66 +192,55 @@ ForceDesktopFocus() {
 }
 
 ; ------------------------------------------------------------------------------
-; YouTube PWA Auto-Focus Clear (Phantom Focus & Cursor Fix)
+; HOT CORNERS (KERNEL-LEVEL MOUSE HOOK)
 ; ------------------------------------------------------------------------------
-global LastYouTubeTitle := ""
+InstallMouseHook() {
+    global hMouseHook
+    if (hMouseHook)
+        return
 
-ClearYouTubeFocus() {
-    global LastYouTubeTitle
+    hMouseHook := DllCall("SetWindowsHookEx", 
+        "Int", 14, 
+        "Ptr", CallbackCreate(MouseHookProc, "Fast"), 
+        "Ptr", DllCall("GetModuleHandle", "UInt", 0, "Ptr"), 
+        "UInt", 0, "Ptr")
+}
+
+MouseHookProc(nCode, wParam, lParam) {
+    global LastCorner, CornerTolerance, HotCornersEnabled
     
-    if (activeHwnd := WinActive("YouTube ahk_class Chrome_WidgetWin_1")) {
-        currentTitle := WinGetTitle(activeHwnd)
+    if (!HotCornersEnabled) {
+        return DllCall("CallNextHookEx", "Ptr", 0, "Int", nCode, "Ptr", wParam, "Ptr", lParam)
+    }
+
+    if (nCode >= 0 && wParam == 0x0200) {
+        mouseX := NumGet(lParam, 0, "Int")
+        mouseY := NumGet(lParam, 4, "Int")
         
-        if (LastYouTubeTitle != "" && currentTitle != LastYouTubeTitle) {
+        isTopLeft     := (mouseX <= CornerTolerance) && (mouseY <= CornerTolerance)
+        isTopRight    := (mouseX >= A_ScreenWidth - 1 - CornerTolerance) && (mouseY <= CornerTolerance)
+        isBottomLeft  := (mouseX <= CornerTolerance) && (mouseY >= A_ScreenHeight - 1 - CornerTolerance)
+        isBottomRight := (mouseX >= A_ScreenWidth - 1 - CornerTolerance) && (mouseY >= A_ScreenHeight - 1 - CornerTolerance)
+        
+        currentCorner := isTopLeft ? "TopLeft" : isTopRight ? "TopRight" : isBottomLeft ? "BottomLeft" : isBottomRight ? "BottomRight" : "None"
+        
+        if (currentCorner != LastCorner) {
+            if (currentCorner != "None") {
+                try {
+                    WinGetPos(&winX, &winY, &winW, &winH, "A")
+                    if (winX <= 0 && winY <= 0 && winW >= A_ScreenWidth && winH >= A_ScreenHeight) {
+                        LastCorner := currentCorner
+                        return DllCall("CallNextHookEx", "Ptr", 0, "Int", nCode, "Ptr", wParam, "Ptr", lParam)
+                    }
+                }
+            }
+            LastCorner := currentCorner 
             
-            Sleep(2000)
-            CoordMode("Mouse", "Screen")
-            centerX := A_ScreenWidth / 2
-            centerY := A_ScreenHeight / 2
-            
-            MouseMove(centerX, centerY, 0)
-            Sleep(50)
-            MouseMove(centerX + 1, centerY + 1, 0)
+            if (currentCorner == "TopLeft")
+                Send("^{Esc}")                      
+            else if (currentCorner == "TopRight")
+                Send("{LWin down}a{LWin up}")       
         }
-        
-        LastYouTubeTitle := currentTitle
-    } else {
-        LastYouTubeTitle := ""
     }
-}
-
-; ------------------------------------------------------------------------------
-; UWP Startup Sniper (Background Apps)
-; ------------------------------------------------------------------------------
-SnipeUWPApps() {
-    SetTimer(HideWhatsApp, 1000)
-    SetTimer(HidePhoneLink, 1000)
-}
-
-HideWhatsApp() {
-    static attemptsWA := 0
-    attemptsWA++
-    
-    if WinExist("WhatsApp") {
-        Sleep(800) 
-        WinClose("WhatsApp") 
-        SetTimer(HideWhatsApp, 0)
-    } 
-    else if (attemptsWA >= 20) {
-        SetTimer(HideWhatsApp, 0)
-    }
-}
-
-HidePhoneLink() {
-    static attemptsPL := 0
-    attemptsPL++
-    
-    if WinExist("Phone Link") {
-        Sleep(800)
-        WinClose("Phone Link") 
-        SetTimer(HidePhoneLink, 0) 
-    } 
-    else if (attemptsPL >= 20) {
-        SetTimer(HidePhoneLink, 0) 
-    }
+    return DllCall("CallNextHookEx", "Ptr", 0, "Int", nCode, "Ptr", wParam, "Ptr", lParam)
 }

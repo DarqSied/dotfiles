@@ -5,7 +5,7 @@
 #SingleInstance Force
 #UseHook
 A_MenuMaskKey := "vkE8"
-ProcessSetPriority("High") ; Give AHK enough CPU priority to beat the DWM render delay
+ProcessSetPriority("High")
 
 ; Load Configurations & Core Engine
 #Include "%A_ScriptDir%\Modules\Config.ahk"
@@ -23,45 +23,10 @@ ProcessSetPriority("High") ; Give AHK enough CPU priority to beat the DWM render
 #Include "%A_ScriptDir%\Modules\Hotstrings.ahk"
 #Include "%A_ScriptDir%\Modules\Keybindings.ahk"
 
-; Load Automations
+; Load Automations & Watchdogs
 #Include "%A_ScriptDir%\Modules\FocusEngine.ahk"
 #Include "%A_ScriptDir%\Modules\BatteryMonitor.ahk"
-
-; Helper: Verify if the active window is an officially launched PWA
-IsVaultedPWA(hwnd) {
-    global PWAVault
-    if IsSet(PWAVault) {
-        for appName, vaultHwnd in PWAVault {
-            if (hwnd == vaultHwnd)
-                return true
-        }
-    }
-    return false
-}
-
-; SUSPEND & HIDE INTERCEPTOR
-; Only triggers if the window is in the MediaPWAs group AND inside the Vault
-#HotIf WinActive("ahk_group MediaPWAs") && IsVaultedPWA(WinExist("A"))
-
-$#q::  ; The '$' forces AHK to only respond to physical key presses
-$!F4:: 
-$^w::  
-{
-    activeHwnd := WinExist("A")
-    if (!activeHwnd)
-        return
-        
-    Send("{Blind}{vkE8}{LWin up}{RWin up}{Alt up}{Ctrl up}{Shift up}")
-    Sleep(50) 
-    
-    Send("^!x")
-    Sleep(300) 
-    WinMinimize(activeHwnd)
-    WinHide(activeHwnd)
-    
-    Notify("Media Stopped", "Playback paused successfully.")
-}
-#HotIf
+#Include "%A_ScriptDir%\Modules\Watchdogs.ahk"
 
 ; BOOT SEQUENCE
 Initialize()
