@@ -7,7 +7,6 @@ BuildTrayMenu() {
     A_TrayMenu.Delete() 
 
     ; 2. Add Quick-Edit shortcuts to your most used modules
-    ; (Change the editor path if you don't use VS Code by default)
     A_TrayMenu.Add("⚙️ Edit Main Hub", (*) => Edit())
     A_TrayMenu.Add("⌨️ Edit Keybindings", (*) => Run("Code.exe " A_ScriptDir "\Modules\Keybindings.ahk"))
     A_TrayMenu.Add("🔤 Edit Hotstrings", (*) => Run("Code.exe " A_ScriptDir "\Modules\Hotstrings.ahk"))
@@ -29,8 +28,6 @@ BuildTrayMenu() {
     A_TrayMenu.Add("🔄 Reload Engine", (*) => Reload())
     A_TrayMenu.Add("❌ Exit Engine", (*) => ExitApp())
     
-    ; Optional: Change the default green 'H' icon to something stealthy
-    ; 174 = A sleek gear/settings icon from native Windows files
     TraySetIcon("imageres.dll", 174) 
 }
 
@@ -39,7 +36,7 @@ BuildTrayMenu() {
 ; ------------------------------------------------------------------------------
 ToggleHotCorners(ItemName, ItemPos, MyMenu) {
     global HotCornersEnabled
-    HotCornersEnabled := !HotCornersEnabled ; Flip the boolean
+    HotCornersEnabled := !HotCornersEnabled
     
     ; Dynamically rename the menu item so you know its current state
     if (HotCornersEnabled) {

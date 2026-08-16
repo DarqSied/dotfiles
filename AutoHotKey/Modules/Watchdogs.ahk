@@ -73,17 +73,14 @@ ListenForGuideButton() {
     xState := Buffer(16, 0)
     isGuidePressed := false
     
-    ; Loop through all 4 possible Xbox controller slots (0 through 3)
     Loop 4 {
-        ; Execute the memory pointer directly for the current controller slot
         if (DllCall(pXInputGetStateEx, "UInt", A_Index - 1, "Ptr", xState) == 0) { 
             
-            ; THE FIX: The button data starts at memory offset 4!
             wButtons := NumGet(xState, 4, "UShort")
             
-            if (wButtons & 0x0400) { ; 0x0400 is the hex code for the Guide Button
+            if (wButtons & 0x0400) {
                 isGuidePressed := true
-                break ; We found the pressed button, stop checking other slots
+                break
             }
         }
     }
@@ -97,7 +94,6 @@ ListenForGuideButton() {
                 Notify("Game Mode", "Playnite Fullscreen Launched")
             }
         } else {
-            ; If it's already running, just pull it to the front
             try WinActivate("ahk_exe Playnite.FullscreenApp.exe")
         }
     }

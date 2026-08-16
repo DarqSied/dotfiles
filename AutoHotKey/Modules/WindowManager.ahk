@@ -5,7 +5,7 @@
 Global FloatedWindows := Map()
 Global LastWindowList := ""
 Global LastDesk := -1
-Global TiledOrder := [] ; STABILIZATION ARRAY: Locks window positions
+Global TiledOrder := []
 
 ; START THE WATCHDOG
 SetTimer(ProcessDynamicLayout, 250)
@@ -43,11 +43,11 @@ IsTileable(hwnd) {
         return false
 
     exStyle := WinGetExStyle(windowId)
-    if (exStyle & 0x00000080) ; WS_EX_TOOLWINDOW
+    if (exStyle & 0x00000080)
         return false
 
     style := WinGetStyle(windowId)
-    if !(style & 0x10000) ; WS_MAXIMIZEBOX
+    if !(style & 0x10000)
         return false
         
     cloaked := 0
@@ -74,7 +74,6 @@ IsTileable(hwnd) {
 ProcessDynamicLayout(params*) {
     global hVDA, VDA_PATH, LastWindowList, LastDesk, FloatedWindows, TiledOrder
     
-    ; Setup Arrays if they don't exist yet
     if !IsSet(TiledOrder) || Type(TiledOrder) !== "Array"
         TiledOrder := []
     if !IsSet(FloatedWindows)
@@ -129,7 +128,7 @@ ProcessDynamicLayout(params*) {
     ; 3. Enforce the 4-window limit
     if (TiledOrder.Length > 4) {
         while (TiledOrder.Length > 4) {
-            excessHwnd := TiledOrder.Pop() ; Float the newest/last window
+            excessHwnd := TiledOrder.Pop()
             if (!FloatedWindows.Has(excessHwnd)) {
                 FloatedWindows[excessHwnd] := true
                 ToolTip("Max 4 Tiled. Window auto-floated.")
@@ -244,12 +243,9 @@ ApplyMathLayout(windows, currentDesk, count) {
         }
         
         try {
-            ; --- CRITICAL FIX: The "Invisible Border" Compensation ---
-            ; Ask DWM for the REAL visible bounds of the window vs its standard API bounds
             rect := Buffer(16, 0)
             offX := 0, offY := 0, offW := 0, offH := 0
             
-            ; 9 = DWMWA_EXTENDED_FRAME_BOUNDS
             if (DllCall("dwmapi\DwmGetWindowAttribute", "Ptr", hwnd, "UInt", 9, "Ptr", rect, "UInt", 16) == 0) {
                 dx := NumGet(rect, 0, "Int")
                 dy := NumGet(rect, 4, "Int")
@@ -264,16 +260,13 @@ ApplyMathLayout(windows, currentDesk, count) {
                 offH := wh - dh
             }
             
-            ; Apply the offset to our target coordinates
             WinMove(tX + offX, tY + offY, tW + offW, tH + offH, windowId)
             
-            ; --- Force Windows 11 Rounded Corners ---
             cornerPref := Buffer(4, 0)
             NumPut("Int", 2, cornerPref, 0) 
             DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", hwnd, "UInt", 33, "Ptr", cornerPref, "UInt", 4)
             
         } catch {
-            ; 3. SAFE MOVE: Swallow errors if UAC/Admin blocks the move
         }
     }
 }
@@ -283,13 +276,12 @@ ApplyMathLayout(windows, currentDesk, count) {
 ; ------------------------------------------------------------------------------
 class WindowBorder {
     static lastHwnd := 0
-    static accentColor := 0x00FFFFFF ; Changed default to White
+    static accentColor := 0x00FFFFFF
     static hookProc := 0
     
     static Init() {
         WindowBorder.UpdateAccentColor()
         
-        ; Register EVENT_SYSTEM_FOREGROUND (0x0003) Hook
         WindowBorder.hookProc := CallbackCreate(WindowBorder.OnForegroundChange, "F")
         DllCall("SetWinEventHook"
             , "UInt", 0x0003, "UInt", 0x0003 
@@ -297,12 +289,10 @@ class WindowBorder {
             , "Ptr", WindowBorder.hookProc
             , "UInt", 0, "UInt", 0, "UInt", 0)
             
-        WindowBorder.Update() ; Initial color application
+        WindowBorder.Update()
     }
 
     static UpdateAccentColor() {
-        ; CRITICAL FIX: Hardcoded to solid white instead of reading the system registry.
-        ; (If you ever want to change this, DWM format is 0x00bbggrr)
         WindowBorder.accentColor := 0x00FFFFFF
     }
     
@@ -314,7 +304,6 @@ class WindowBorder {
         if (!hwnd)
             hwnd := WinExist("A")
             
-        ; --- CRITICAL FIX: Count valid windows on the current desktop ---
         global hVDA, VDA_PATH
         currentDesk := 0
         try {
@@ -342,7 +331,6 @@ class WindowBorder {
                 break
         }
         
-        ; If there is only 1 (or 0) valid windows, clear the border and abort
         if (validCount < 2) {
             if (WindowBorder.lastHwnd && WinExist(WindowBorder.lastHwnd)) {
                 try {
@@ -406,12 +394,12 @@ PromoteToMaster() {
     for index, hwnd in TiledOrder {
         if (hwnd == activeHwnd) {
             if (index == 1)
-                return ; Already in the Master position
+                return
                 
             TiledOrder.RemoveAt(index)
             TiledOrder.InsertAt(1, activeHwnd)
             
-            LastWindowList := "" ; Clear cache to force a geometry redraw
+            LastWindowList := ""
             ProcessDynamicLayout()
             return
         }
@@ -595,28 +583,23 @@ ManagePopups() {
         if (!WinExist(windowId))
             continue
             
-        ; --- THE FIX: SAFETY WRAPPER ---
         title := ""
         exe := ""
         try {
             title := WinGetTitle(windowId)
             exe := WinGetProcessName(windowId)
         } catch {
-            continue ; ERROR 5 PREVENTION: Silently skip Admin/System windows
+            continue
         }
-        ; -------------------------------
         
         isFollowMe := false
         
-        ; 1. Catch Browser Picture-in-Picture
         if (title == "Picture in picture" || title == "Picture-in-Picture")
             isFollowMe := true
             
-        ; 2. Catch WhatsApp Pop-ups / Calls
         if (exe ~= "i)whatsapp\.exe" && title != "WhatsApp" && title != "")
             isFollowMe := true
             
-        ; Apply PiP Behaviors
         if (isFollowMe && !TrackedPopups.Has(hwnd)) {
             TrackedPopups[hwnd] := true
             WinSetAlwaysOnTop(1, windowId)
@@ -627,7 +610,6 @@ ManagePopups() {
         }
     }
     
-    ; 3. Maintenance & Desktop Traversal Fallback
     for hwnd in TrackedPopups.Clone() {
         if (!WinExist("ahk_id " . hwnd)) {
             TrackedPopups.Delete(hwnd)

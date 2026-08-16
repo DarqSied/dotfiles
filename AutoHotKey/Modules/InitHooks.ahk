@@ -60,7 +60,7 @@ SetAppMode := DllCall("GetProcAddress", "Ptr", hTheme, "Ptr", 135, "Ptr")
 FlushMenu  := DllCall("GetProcAddress", "Ptr", hTheme, "Ptr", 136, "Ptr")
 
 ; 3. Execute the pointers
-DllCall(SetAppMode, "Int", 2) ; 2 = Force Dark Mode
+DllCall(SetAppMode, "Int", 2)
 DllCall(FlushMenu)
 
 ; ------------------------------------------------------------------------------
@@ -148,8 +148,6 @@ ForceWindowRecalculation(hwnd) => DllCall("SetWindowPos", "Ptr", hwnd, "Ptr", 0,
 ; ------------------------------------------------------------------------------
 ; GLOBAL FOCUS TRACKER (KERNEL-LEVEL WINEVENT HOOK)
 ; ------------------------------------------------------------------------------
-; Shell Hooks are blind to custom docks (Tool Windows). This kernel hook tracks 
-; literal foreground changes at the OS level, meaning nothing can hide from it.
 
 Global FocusHookProc := CallbackCreate(OnForegroundChange, "F")
 
@@ -230,7 +228,6 @@ MouseHookProc(nCode, wParam, lParam) {
                     activeHwnd := WinExist("A")
                     activeClass := WinGetClass(activeHwnd)
                     
-                    ; THE FIX: Do not block hot corners if the Desktop is the active window
                     if (!(activeClass ~= "^(Progman|WorkerW)$")) {
                         WinGetPos(&winX, &winY, &winW, &winH, activeHwnd)
                         if (winX <= 0 && winY <= 0 && winW >= A_ScreenWidth && winH >= A_ScreenHeight) {

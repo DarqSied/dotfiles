@@ -86,12 +86,10 @@ AutoRouteWindow(hwnd) {
         
         ; 4. Map Routing
         if (processName == "explorer.exe" and windowClass == "CabinetWClass") {
-            ; A. Standard USB Drive insertion
             if (A_TickCount - LastDriveInsertTime < 5000) {
                 targetDesk := 6 
                 LastDriveInsertTime := 0 
             }
-            ; B. Android Storage Share (MTP or Network)
             else if (InStr(windowTitle, "Internal shared storage") || InStr(windowTitle, "Himanshu's S25+")) {
                 targetDesk := 6
             }
@@ -120,22 +118,18 @@ AutoRouteWindow(hwnd) {
             DllCall(VDA_PATH "\GoToDesktopNumber", "Int", targetDesk)
         }
     } catch as err {
-        ; THE BLACKBOX: Silently writes routing failures to debug.log 
         Logger("Routing Failed | App: " processName " | Error: " err.Message)   
     } 
-    ; Try block silently swallows edge cases without halting the script or showing popups
 }
 
 ; ------------------------------------------------------------------------------
 ; Smart Desktop Routing & Resurrector for PWAs
 ; ------------------------------------------------------------------------------
-; Update the parameters and pull the global path
 LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "") {
     global hVDA, PWAVault, PATH_VIVALDI
     if !IsSet(PWAVault)
         PWAVault := Map()
         
-    ; Use the absolute config path if no browser is specified
     if (browser == "")
         browser := PATH_VIVALDI
         
@@ -164,25 +158,22 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "") {
         targetHwnd := PWAVault[appName]
         
         if (isWebLink) {
-            ; --- THE VISUAL PROMPT ---
             SwitchConfirm := MsgBox("A new link was intercepted.`n`nSwitch to this new video instead of the one currently playing in " appName "?", "Confirm Switch", "YesNo IconQuestion")
             
             if (SwitchConfirm == "No") {
                 SetTitleMatchMode(savedTitleMode)
                 DetectHiddenWindows(savedHiddenMode)
-                return ; Abort the switch entirely
+                return
             }
         }
         
-        ; Bring the existing PWA to the front
         WinSetExStyle("-0x80", targetHwnd)
         WinShow(targetHwnd)
-        DllCall("ShowWindow", "Ptr", targetHwnd, "Int", 9) ; SW_RESTORE
+        DllCall("ShowWindow", "Ptr", targetHwnd, "Int", 9)
         WinActivate(targetHwnd)
         WinWaitActive(targetHwnd, , 2)
         Notify("Media Resumed", appName " ready.")
         
-        ; Force the window to navigate to the new video
         if (isWebLink) {
             Sleep(200) 
             InjectURL(url)
@@ -193,12 +184,10 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "") {
     ; ==========================================================================
     else {
         if (foundHwnd := WinExist(searchString)) {
-            ; ... [Keep existing background recovery logic] ...
         }
         else {
             oldActive := WinActive("A")
             
-            ; THE CRITICAL FIX: Safe Launching
             try {
                 if (AppIdMap.Has(appName)) {
                     Run(browser ' ' AppIdMap[appName] ' --start-maximized')
@@ -212,7 +201,6 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "") {
                 return
             }
             
-            ; Dynamically wait for the NEW window to take focus
             Loop 60 {
                 Sleep(100)
                 active := WinActive("ahk_class Chrome_WidgetWin_1")
@@ -229,9 +217,8 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "") {
                 return
             }
             
-            ; Wait for the UI to fully render, then push the specific video URL
             if (isWebLink && AppIdMap.Has(appName)) {
-                Sleep(1200) ; Extra buffer for cold boots
+                Sleep(1200)
                 InjectURL(url)
             }
         }
@@ -239,7 +226,6 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "") {
         PWAVault[appName] := targetHwnd
     }
     
-    ; 3. Desktop Routing Execution
     if (targetHwnd) {
         Sleep(200) 
         if (IsSet(hVDA) && hVDA) {
@@ -259,13 +245,11 @@ InjectURL(targetUrl) {
     A_Clipboard := targetUrl
     
     if ClipWait(1) {
-        ; Ctrl+L is the universal Chromium shortcut to focus the address bar. 
-        ; Even if the bar is hidden, Chromium will catch this and prep for input!
         Send("^l")    
         Sleep(150)
-        Send("^v")    ; Paste the new link
+        Send("^v")
         Sleep(50)
-        Send("{Enter}") ; Go!
+        Send("{Enter}")
     }
     A_Clipboard := savedClip
 }
@@ -274,7 +258,7 @@ InjectURL(targetUrl) {
 ; PWA Auto-Interceptor & Router Initialization
 ; ------------------------------------------------------------------------------
 global PwaBlacklist := Map() 
-global PrivateHwnds := Map() ; Permanent memory for Private Window IDs
+global PrivateHwnds := Map()
 
 InitRouter() ; Execute the boot sequence
 
@@ -336,13 +320,12 @@ InitRouter() {
 ; ------------------------------------------------------------------------------
 TrackPrivateWindows(wParam, lParam, msg, hwnd) {
     TrackDynamicLayouts(wParam, lParam, msg, hwnd)
-    ; wParam 1 = Window Created | wParam 6 = Window Title Redrawn
     if (wParam == 1 || wParam == 6) {
         try {
             title := WinGetTitle("ahk_id " lParam)
             if InStr(title, "Private") || InStr(title, "Incognito") {
                 global PrivateHwnds
-                PrivateHwnds[lParam] := true ; Tag this unique window ID permanently
+                PrivateHwnds[lParam] := true
             }
         }
     }
@@ -353,8 +336,6 @@ SetTimer(CatchAndEject, 400)
 CatchAndEject() {
     if (activeHwnd := WinActive("ahk_group MediaPWAs")) {
         
-        ; --- THE FIX: STRICT TITLE SANITY CHECK ---
-        ; Prevents AI chats and Google searches from triggering the URL extraction
         windowTitle := WinGetTitle(activeHwnd)
         isValidMedia := false
         
@@ -392,7 +373,6 @@ CatchAndEject() {
         SetTimer(CatchAndEject, 0)
         Sleep(800) 
         
-        ; Make sure the user didn't Alt+Tab away while we waited
         if !WinActive("ahk_id " . activeHwnd) {
             SetTimer(CatchAndEject, 400)
             return
@@ -418,7 +398,6 @@ CatchAndEject() {
             }
         }
         
-        ; If it failed, this is a PWA! Blacklist it and abort silently.
         if (TargetURL = "" || !InStr(TargetURL, "http")) {
             if !IsSet(PwaBlacklist)
                 PwaBlacklist := Map()
@@ -467,7 +446,6 @@ CatchAndEject() {
 GoToDesktop(target) {
     if (hVDA) {
         DllCall(VDA_PATH "\GoToDesktopNumber", "Int", target)
-        ; Wait 500ms for the slide animation to completely finish
         SetTimer(ProcessDynamicLayout.Bind(0, false), -500) 
     }
 }

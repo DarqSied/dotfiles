@@ -16,9 +16,9 @@ global TASKBAR_WND := "ahk_class Shell_TrayWnd"
 global SECONDARY_TASKBAR_WND := "ahk_class Shell_SecondaryTrayWnd"
 
 ; --- Hot Corner Configurations ---
-global CornerTolerance := 15  ; Pixels from the absolute corner to trigger action
-global CornerInterval := 100  ; Milliseconds between mouse position checks
-global LastCorner := "None"   ; Tracks current corner to prevent spamming
+global CornerTolerance := 15
+global CornerInterval := 100
+global LastCorner := "None"
 global HotCornersEnabled := true
 global hMouseHook := 0
 

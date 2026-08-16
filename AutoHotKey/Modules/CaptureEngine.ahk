@@ -8,11 +8,10 @@ PerformCapture(mode) {
     
     ; 2. Trigger the appropriate engine
     if (mode = "Scrolling") {
-        ; Wake ShareX for scrolling captures
         if not ProcessExist("ShareX.exe") {
             Run(PATH_SHAREX ' -silent')
             WinWait("ahk_exe ShareX.exe",, 5)
-            Sleep(1000) ; Buffer for cold boot
+            Sleep(1000)
         }
         Run(PATH_SHAREX ' -ScrollingCapture')
     } else if (mode = "Region") {
@@ -26,7 +25,7 @@ PerformCapture(mode) {
     ; 3. The Watchdog: Wait up to 120 seconds for clipboard data
     if ClipWait(10, 1) {
         
-        Sleep(300) ; Brief buffer to let the clipboard finalize the image data
+        Sleep(300)
         
         ; 4. Directory Setup
         currentMonth := FormatTime(, "yyyy-MM")
@@ -55,13 +54,11 @@ PerformCapture(mode) {
             Notify("Capture Failed", "Clipboard did not contain valid image data.")
         }
         
-        ; Aggressively terminate ShareX if it was used
         if (mode = "Scrolling") {
             RunWait("taskkill /F /IM ShareX.exe", , "Hide")
         }
         
     } else {
-        ; Handle timeouts or cancellations
         if (mode = "Scrolling") {
             RunWait("taskkill /F /IM ShareX.exe", , "Hide")
             Notify("Capture Canceled", "Scrolling capture timed out.")

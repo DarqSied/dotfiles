@@ -42,7 +42,7 @@ ShowCheatSheet() {
             ; A. Detect Categories
             if (RegExMatch(line, 'i)^\s*;\s*\[(.*?)\]', &match)) {
                 currentCategory := Trim(match[1])
-                currentSubCategory := "" ; Reset memory for new blocks
+                currentSubCategory := ""
                 cheatText .= "►CAT_TOP`n►CAT_TXT:" StrUpper(currentCategory) "`n►CAT_BOT`n"
                 continue
             }
@@ -66,16 +66,13 @@ ShowCheatSheet() {
                     desc := Trim(RegExReplace(fullComment, "^.*?:", "")) 
                     finalText := "Press " char " -> " desc
                 } else {
-                    ; AUTO-AESTHETIC: Convert generic "Key: Desc" into beautiful "Key -> Desc" automatically
                     if RegExMatch(fullComment, "^(.*?):\s*(.*)", &parts) {
                         finalText := Trim(parts[1]) " -> " Trim(parts[2])
                     } else {
-                        finalText := fullComment ; Trust the user's custom formatting
+                        finalText := fullComment
                     }
                 }
                 
-                ; SMART BRANCHING: Only use the ├─ tree branch if it belongs to a Sub-Category!
-                ; If it's directly under a Main Category (like Leader Keys), just use clean spaces.
                 prefix := (currentSubCategory != "") ? "    ├─ " : "    "
                 cheatText .= prefix . finalText . "`n"
             }

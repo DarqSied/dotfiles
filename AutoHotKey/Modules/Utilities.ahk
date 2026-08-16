@@ -122,7 +122,6 @@ OpenMonthlyScreenshots(*) {
     if DirExist(targetDir) {
         Run('explore "' targetDir '"')
     } else {
-        ; Assuming your Notify() function is globally accessible via Utilities.ahk
         Notify("Directory Missing", "No screenshots folder exists for " currentMonth " yet.")
     }
 }
