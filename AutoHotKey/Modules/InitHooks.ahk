@@ -227,10 +227,16 @@ MouseHookProc(nCode, wParam, lParam) {
         if (currentCorner != LastCorner) {
             if (currentCorner != "None") {
                 try {
-                    WinGetPos(&winX, &winY, &winW, &winH, "A")
-                    if (winX <= 0 && winY <= 0 && winW >= A_ScreenWidth && winH >= A_ScreenHeight) {
-                        LastCorner := currentCorner
-                        return DllCall("CallNextHookEx", "Ptr", 0, "Int", nCode, "Ptr", wParam, "Ptr", lParam)
+                    activeHwnd := WinExist("A")
+                    activeClass := WinGetClass(activeHwnd)
+                    
+                    ; THE FIX: Do not block hot corners if the Desktop is the active window
+                    if (!(activeClass ~= "^(Progman|WorkerW)$")) {
+                        WinGetPos(&winX, &winY, &winW, &winH, activeHwnd)
+                        if (winX <= 0 && winY <= 0 && winW >= A_ScreenWidth && winH >= A_ScreenHeight) {
+                            LastCorner := currentCorner
+                            return DllCall("CallNextHookEx", "Ptr", 0, "Int", nCode, "Ptr", wParam, "Ptr", lParam)
+                        }
                     }
                 }
             }

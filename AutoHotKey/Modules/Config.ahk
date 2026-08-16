@@ -52,7 +52,7 @@ global AppRoutingMap := Map(
     "riotclientux.exe", 3,
     "upc.exe", 3,
     "eadesktop.exe", 3,
-    "playnite.desktopapp.exe", 3,
+    "playnite.desktopapp.exe", "SKIP",
     "playnite.fullscreenapp.exe", 3,
     "bmaac.exe", 3,
     "batmanak.exe", 3,

@@ -2,17 +2,14 @@
 ; [ MODULE: WINDOW MANAGER & LAYOUT LOGIC ]
 ; ==============================================================================
 
-; ------------------------------------------------------------------------------
-; [ PART 1: THE AUTO-TILING ENGINE (TWM) ]
-; ------------------------------------------------------------------------------
 Global FloatedWindows := Map()
 Global LastWindowList := ""
 Global LastDesk := -1
+Global TiledOrder := [] ; STABILIZATION ARRAY: Locks window positions
 
-; START THE WATCHDOG: Runs continuously in the background (virtually 0% CPU).
+; START THE WATCHDOG
 SetTimer(ProcessDynamicLayout, 250)
 
-; Shell hook now acts as an instant-trigger for fast-loading apps
 TrackDynamicLayouts(params*) {
     SetTimer(ProcessDynamicLayout, -50)
 }
@@ -20,6 +17,9 @@ TrackDynamicLayouts(params*) {
 ; --- THE WINDOW FILTER ---
 IsTileable(hwnd) {
     global FloatedWindows
+    if !IsSet(FloatedWindows)
+        FloatedWindows := Map()
+        
     windowId := "ahk_id " . hwnd
 
     if (!WinExist(windowId) || !DllCall("IsWindowVisible", "Ptr", hwnd))
@@ -29,13 +29,14 @@ IsTileable(hwnd) {
         return false
         
     title := WinGetTitle(windowId)
+    
     if (title == "" || title == "Program Manager" || title == "Shut Down Windows")
         return false
-    
     if (title == "Picture in picture" || title == "Picture-in-Picture")
         return false
-
     if (title ~= "i)(CAT_Comprehensive_Plan|CAT_QA_Formula_Notebook)")
+        return false
+    if (title == "WhatsApp" || title == "Phone Link" || title == "Calculator")
         return false
         
     if FloatedWindows.Has(hwnd)
@@ -46,7 +47,7 @@ IsTileable(hwnd) {
         return false
 
     style := WinGetStyle(windowId)
-    if (style & 0x08000000) ; WS_DISABLED
+    if !(style & 0x10000) ; WS_MAXIMIZEBOX
         return false
         
     cloaked := 0
@@ -54,8 +55,8 @@ IsTileable(hwnd) {
     if (cloaked)
         return false
         
-    class := WinGetClass(windowId)
-    if (class ~= "^(Progman|WorkerW|Shell_TrayWnd|Shell_SecondaryTrayWnd|NotifyIconOverflowWindow|Windows\.UI\.Core\.CoreWindow|TopLevelWindowForOverflowXamlIsland|XamlExplorerHostIslandWindow|PopupHost|#32770)$")
+    winClass := WinGetClass(windowId)
+    if (winClass ~= "^(Progman|WorkerW|Shell_TrayWnd|Shell_SecondaryTrayWnd|NotifyIconOverflowWindow|Windows\.UI\.Core\.CoreWindow|TopLevelWindowForOverflowXamlIsland|XamlExplorerHostIslandWindow|PopupHost|#32770)$")
         return false
         
     exe := WinGetProcessName(windowId)
@@ -71,8 +72,14 @@ IsTileable(hwnd) {
 
 ; --- THE MASTER ROUTER ---
 ProcessDynamicLayout(params*) {
-    global hVDA, VDA_PATH, LastWindowList, LastDesk, FloatedWindows
+    global hVDA, VDA_PATH, LastWindowList, LastDesk, FloatedWindows, TiledOrder
     
+    ; Setup Arrays if they don't exist yet
+    if !IsSet(TiledOrder) || Type(TiledOrder) !== "Array"
+        TiledOrder := []
+    if !IsSet(FloatedWindows)
+        FloatedWindows := Map()
+        
     currentDesk := 0
     try {
         if (hVDA && VDA_PATH)
@@ -81,7 +88,9 @@ ProcessDynamicLayout(params*) {
         currentDesk := 0
     }
     
-    validWindows := []
+    ; 1. Gather all currently valid, tileable windows
+    validSet := Map()
+    currentTileable := []
     
     for hwnd in WinGetList() {
         if (!IsTileable(hwnd))
@@ -95,35 +104,43 @@ ProcessDynamicLayout(params*) {
             } catch {
             }
         }
-        validWindows.Push(hwnd)
+        validSet[hwnd] := true
+        currentTileable.Push(hwnd)
     }
     
-    if (validWindows.Length > 4) {
-        while (validWindows.Length > 4) {
-            excessHwnd := validWindows.RemoveAt(1)
+    ; 2. Stabilize the array (Prevents focus-jumping)
+    newTiledOrder := []
+    
+    for hwnd in TiledOrder {
+        if validSet.Has(hwnd) {
+            newTiledOrder.Push(hwnd)
+            validSet.Delete(hwnd) 
+        }
+    }
+    
+    for hwnd in currentTileable {
+        if validSet.Has(hwnd) {
+            newTiledOrder.Push(hwnd) 
+        }
+    }
+    
+    TiledOrder := newTiledOrder
+    
+    ; 3. Enforce the 4-window limit
+    if (TiledOrder.Length > 4) {
+        while (TiledOrder.Length > 4) {
+            excessHwnd := TiledOrder.Pop() ; Float the newest/last window
             if (!FloatedWindows.Has(excessHwnd)) {
                 FloatedWindows[excessHwnd] := true
                 ToolTip("Max 4 Tiled. Window auto-floated.")
                 SetTimer(() => ToolTip(), -1500)
             }
         }
-        
-        validWindows := []
-        for hwnd in WinGetList() {
-            if (!IsTileable(hwnd))
-                continue
-            if (hVDA && VDA_PATH) {
-                try {
-                    winDesk := DllCall(VDA_PATH "\GetWindowDesktopNumber", "Ptr", hwnd, "Int")
-                    if (winDesk != -1 && winDesk != currentDesk)
-                        continue
-                } catch {
-                }
-            }
-            validWindows.Push(hwnd)
-        }
     }
     
+    validWindows := TiledOrder
+    
+    ; 4. Check if layout actually needs updating
     currentList := ""
     for hwnd in validWindows {
         currentList .= hwnd . "|"
@@ -140,6 +157,8 @@ ProcessDynamicLayout(params*) {
     if (appCount > 0) {
         ApplyMathLayout(validWindows, currentDesk, appCount)
     }
+    
+    WindowBorder.Update()
 }
 
 ; --- THE GEOMETRY FILTER ---
@@ -156,7 +175,7 @@ ApplyMathLayout(windows, currentDesk, count) {
         H := A_ScreenHeight
     }
     
-    g := 5 ; GAP SIZE
+    g := 10 ; GAP SIZE
     
     for index, hwnd in windows {
         windowId := "ahk_id " . hwnd 
@@ -225,7 +244,34 @@ ApplyMathLayout(windows, currentDesk, count) {
         }
         
         try {
-            WinMove(tX, tY, tW, tH, windowId)
+            ; --- CRITICAL FIX: The "Invisible Border" Compensation ---
+            ; Ask DWM for the REAL visible bounds of the window vs its standard API bounds
+            rect := Buffer(16, 0)
+            offX := 0, offY := 0, offW := 0, offH := 0
+            
+            ; 9 = DWMWA_EXTENDED_FRAME_BOUNDS
+            if (DllCall("dwmapi\DwmGetWindowAttribute", "Ptr", hwnd, "UInt", 9, "Ptr", rect, "UInt", 16) == 0) {
+                dx := NumGet(rect, 0, "Int")
+                dy := NumGet(rect, 4, "Int")
+                dw := NumGet(rect, 8, "Int") - dx
+                dh := NumGet(rect, 12, "Int") - dy
+                
+                WinGetPos(&wx, &wy, &ww, &wh, windowId)
+                
+                offX := wx - dx
+                offY := wy - dy
+                offW := ww - dw
+                offH := wh - dh
+            }
+            
+            ; Apply the offset to our target coordinates
+            WinMove(tX + offX, tY + offY, tW + offW, tH + offH, windowId)
+            
+            ; --- Force Windows 11 Rounded Corners ---
+            cornerPref := Buffer(4, 0)
+            NumPut("Int", 2, cornerPref, 0) 
+            DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", hwnd, "UInt", 33, "Ptr", cornerPref, "UInt", 4)
+            
         } catch {
             ; 3. SAFE MOVE: Swallow errors if UAC/Admin blocks the move
         }
@@ -233,36 +279,88 @@ ApplyMathLayout(windows, currentDesk, count) {
 }
 
 ; ------------------------------------------------------------------------------
-; NATIVE WINDOW BORDER HIGHLIGHTER
+; NATIVE WINDOW BORDER HIGHLIGHTER (EVENT HOOK OPTIMIZED)
 ; ------------------------------------------------------------------------------
 class WindowBorder {
     static lastHwnd := 0
-    static accentColor := 0x00F6823B
+    static accentColor := 0x00FFFFFF ; Changed default to White
+    static hookProc := 0
     
     static Init() {
         WindowBorder.UpdateAccentColor()
-        SetTimer(() => WindowBorder.Update(), 100)
+        
+        ; Register EVENT_SYSTEM_FOREGROUND (0x0003) Hook
+        WindowBorder.hookProc := CallbackCreate(WindowBorder.OnForegroundChange, "F")
+        DllCall("SetWinEventHook"
+            , "UInt", 0x0003, "UInt", 0x0003 
+            , "Ptr", 0
+            , "Ptr", WindowBorder.hookProc
+            , "UInt", 0, "UInt", 0, "UInt", 0)
+            
+        WindowBorder.Update() ; Initial color application
     }
-    
+
     static UpdateAccentColor() {
-        try {
-            accentInt := RegRead("HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM", "AccentColor")
-            red   := accentInt & 0xFF
-            green := (accentInt >> 8) & 0xFF
-            blue  := (accentInt >> 16) & 0xFF
-            WindowBorder.accentColor := (blue << 16) | (green << 8) | red
-        } catch {
-            WindowBorder.accentColor := 0x003B82F6
-        }
+        ; CRITICAL FIX: Hardcoded to solid white instead of reading the system registry.
+        ; (If you ever want to change this, DWM format is 0x00bbggrr)
+        WindowBorder.accentColor := 0x00FFFFFF
     }
     
-    static Update() {
-        hwnd := WinExist("A")
+    static OnForegroundChange(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime) {
+        WindowBorder.Update(hwnd)
+    }
+    
+    static Update(hwnd := 0) {
+        if (!hwnd)
+            hwnd := WinExist("A")
+            
+        ; --- CRITICAL FIX: Count valid windows on the current desktop ---
+        global hVDA, VDA_PATH
+        currentDesk := 0
+        try {
+            if (hVDA && VDA_PATH)
+                currentDesk := DllCall(VDA_PATH "\GetCurrentDesktopNumber", "Int")
+        } catch {
+        }
+        
+        validCount := 0
+        for w in WinGetList() {
+            if (!IsTileable(w))
+                continue
+                
+            if (hVDA && VDA_PATH) {
+                try {
+                    winDesk := DllCall(VDA_PATH "\GetWindowDesktopNumber", "Ptr", w, "Int")
+                    if (winDesk != -1 && winDesk != currentDesk)
+                        continue
+                } catch {
+                }
+            }
+            
+            validCount++
+            if (validCount >= 2)
+                break
+        }
+        
+        ; If there is only 1 (or 0) valid windows, clear the border and abort
+        if (validCount < 2) {
+            if (WindowBorder.lastHwnd && WinExist(WindowBorder.lastHwnd)) {
+                try {
+                    bufDefault := Buffer(4, 0)
+                    NumPut("UInt", 0xFFFFFFFF, bufDefault, 0)
+                    DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", WindowBorder.lastHwnd, "UInt", 34, "Ptr", bufDefault, "UInt", 4)
+                } catch {
+                }
+                WindowBorder.lastHwnd := 0
+            }
+            return
+        }
+            
         if (!hwnd || hwnd == WindowBorder.lastHwnd)
             return
             
-        class := WinGetClass(hwnd)
-        if (class ~= "^(Progman|WorkerW|Shell_TrayWnd|Shell_SecondaryTrayWnd)$")
+        winClass := WinGetClass(hwnd)
+        if (winClass ~= "^(Progman|WorkerW|Shell_TrayWnd|Shell_SecondaryTrayWnd)$")
             return
             
         try {
@@ -292,6 +390,30 @@ class WindowBorder {
             }
         } catch {
             WindowBorder.lastHwnd := 0
+        }
+    }
+}
+
+; ------------------------------------------------------------------------------
+; "ORDERED OTHERWISE": PROMOTE ACTIVE WINDOW TO MASTER
+; ------------------------------------------------------------------------------
+PromoteToMaster() {
+    global TiledOrder, LastWindowList
+    activeHwnd := WinExist("A")
+    if !activeHwnd
+        return
+        
+    for index, hwnd in TiledOrder {
+        if (hwnd == activeHwnd) {
+            if (index == 1)
+                return ; Already in the Master position
+                
+            TiledOrder.RemoveAt(index)
+            TiledOrder.InsertAt(1, activeHwnd)
+            
+            LastWindowList := "" ; Clear cache to force a geometry redraw
+            ProcessDynamicLayout()
+            return
         }
     }
 }
@@ -383,12 +505,6 @@ ActivateFocusMode() {
     activeHwnd := WinExist("A")
     if !activeHwnd
         return
-
-    for hwnd in WinGetList() {
-        if (hwnd != activeHwnd && !(WinGetClass(hwnd) ~= "^(Progman|WorkerW|Shell_TrayWnd)$")) {
-            try WinMinimize(hwnd)
-        }
-    }
 }
 
 ToggleAlwaysOnTop() => WinSetAlwaysOnTop(-1, "A") 
@@ -461,4 +577,68 @@ SetDockSpace(dockPosition := "Top", dockSizePixels := 50) {
     NumPut("Int", Bottom, rect, 12)
     
     DllCall("SystemParametersInfo", "UInt", 0x002F, "UInt", 0, "Ptr", rect, "UInt", 0x0003)
+}
+
+; ------------------------------------------------------------------------------
+; [ PART 3: PiP & POP-UP "FOLLOW ME" ENGINE ]
+; ------------------------------------------------------------------------------
+Global TrackedPopups := Map()
+
+ManagePopups() {
+    global hVDA, VDA_PATH, TrackedPopups
+    
+    if !IsSet(TrackedPopups)
+        TrackedPopups := Map()
+        
+    for hwnd in WinGetList() {
+        windowId := "ahk_id " . hwnd
+        if (!WinExist(windowId))
+            continue
+            
+        ; --- THE FIX: SAFETY WRAPPER ---
+        title := ""
+        exe := ""
+        try {
+            title := WinGetTitle(windowId)
+            exe := WinGetProcessName(windowId)
+        } catch {
+            continue ; ERROR 5 PREVENTION: Silently skip Admin/System windows
+        }
+        ; -------------------------------
+        
+        isFollowMe := false
+        
+        ; 1. Catch Browser Picture-in-Picture
+        if (title == "Picture in picture" || title == "Picture-in-Picture")
+            isFollowMe := true
+            
+        ; 2. Catch WhatsApp Pop-ups / Calls
+        if (exe ~= "i)whatsapp\.exe" && title != "WhatsApp" && title != "")
+            isFollowMe := true
+            
+        ; Apply PiP Behaviors
+        if (isFollowMe && !TrackedPopups.Has(hwnd)) {
+            TrackedPopups[hwnd] := true
+            WinSetAlwaysOnTop(1, windowId)
+            
+            if (hVDA && VDA_PATH) {
+                try DllCall(VDA_PATH "\PinWindow", "Ptr", hwnd)
+            }
+        }
+    }
+    
+    ; 3. Maintenance & Desktop Traversal Fallback
+    for hwnd in TrackedPopups.Clone() {
+        if (!WinExist("ahk_id " . hwnd)) {
+            TrackedPopups.Delete(hwnd)
+        } else if (hVDA && VDA_PATH) {
+            try {
+                currentDesk := DllCall(VDA_PATH "\GetCurrentDesktopNumber", "Int")
+                winDesk := DllCall(VDA_PATH "\GetWindowDesktopNumber", "Ptr", hwnd, "Int")
+                if (winDesk != -1 && winDesk != currentDesk) {
+                    DllCall(VDA_PATH "\MoveWindowToDesktopNumber", "Ptr", hwnd, "Int", currentDesk)
+                }
+            }
+        }
+    }
 }

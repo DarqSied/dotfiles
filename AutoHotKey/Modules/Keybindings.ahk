@@ -28,10 +28,10 @@ $^w::
 ; [ HOTKEYS: INSTANT ACTIONS & WINDOW/DESKTOP MANAGEMENT ]
 ; ------------------------------------------------------------------------------
 ; --- Window & Workspace Destruction ---
-#q::                                                                           ; Win+Q: Close Current App
-{
-    Send("{Blind}{vkE8}")
-    Send("!{F4}")
+#q:: {                                                                         ; Win+Q: Close Current App
+    target := WinExist("A")
+    if target
+        WinClose(target)
 }
 #+q::KillAllOnCurrentDesktop()                                                 ; Win+Shift+Q: Kill Entire Workspace
 
@@ -77,8 +77,19 @@ $^w::
 +<#9::MoveActiveWindowToDesktop(8)
 ^+#Right::CarryActiveWindowToNextDesktop()                                     ; Ctrl+Shift+Win+Right: Carry window right
 ^+#Left::CarryActiveWindowToPrevDesktop()                                      ; Ctrl+Shift+Win+Left: Carry window left
-#+h::Send("#+{Left}")                                                          ; Win+Shift+H: Send to left monitor
-#+l::Send("#+{Right}")                                                         ; Win+Shift+L: Send to right monitor
+#+h:: {                                                                        ; Win+Shift+H: Send to left monitor
+    global FloatedWindows
+    if (target := WinExist("A"))
+        FloatedWindows[target] := true
+    Send("#+{Left}")
+}
+
+#+l:: {                                                                       ; Win+Shift+L: Send to right monitor
+    global FloatedWindows
+    if (target := WinExist("A"))
+        FloatedWindows[target] := true
+    Send("#+{Right}")
+}
 
 ; --- Layout Controls & States ---
 #Space:: {                                                                     ; Win+Space: Toggle Monocle / Maximize
@@ -104,6 +115,7 @@ $^w::
 }
 #t::ToggleFloatState()                                                         ; Win+T: Toggle window float / snap
 #+t::CenterActiveWindow()                                                      ; Win+Shift+T: Shrink and center window
+#+m::PromoteToMaster()                                                         ; Win+Shift+M: Promotes to top of the stack
 #+f::ActivateFocusMode()                                                       ; Win+Shift+F: Minimize all but active window
 
 ; --- Z-Order & Visibility States ---

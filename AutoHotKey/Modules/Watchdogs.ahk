@@ -8,6 +8,19 @@ InitWatchdogs() {
     SetTimer(CheckSystemUptime, 3600000) 
     SetTimer(HideWhatsApp, 1000)
     SetTimer(HidePhoneLink, 1000)
+    
+    ; 1. Load the XInput hardware driver into memory
+    global hXInput := DllCall("LoadLibrary", "Str", "xinput1_4.dll", "Ptr")
+    
+    ; 2. Extract the raw memory pointer for Ordinal 100 (XInputGetStateEx)
+    global pXInputGetStateEx := DllCall("GetProcAddress", "Ptr", hXInput, "Ptr", 100, "Ptr")
+    
+    ; 3. Engage the Watchdog ONLY if the pointer was successfully found
+    if (pXInputGetStateEx) {
+        SetTimer(ListenForGuideButton, 100) 
+    } else {
+        Notify("XInput Error", "Could not bind to Xbox Guide button.")
+    }
 }
 
 CheckSystemUptime() {
@@ -49,4 +62,45 @@ HidePhoneLink() {
     } else if (attemptsPL >= 20) {
         SetTimer(HidePhoneLink, 0) 
     }
+}
+
+; ------------------------------------------------------------------------------
+; XINPUT WATCHDOG: Reads raw Xbox Guide Button hardware signal
+; ------------------------------------------------------------------------------
+ListenForGuideButton() {
+    global pXInputGetStateEx
+    static lastGuideState := false
+    xState := Buffer(16, 0)
+    isGuidePressed := false
+    
+    ; Loop through all 4 possible Xbox controller slots (0 through 3)
+    Loop 4 {
+        ; Execute the memory pointer directly for the current controller slot
+        if (DllCall(pXInputGetStateEx, "UInt", A_Index - 1, "Ptr", xState) == 0) { 
+            
+            ; THE FIX: The button data starts at memory offset 4!
+            wButtons := NumGet(xState, 4, "UShort")
+            
+            if (wButtons & 0x0400) { ; 0x0400 is the hex code for the Guide Button
+                isGuidePressed := true
+                break ; We found the pressed button, stop checking other slots
+            }
+        }
+    }
+    
+    if (isGuidePressed && !lastGuideState) {
+        playniteFS := EnvGet("LOCALAPPDATA") "\Playnite\Playnite.FullscreenApp.exe"
+        
+        if !ProcessExist("Playnite.FullscreenApp.exe") {
+            if FileExist(playniteFS) {
+                Run('"' playniteFS '"')
+                Notify("Game Mode", "Playnite Fullscreen Launched")
+            }
+        } else {
+            ; If it's already running, just pull it to the front
+            try WinActivate("ahk_exe Playnite.FullscreenApp.exe")
+        }
+    }
+    
+    lastGuideState := isGuidePressed
 }
