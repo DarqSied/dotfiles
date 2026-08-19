@@ -28,6 +28,13 @@ IsTileable(hwnd) {
     if (WinGetMinMax(windowId) == -1)
         return false
         
+    WinGetPos(&winX, &winY, &winW, &winH, windowId)
+    Loop MonitorGetCount() {
+        MonitorGet(A_Index, &mLeft, &mTop, &mRight, &mBottom)
+        if (winW >= (mRight - mLeft - 2) && winH >= (mBottom - mTop - 2))
+            return false
+    }
+
     title := WinGetTitle(windowId)
     
     if (title == "" || title == "Program Manager" || title == "Shut Down Windows")
@@ -196,8 +203,11 @@ ApplyMathLayout(windows, currentDesk, count) {
         tX := Left, tY := Top, tW := W, tH := H
         
         if (count == 1) {
-            tX += g, tY += g, tW -= (g * 2), tH -= (g * 2)
-        } 
+            tX := Left
+            tY := Top
+            tW := W
+            tH := H
+        }
         else if (count == 2) {
             tW := (W // 2) - (g * 3 // 2), tH := H - (g * 2)
             tX := (index == 1) ? Left + g : Left + (W // 2) + (g // 2)
@@ -263,7 +273,11 @@ ApplyMathLayout(windows, currentDesk, count) {
             WinMove(tX + offX, tY + offY, tW + offW, tH + offH, windowId)
             
             cornerPref := Buffer(4, 0)
-            NumPut("Int", 2, cornerPref, 0) 
+            if (count == 1) {
+                NumPut("Int", 1, cornerPref, 0)
+            } else {
+                NumPut("Int", 2, cornerPref, 0)
+            }
             DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", hwnd, "UInt", 33, "Ptr", cornerPref, "UInt", 4)
             
         } catch {
@@ -282,6 +296,7 @@ class WindowBorder {
     static Init() {
         WindowBorder.UpdateAccentColor()
         
+        ; Register EVENT_SYSTEM_FOREGROUND (0x0003) Hook (For instant Alt+Tab)
         WindowBorder.hookProc := CallbackCreate(WindowBorder.OnForegroundChange, "F")
         DllCall("SetWinEventHook"
             , "UInt", 0x0003, "UInt", 0x0003 
@@ -289,11 +304,16 @@ class WindowBorder {
             , "Ptr", WindowBorder.hookProc
             , "UInt", 0, "UInt", 0, "UInt", 0)
             
-        WindowBorder.Update()
+        ; --- CRITICAL FIX 1: The Shape-Shifter Watchdog ---
+        ; Continuously checks if the active window changed dimensions (e.g. went fullscreen)
+        ; independent of focus shifts or layout grid changes.
+        SetTimer(() => WindowBorder.Update(), 150)
+            
+        WindowBorder.Update() ; Initial color application
     }
 
     static UpdateAccentColor() {
-        WindowBorder.accentColor := 0x00FFFFFF
+        WindowBorder.accentColor := 0x00FFFFFF ; White Border
     }
     
     static OnForegroundChange(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime) {
@@ -304,6 +324,7 @@ class WindowBorder {
         if (!hwnd)
             hwnd := WinExist("A")
             
+        ; --- Count valid windows on the current desktop ---
         global hVDA, VDA_PATH
         currentDesk := 0
         try {
@@ -331,11 +352,12 @@ class WindowBorder {
                 break
         }
         
+        ; If there is only 1 (or 0) valid windows, clear the border and abort
         if (validCount < 2) {
             if (WindowBorder.lastHwnd && WinExist(WindowBorder.lastHwnd)) {
                 try {
                     bufDefault := Buffer(4, 0)
-                    NumPut("UInt", 0xFFFFFFFF, bufDefault, 0)
+                    NumPut("UInt", 0xFFFFFFFE, bufDefault, 0) ; CRITICAL FIX: Explicit NO BORDER
                     DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", WindowBorder.lastHwnd, "UInt", 34, "Ptr", bufDefault, "UInt", 4)
                 } catch {
                 }
@@ -344,7 +366,7 @@ class WindowBorder {
             return
         }
             
-        if (!hwnd || hwnd == WindowBorder.lastHwnd)
+        if (!hwnd)
             return
             
         winClass := WinGetClass(hwnd)
@@ -358,23 +380,50 @@ class WindowBorder {
         } catch {
         }
         
-        if (WindowBorder.lastHwnd && WinExist(WindowBorder.lastHwnd)) {
-            try {
-                bufDefault := Buffer(4, 0)
-                NumPut("UInt", 0xFFFFFFFF, bufDefault, 0)
-                DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", WindowBorder.lastHwnd, "UInt", 34, "Ptr", bufDefault, "UInt", 4)
-            } catch {
+        ; --- CRITICAL FIX 1: Monitor-Agnostic Fullscreen Detection ---
+        WinGetPos(&winX, &winY, &winW, &winH, hwnd)
+        isFullScreen := false
+        Loop MonitorGetCount() {
+            MonitorGet(A_Index, &mLeft, &mTop, &mRight, &mBottom)
+            mW := mRight - mLeft
+            mH := mBottom - mTop
+            ; Check if window matches monitor dimensions (with a 2px tolerance for scaling)
+            if (winW >= (mW - 2) && winH >= (mH - 2)) {
+                isFullScreen := true
+                break
             }
         }
         
+        isMaximized := (WinGetMinMax(hwnd) == 1)
+        shouldHaveBorder := !(isFullScreen || isMaximized)
+        
+        ; Clear the old window's border if focus changed to a new window
+        if (WindowBorder.lastHwnd && WindowBorder.lastHwnd != hwnd) {
+            try {
+                bufDefault := Buffer(4, 0)
+                NumPut("UInt", 0xFFFFFFFE, bufDefault, 0) ; CRITICAL FIX 2: Explicit NO BORDER
+                DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", WindowBorder.lastHwnd, "UInt", 34, "Ptr", bufDefault, "UInt", 4)
+            } catch {
+            }
+            WindowBorder.lastHwnd := 0 
+        }
+        
+        ; Apply or remove border on the current window based on its fullscreen state
         try {
-            if (WinGetMinMax(hwnd) != 1) {
-                bufColor := Buffer(4, 0)
-                NumPut("UInt", WindowBorder.accentColor, bufColor, 0)
-                DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", hwnd, "UInt", 34, "Ptr", bufColor, "UInt", 4)
-                WindowBorder.lastHwnd := hwnd
+            if (shouldHaveBorder) {
+                if (WindowBorder.lastHwnd != hwnd) { 
+                    bufColor := Buffer(4, 0)
+                    NumPut("UInt", WindowBorder.accentColor, bufColor, 0)
+                    DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", hwnd, "UInt", 34, "Ptr", bufColor, "UInt", 4)
+                    WindowBorder.lastHwnd := hwnd
+                }
             } else {
-                WindowBorder.lastHwnd := 0
+                if (WindowBorder.lastHwnd == hwnd) { 
+                    bufDefault := Buffer(4, 0)
+                    NumPut("UInt", 0xFFFFFFFE, bufDefault, 0) ; CRITICAL FIX 3: Explicit NO BORDER
+                    DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", hwnd, "UInt", 34, "Ptr", bufDefault, "UInt", 4)
+                    WindowBorder.lastHwnd := 0
+                }
             }
         } catch {
             WindowBorder.lastHwnd := 0
