@@ -6,14 +6,13 @@ InitWatchdogs()
 
 InitWatchdogs() {
     SetTimer(CheckSystemUptime, 3600000) 
-    SetTimer(HideWhatsApp, 1000)
-    SetTimer(HidePhoneLink, 1000)
+    SetTimer(StartupAppHider, 1000)
     
     ; 1. Load the XInput hardware driver into memory
     global hXInput := DllCall("LoadLibrary", "Str", "xinput1_4.dll", "Ptr")
     
     ; 2. Extract the raw memory pointer for Ordinal 100 (XInputGetStateEx)
-    global pXInputGetStateEx := DllCall("GetProcAddress", "Ptr", hXInput, "Ptr", 100, "Ptr")
+    global pXInputGetStateEx := hXInput ? DllCall("GetProcAddress", "Ptr", hXInput, "Ptr", 100, "Ptr") : 0
     
     ; 3. Engage the Watchdog ONLY if the pointer was successfully found
     if (pXInputGetStateEx) {
@@ -40,28 +39,29 @@ CheckSystemUptime() {
     }
 }
 
-HideWhatsApp() {
-    static attemptsWA := 0
-    attemptsWA++
-    if WinExist("WhatsApp") {
-        Sleep(800) 
-        WinClose("WhatsApp") 
-        SetTimer(HideWhatsApp, 0)
-    } else if (attemptsWA >= 20) {
-        SetTimer(HideWhatsApp, 0)
+StartupAppHider() {
+    static attempts := 0
+    static closedWA := false
+    static closedPL := false
+    
+    attempts++
+    
+    if (!closedWA && WinExist("WhatsApp")) {
+        SetTimer(() => TryCloseWindow("WhatsApp"), -800)
+        closedWA := true
+    }
+    if (!closedPL && WinExist("Phone Link")) {
+        SetTimer(() => TryCloseWindow("Phone Link"), -800)
+        closedPL := true
+    }
+    
+    if ((closedWA && closedPL) || attempts >= 20) {
+        SetTimer(StartupAppHider, 0)
     }
 }
 
-HidePhoneLink() {
-    static attemptsPL := 0
-    attemptsPL++
-    if WinExist("Phone Link") {
-        Sleep(800)
-        WinClose("Phone Link") 
-        SetTimer(HidePhoneLink, 0) 
-    } else if (attemptsPL >= 20) {
-        SetTimer(HidePhoneLink, 0) 
-    }
+TryCloseWindow(winTitle) {
+    try WinClose(winTitle)
 }
 
 ; ------------------------------------------------------------------------------
@@ -70,14 +70,12 @@ HidePhoneLink() {
 ListenForGuideButton() {
     global pXInputGetStateEx
     static lastGuideState := false
-    xState := Buffer(16, 0)
+    static xState := Buffer(16, 0)
     isGuidePressed := false
     
     Loop 4 {
         if (DllCall(pXInputGetStateEx, "UInt", A_Index - 1, "Ptr", xState) == 0) { 
-            
             wButtons := NumGet(xState, 4, "UShort")
-            
             if (wButtons & 0x0400) {
                 isGuidePressed := true
                 break

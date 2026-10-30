@@ -20,17 +20,19 @@ global LastYouTubeTitle := ""
 ClearYouTubeFocus() {
     global LastYouTubeTitle
     if (activeHwnd := WinActive("YouTube ahk_class Chrome_WidgetWin_1")) {
-        currentTitle := WinGetTitle(activeHwnd)
-        if (LastYouTubeTitle != "" && currentTitle != LastYouTubeTitle) {
-            Sleep(2000)
-            CoordMode("Mouse", "Screen")
-            centerX := A_ScreenWidth / 2
-            centerY := A_ScreenHeight / 2
-            MouseMove(centerX, centerY, 0)
-            Sleep(50)
-            MouseMove(centerX + 1, centerY + 1, 0)
+        try {
+            currentTitle := WinGetTitle(activeHwnd)
+            if (LastYouTubeTitle != "" && currentTitle != LastYouTubeTitle) {
+                Sleep(2000)
+                CoordMode("Mouse", "Screen")
+                centerX := A_ScreenWidth / 2
+                centerY := A_ScreenHeight / 2
+                MouseMove(centerX, centerY, 0)
+                Sleep(50)
+                MouseMove(centerX + 1, centerY + 1, 0)
+            }
+            LastYouTubeTitle := currentTitle
         }
-        LastYouTubeTitle := currentTitle
     } else {
         LastYouTubeTitle := ""
     }
@@ -40,9 +42,9 @@ ClearYouTubeFocus() {
 ; Universal Background Window Routing
 ; ------------------------------------------------------------------------------
 AutoRouteWindow(hwnd) {
-    global AppRoutingMap, PWATitles, LastDriveInsertTime, hVDA
+    global AppRoutingMap, PWATitles, LastDriveInsertTime, hVDA, VDA_PATH
     
-    if (!hVDA or !WinExist(hwnd))
+    if (!hVDA || !WinExist(hwnd))
         return
     processName := "Unknown"
     try {
@@ -67,7 +69,7 @@ AutoRouteWindow(hwnd) {
             
         windowTitle := WinGetTitle(hwnd)
         
-        if (windowTitle = "Picture in picture" or windowTitle = "Picture-in-Picture") {
+        if (windowTitle = "Picture in picture" || windowTitle = "Picture-in-Picture") {
             WinSetAlwaysOnTop(1, hwnd)
             DllCall(VDA_PATH "\PinWindow", "Ptr", hwnd)
             return 
@@ -85,7 +87,7 @@ AutoRouteWindow(hwnd) {
         }
         
         ; 4. Map Routing
-        if (processName == "explorer.exe" and windowClass == "CabinetWClass") {
+        if (processName == "explorer.exe" && windowClass == "CabinetWClass") {
             if (A_TickCount - LastDriveInsertTime < 5000) {
                 targetDesk := 6 
                 LastDriveInsertTime := 0 
@@ -113,7 +115,7 @@ AutoRouteWindow(hwnd) {
         }
 
         ; 5. Execution
-        if (targetDesk != -1 and targetDesk != "SKIP") {
+        if (targetDesk != -1 && targetDesk != "SKIP") {
             DllCall(VDA_PATH "\MoveWindowToDesktopNumber", "Ptr", hwnd, "Int", targetDesk)
             DllCall(VDA_PATH "\GoToDesktopNumber", "Int", targetDesk)
         }
@@ -152,7 +154,7 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "") {
     isWebLink := RegExMatch(url, "^(https?://|www\.)")
     
     ; ==========================================================================
-    ; SCENARIO 1: The App is already running in the background
+    ; SCENARIO 1: The App is already tracked in PWAVault
     ; ==========================================================================
     if (PWAVault.Has(appName) && WinExist("ahk_id " . PWAVault[appName])) {
         targetHwnd := PWAVault[appName]
@@ -180,10 +182,20 @@ LaunchWebAppToDesktop(url, appName, targetDesktop, browser := "") {
         }
     } 
     ; ==========================================================================
-    ; SCENARIO 2: The App is NOT running (Cold Boot)
+    ; SCENARIO 2: The App is NOT in Vault (Check if open, otherwise Cold Boot)
     ; ==========================================================================
     else {
         if (foundHwnd := WinExist(searchString)) {
+            targetHwnd := foundHwnd
+            WinSetExStyle("-0x80", targetHwnd)
+            WinShow(targetHwnd)
+            DllCall("ShowWindow", "Ptr", targetHwnd, "Int", 9)
+            WinActivate(targetHwnd)
+            WinWaitActive(targetHwnd, , 2)
+            if (isWebLink) {
+                Sleep(200)
+                InjectURL(url)
+            }
         }
         else {
             oldActive := WinActive("A")
@@ -260,7 +272,7 @@ InjectURL(targetUrl) {
 global PwaBlacklist := Map() 
 global PrivateHwnds := Map()
 
-InitRouter() ; Execute the boot sequence
+InitRouter()
 
 InitRouter() {
     global PWATitles, PWAVault, PrivateHwnds
@@ -273,7 +285,6 @@ InitRouter() {
     }
     
     ; 2. Register OS-Level Shell Hook for Private Windows
-    DllCall("RegisterShellHookWindow", "Ptr", A_ScriptHwnd)
     OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), TrackPrivateWindows)
     
     ; 3. Catch any private windows already open on boot
@@ -331,12 +342,14 @@ TrackPrivateWindows(wParam, lParam, msg, hwnd) {
     }
 }
 
-SetTimer(CatchAndEject, 400)
-
 CatchAndEject() {
     if (activeHwnd := WinActive("ahk_group MediaPWAs")) {
+        try {
+            windowTitle := WinGetTitle(activeHwnd)
+        } catch {
+            return
+        }
         
-        windowTitle := WinGetTitle(activeHwnd)
         isValidMedia := false
         
         global PWATitles
@@ -378,7 +391,7 @@ CatchAndEject() {
             return
         }
         
-        SavedClip := A_Clipboard
+        SavedClip := ClipboardAll()
         TargetURL := ""
         
         Loop 3 {
@@ -444,6 +457,7 @@ CatchAndEject() {
 ; Virtual Desktop Navigation Utilities (VDA)
 ; ------------------------------------------------------------------------------
 GoToDesktop(target) {
+    global hVDA, VDA_PATH
     if (hVDA) {
         DllCall(VDA_PATH "\GoToDesktopNumber", "Int", target)
         SetTimer(ProcessDynamicLayout.Bind(0, false), -500) 
@@ -451,10 +465,12 @@ GoToDesktop(target) {
 }
 
 GetCurrentDesktop() {
+    global hVDA, VDA_PATH
     return hVDA ? DllCall(VDA_PATH "\GetCurrentDesktopNumber", "Int") : 0
 }
 
 GetDesktopCount() {
+    global hVDA, VDA_PATH
     return hVDA ? DllCall(VDA_PATH "\GetDesktopCount", "Int") : 1
 }
 
@@ -483,21 +499,24 @@ EnsureDesktops(targetCount) {
 }
 
 MoveActiveWindowToDesktop(target) {
-    if (hVDA) {
-        DllCall(VDA_PATH "\MoveWindowToDesktopNumber", "Ptr", WinExist("A"), "Int", target)
+    global hVDA, VDA_PATH
+    if (hVDA && (activeHwnd := WinExist("A"))) {
+        DllCall(VDA_PATH "\MoveWindowToDesktopNumber", "Ptr", activeHwnd, "Int", target)
     }
 }
 
 MoveAndGoToDesktop(hwnd, targetDesk) {
-    DllCall(VDA_PATH "\MoveWindowToDesktopNumber", "Ptr", hwnd, "Int", targetDesk)
-    DllCall(VDA_PATH "\GoToDesktopNumber", "Int", targetDesk)
+    global hVDA, VDA_PATH
+    if (hVDA) {
+        DllCall(VDA_PATH "\MoveWindowToDesktopNumber", "Ptr", hwnd, "Int", targetDesk)
+        DllCall(VDA_PATH "\GoToDesktopNumber", "Int", targetDesk)
+    }
 }
 
 CarryActiveWindowToNextDesktop() {
-    if (!hVDA) {
+    global hVDA
+    if (!hVDA || !(activeHwnd := WinExist("A")))
         return
-    }
-    activeHwnd := WinExist("A")
     total := GetDesktopCount()
     nextDesktop := GetCurrentDesktop() + 1
     targetDesk := (nextDesktop >= total) ? 0 : nextDesktop
@@ -506,10 +525,9 @@ CarryActiveWindowToNextDesktop() {
 }
 
 CarryActiveWindowToPrevDesktop() {
-    if (!hVDA) {
+    global hVDA
+    if (!hVDA || !(activeHwnd := WinExist("A")))
         return
-    }
-    activeHwnd := WinExist("A")
     total := GetDesktopCount()
     prevDesktop := GetCurrentDesktop() - 1
     targetDesk := (prevDesktop < 0) ? (total - 1) : prevDesktop
@@ -518,18 +536,22 @@ CarryActiveWindowToPrevDesktop() {
 }
 
 KillAllOnCurrentDesktop() {
-    if (!hVDA) {
+    global hVDA, VDA_PATH
+    if (!hVDA)
         return
-    }
     currentDesk := GetCurrentDesktop()
+    prevDetect := A_DetectHiddenWindows
     DetectHiddenWindows(false)
     
     for hwnd in WinGetList() {
-        if (!(WinGetClass(hwnd) ~= "^(Progman|WorkerW|Shell_TrayWnd|Shell_SecondaryTrayWnd)$")) {
-            winDesk := DllCall(VDA_PATH "\GetWindowDesktopNumber", "Ptr", hwnd, "Int")
-            if (winDesk == currentDesk) {
-                WinClose(hwnd)
+        try {
+            if (!(WinGetClass(hwnd) ~= "^(Progman|WorkerW|Shell_TrayWnd|Shell_SecondaryTrayWnd)$")) {
+                winDesk := DllCall(VDA_PATH "\GetWindowDesktopNumber", "Ptr", hwnd, "Int")
+                if (winDesk == currentDesk) {
+                    WinClose(hwnd)
+                }
             }
         }
     }
+    DetectHiddenWindows(prevDetect)
 }

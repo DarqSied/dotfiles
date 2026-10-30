@@ -7,10 +7,10 @@ BuildTrayMenu() {
     A_TrayMenu.Delete() 
 
     ; 2. Add Quick-Edit shortcuts to your most used modules
-    A_TrayMenu.Add("⚙️ Edit Main Hub", (*) => Edit())
-    A_TrayMenu.Add("⌨️ Edit Keybindings", (*) => Run("Code.exe " A_ScriptDir "\Modules\Keybindings.ahk"))
-    A_TrayMenu.Add("🔤 Edit Hotstrings", (*) => Run("Code.exe " A_ScriptDir "\Modules\Hotstrings.ahk"))
-    A_TrayMenu.Add("📝 Edit Cheatsheet", (*) => Run("Code.exe " A_ScriptDir "\Modules\Cheatsheet.ahk"))
+    A_TrayMenu.Add("⚙️ Edit Main Hub", (*) => OpenInEditor(A_ScriptFullPath))
+    A_TrayMenu.Add("⌨️ Edit Keybindings", (*) => OpenInEditor(A_ScriptDir "\Modules\Keybindings.ahk"))
+    A_TrayMenu.Add("🔤 Edit Hotstrings", (*) => OpenInEditor(A_ScriptDir "\Modules\Hotstrings.ahk"))
+    A_TrayMenu.Add("📝 Edit Cheatsheet", (*) => OpenInEditor(A_ScriptDir "\Modules\Cheatsheet.ahk"))
     
     A_TrayMenu.Add() ; Separator line
 
@@ -19,7 +19,7 @@ BuildTrayMenu() {
     
     A_TrayMenu.Add() ; Separator line
 
-    ; 4. Add Quick Directories (Update path to match your screenshots folder)
+    ; 4. Add Quick Directories
     A_TrayMenu.Add("📸 Open Screenshots", OpenMonthlyScreenshots)
     
     A_TrayMenu.Add() ; Separator line
@@ -34,6 +34,18 @@ BuildTrayMenu() {
 ; ------------------------------------------------------------------------------
 ; Menu Callback Functions
 ; ------------------------------------------------------------------------------
+OpenInEditor(targetPath) {
+    codiumPath := EnvGet("LOCALAPPDATA") "\Programs\VSCodium\VSCodium.exe"
+    try {
+        if FileExist(codiumPath)
+            Run('"' codiumPath '" "' targetPath '"')
+        else
+            Edit()
+    } catch {
+        Notify("Editor Error", "Could not open file in VSCodium.", true)
+    }
+}
+
 ToggleHotCorners(ItemName, ItemPos, MyMenu) {
     global HotCornersEnabled
     HotCornersEnabled := !HotCornersEnabled

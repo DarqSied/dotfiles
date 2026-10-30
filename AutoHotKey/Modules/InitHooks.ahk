@@ -2,12 +2,24 @@
 ; [ MODULE: CORE ENGINE ] - INITIALIZATION, HOOKS & SYSTEM STATES
 ; ==============================================================================
 
+Global FocusHookProc := 0
+Global hWinEventHook := 0
+
 ; ------------------------------------------------------------------------------
 ; Initialization & Core Setup
 ; ------------------------------------------------------------------------------
 Initialize() {
-    global hVDA, TargetDesktopCount, CornerInterval
+    global hVDA, VDA_PATH, TargetDesktopCount, FocusHookProc, hWinEventHook
     
+    ; 1. Force Dark Mode for Native Menus BEFORE building the Tray Menu
+    try {
+        hTheme := DllCall("GetModuleHandle", "Str", "uxtheme", "Ptr")
+        SetAppMode := DllCall("GetProcAddress", "Ptr", hTheme, "Ptr", 135, "Ptr")
+        FlushMenu  := DllCall("GetProcAddress", "Ptr", hTheme, "Ptr", 136, "Ptr")
+        DllCall(SetAppMode, "Int", 2)
+        DllCall(FlushMenu)
+    }
+
     BuildTrayMenu()
     InstallMouseHook()
     SendMode("Input")
@@ -19,7 +31,7 @@ Initialize() {
         ExitApp()
     }
 
-    if not FileExist(VDA_PATH) {
+    if !FileExist(VDA_PATH) {
         MsgBox("Error: VirtualDesktopAccessor.dll not found.`n`nPlease download it and place it in the same folder as this script.")
         ExitApp()
     }
@@ -35,6 +47,15 @@ Initialize() {
     OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), OnWindowCreated)
     OnMessage(0x0219, OnDeviceArrival)
     
+    ; 2. Register Kernel-Level Foreground Focus Tracker
+    if (!FocusHookProc) {
+        FocusHookProc := CallbackCreate(OnForegroundChange, "F")
+        hWinEventHook := DllCall("SetWinEventHook"
+            , "UInt", 0x0003, "UInt", 0x0003
+            , "Ptr", 0, "Ptr", FocusHookProc
+            , "UInt", 0, "UInt", 0, "UInt", 0, "Ptr")
+    }
+    
     EnsureDesktops(TargetDesktopCount)
     ApplyGlobalTitleBarState()
 }
@@ -48,20 +69,6 @@ OnDeviceArrival(wParam, lParam, msg, hwnd) {
         LastDriveInsertTime := A_TickCount
     }
 }
-
-; ------------------------------------------------------------------------------
-; Modernize UI & Force Dark Mode for Native Menus (AHK v2)
-; ------------------------------------------------------------------------------
-; 1. Get the memory handle for the uxtheme library
-hTheme := DllCall("GetModuleHandle", "Str", "uxtheme", "Ptr")
-
-; 2. Extract the specific memory pointers for the undocumented ordinals
-SetAppMode := DllCall("GetProcAddress", "Ptr", hTheme, "Ptr", 135, "Ptr")
-FlushMenu  := DllCall("GetProcAddress", "Ptr", hTheme, "Ptr", 136, "Ptr")
-
-; 3. Execute the pointers
-DllCall(SetAppMode, "Int", 2)
-DllCall(FlushMenu)
 
 ; ------------------------------------------------------------------------------
 ; System Styling & Hooks (Taskbar, Titlebars)
@@ -104,8 +111,19 @@ EnforceTaskbarVisibility() {
 }
 
 RestoreTaskbar(ExitReason, ExitCode) {
+    global TASKBAR_WND, SECONDARY_TASKBAR_WND, hMouseHook, hWinEventHook
+    
+    if (hMouseHook)
+        DllCall("UnhookWindowsHookEx", "Ptr", hMouseHook)
+    if (hWinEventHook)
+        DllCall("UnhookWinEvent", "Ptr", hWinEventHook)
+        
+    prevDetect := A_DetectHiddenWindows
+    DetectHiddenWindows(true)
     try WinShow(TASKBAR_WND)
     try WinShow(SECONDARY_TASKBAR_WND)
+    DetectHiddenWindows(prevDetect)
+    
     if !ProcessExist("translucenttb.exe") {
         try Run('cmd.exe /c start "" "ttb.exe"', "", "Hide")
     }
@@ -113,30 +131,32 @@ RestoreTaskbar(ExitReason, ExitCode) {
 
 ToggleAllTitleBars() {
     global GlobalTitleBarsHidden := !GlobalTitleBarsHidden
-    ApplyGlobalTitleBarState()
+    ApplyGlobalTitleBarState(true)
 }
 
-ApplyGlobalTitleBarState() {
+ApplyGlobalTitleBarState(forceToggle := false) {
     for hwnd in WinGetList() {
-        EnforceTitleBarState(hwnd)
+        EnforceTitleBarState(hwnd, forceToggle)
     }
 }
 
 OnWindowCreated(wParam, lParam, *) {
     if (wParam = 1) {
-        SetTimer(EnforceTitleBarState.Bind(lParam), -50)
+        SetTimer(EnforceTitleBarState.Bind(lParam, false), -50)
         SetTimer(AutoRouteWindow.Bind(lParam), -100)
     }
 }
 
-EnforceTitleBarState(hwnd) {
+EnforceTitleBarState(hwnd, forceToggle := false) {
     global GlobalTitleBarsHidden
-    if (!GlobalTitleBarsHidden || !WinExist(hwnd))
+    if (!WinExist(hwnd))
+        return
+    if (!GlobalTitleBarsHidden && !forceToggle)
         return
 
     try {
         if (WinGetTitle(hwnd) = "" || WinGetClass(hwnd) ~= "^(Progman|WorkerW|Shell_TrayWnd|CabinetWClass|Chrome_WidgetWin_1|Notepad|ApplicationFrameWindow)$")
-             return
+            return
          
         WinSetStyle(GlobalTitleBarsHidden ? "-0xC40000" : "+0xC40000", hwnd)
         ForceWindowRecalculation(hwnd)
@@ -148,14 +168,6 @@ ForceWindowRecalculation(hwnd) => DllCall("SetWindowPos", "Ptr", hwnd, "Ptr", 0,
 ; ------------------------------------------------------------------------------
 ; GLOBAL FOCUS TRACKER (KERNEL-LEVEL WINEVENT HOOK)
 ; ------------------------------------------------------------------------------
-
-Global FocusHookProc := CallbackCreate(OnForegroundChange, "F")
-
-Global hWinEventHook := DllCall("SetWinEventHook"
-    , "UInt", 0x0003, "UInt", 0x0003
-    , "Ptr", 0, "Ptr", FocusHookProc
-    , "UInt", 0, "UInt", 0, "UInt", 0)
-
 OnForegroundChange(hHook, event, hwnd, idObject, idChild, idEventThread, dwmsEventTime) {
     try {
         activeClass := WinGetClass("ahk_id " hwnd)
@@ -239,10 +251,11 @@ MouseHookProc(nCode, wParam, lParam) {
             }
             LastCorner := currentCorner 
             
+            ; Dispatch keystrokes asynchronously so the low-level mouse hook never blocks
             if (currentCorner == "TopLeft")
-                Send("^{Esc}")                      
+                SetTimer(() => Send("^{Esc}"), -10)
             else if (currentCorner == "TopRight")
-                Send("{LWin down}a{LWin up}")       
+                SetTimer(() => Send("#a"), -10)
         }
     }
     return DllCall("CallNextHookEx", "Ptr", 0, "Int", nCode, "Ptr", wParam, "Ptr", lParam)

@@ -16,10 +16,12 @@ $^w::
         
     Send("{Blind}{vkE8}{LWin up}{RWin up}{Alt up}{Ctrl up}{Shift up}")
     Sleep(50) 
-    Send("^!x")
+    Send("!+y") ; Matches Alt+Shift+Y listener in PWA-Fix/content.js
     Sleep(300) 
-    WinMinimize(activeHwnd)
-    WinHide(activeHwnd)
+    try {
+        WinMinimize(activeHwnd)
+        WinHide(activeHwnd)
+    }
     Notify("Media Stopped", "Playback paused successfully.")
 }
 #HotIf
@@ -31,7 +33,7 @@ $^w::
 #q:: {                                                                         ; Win+Q: Close Current App
     target := WinExist("A")
     if target
-        WinClose(target)
+        try WinClose(target)
 }
 #+q::KillAllOnCurrentDesktop()                                                 ; Win+Shift+Q: Kill Entire Workspace
 
@@ -84,7 +86,7 @@ $^w::
     Send("#+{Left}")
 }
 
-#+l:: {                                                                       ; Win+Shift+L: Send to right monitor
+#+l:: {                                                                        ; Win+Shift+L: Send to right monitor
     global FloatedWindows
     if (target := WinExist("A"))
         FloatedWindows[target] := true
@@ -102,14 +104,17 @@ $^w::
         if (WinGetMinMax(targetWin) == 1) {
             ; If it was maximized, snap it back into the grid
             WinRestore(targetWin)
-            FloatedWindows.Delete(targetWin)
+            if FloatedWindows.Has(targetWin)
+                FloatedWindows.Delete(targetWin)
             LastWindowList := ""
+            ProcessDynamicLayout()
             Notify("Grid Snap", "Window returned to layout.")
         } else {
             ; If we are maximizing it, float it first
             FloatedWindows[targetWin] := true
             LastWindowList := ""
             WinMaximize(targetWin)
+            ProcessDynamicLayout()
         }
     }
 }
@@ -137,7 +142,7 @@ $^w::
         WinSetAlwaysOnTop(0, targetWin)
         try WinActivate("ahk_class WorkerW")
         catch
-            WinActivate("ahk_class Progman")
+            try WinActivate("ahk_class Progman")
     }
 }
 
@@ -150,27 +155,34 @@ $^w::
     global FloatedWindows, LastWindowList
     CoordMode("Mouse", "Screen") 
     MouseGetPos(,, &targetWin)
-    
-    ; Auto-float the window the moment you grab it
-    if (!FloatedWindows.Has(targetWin)) {
-        FloatedWindows[targetWin] := true
-        LastWindowList := ""
-    }
-    
-    if (WinGetMinMax(targetWin) = 1) {
-        WinRestore(targetWin)
-        Sleep(50)
-    }
-    WinActivate(targetWin)
-    MouseGetPos(&startX, &startY)
-    WinGetPos(&startWinX, &startWinY,,, targetWin)
-    while GetKeyState("LButton", "P") {
-        MouseGetPos(&currentX, &currentY)
-        DllCall("SetWindowPos", "Ptr", targetWin, "Ptr", 0, 
-                "Int", startWinX + (currentX - startX), 
-                "Int", startWinY + (currentY - startY), 
-                "Int", 0, "Int", 0, "UInt", 0x5)
-        Sleep(5) 
+    if !targetWin
+        return
+        
+    try {
+        if (WinGetClass(targetWin) ~= "^(Progman|WorkerW|Shell_TrayWnd|Shell_SecondaryTrayWnd)$")
+            return
+            
+        ; Auto-float the window the moment you grab it
+        if (!FloatedWindows.Has(targetWin)) {
+            FloatedWindows[targetWin] := true
+            LastWindowList := ""
+        }
+        
+        if (WinGetMinMax(targetWin) = 1) {
+            WinRestore(targetWin)
+            Sleep(50)
+        }
+        WinActivate(targetWin)
+        MouseGetPos(&startX, &startY)
+        WinGetPos(&startWinX, &startWinY,,, targetWin)
+        while GetKeyState("LButton", "P") {
+            MouseGetPos(&currentX, &currentY)
+            DllCall("SetWindowPos", "Ptr", targetWin, "Ptr", 0, 
+                    "Int", startWinX + (currentX - startX), 
+                    "Int", startWinY + (currentY - startY), 
+                    "Int", 0, "Int", 0, "UInt", 0x5)
+            Sleep(5) 
+        }
     }
 }
 
@@ -178,28 +190,35 @@ $^w::
     global FloatedWindows, LastWindowList
     CoordMode("Mouse", "Screen") 
     MouseGetPos(,, &targetWin)
-    
-    ; Auto-float the window the moment you resize it
-    if (!FloatedWindows.Has(targetWin)) {
-        FloatedWindows[targetWin] := true
-        LastWindowList := ""
-    }
-    
-    if (WinGetMinMax(targetWin) = 1) {
-        WinRestore(targetWin)
-        Sleep(50)
-    }
-    WinActivate(targetWin)
-    MouseGetPos(&startX, &startY)
-    WinGetPos(,, &startWinW, &startWinH, targetWin)
-    while GetKeyState("RButton", "P") {
-        MouseGetPos(&currentX, &currentY)
-        newW := Max(150, startWinW + (currentX - startX))
-        newH := Max(150, startWinH + (currentY - startY))
-        DllCall("SetWindowPos", "Ptr", targetWin, "Ptr", 0, 
-                "Int", 0, "Int", 0, 
-                "Int", newW, "Int", newH, "UInt", 0x6)
-        Sleep(5) 
+    if !targetWin
+        return
+        
+    try {
+        if (WinGetClass(targetWin) ~= "^(Progman|WorkerW|Shell_TrayWnd|Shell_SecondaryTrayWnd)$")
+            return
+            
+        ; Auto-float the window the moment you resize it
+        if (!FloatedWindows.Has(targetWin)) {
+            FloatedWindows[targetWin] := true
+            LastWindowList := ""
+        }
+        
+        if (WinGetMinMax(targetWin) = 1) {
+            WinRestore(targetWin)
+            Sleep(50)
+        }
+        WinActivate(targetWin)
+        MouseGetPos(&startX, &startY)
+        WinGetPos(,, &startWinW, &startWinH, targetWin)
+        while GetKeyState("RButton", "P") {
+            MouseGetPos(&currentX, &currentY)
+            newW := Max(150, startWinW + (currentX - startX))
+            newH := Max(150, startWinH + (currentY - startY))
+            DllCall("SetWindowPos", "Ptr", targetWin, "Ptr", 0, 
+                    "Int", 0, "Int", 0, 
+                    "Int", newW, "Int", newH, "UInt", 0x6)
+            Sleep(5) 
+        }
     }
 }
 
@@ -337,7 +356,7 @@ $#s:: {
             } else {
                 Notify("Syncthing Status", "🔴 NOT Running.")
             }
-        case "n":                                                                          ; N: Quick Sync Note
+        case "n":                                                                                          ; N: Quick Sync Note
             savedNote := InputBox("Type note for phone:", "Local Sync", "w400 h100")
             if (savedNote.Result == "OK" && savedNote.Value != "") {
                 timestamp := FormatTime(, "dd-MM-yyyy h:mm tt")
@@ -345,7 +364,7 @@ $#s:: {
                 Notify("Synced", "Note sent to Syncthing folder.")
             }
             
-        case "h":                                                                          ; H: Highlight to Sync
+        case "h":                                                                                          ; H: Highlight to Sync
             savedClip := ClipboardAll() 
             A_Clipboard := ""           
             Send("^c")                  

@@ -7,26 +7,24 @@
 A_MenuMaskKey := "vkE8"
 ProcessSetPriority("High")
 
-; Load Configurations & Core Engine
+; 1. Load Core Definitions & Pure Function Libraries
 #Include "%A_ScriptDir%\Modules\Config.ahk"
-#Include "%A_ScriptDir%\Modules\InitHooks.ahk"
 #Include "%A_ScriptDir%\Modules\Utilities.ahk"
+#Include "%A_ScriptDir%\Modules\InitHooks.ahk"
 #Include "%A_ScriptDir%\Modules\TrayMenu.ahk"
-
-; Load Function Libraries
 #Include "%A_ScriptDir%\Modules\CaptureEngine.ahk"
-#Include "%A_ScriptDir%\Modules\Router.ahk"
+
+; 2. Run Core Boot Sequence FIRST (Loads VDA.dll, Taskbar, and Shell Hooks)
+Initialize()
+
+; 3. Load & Auto-Start Background Engines (No Hotkeys Inside)
 #Include "%A_ScriptDir%\Modules\WindowManager.ahk"
-#Include "%A_ScriptDir%\Modules\Cheatsheet.ahk"
-
-; Load Triggers (Hotstrings & Keybindings)
-#Include "%A_ScriptDir%\Modules\Hotstrings.ahk"
-#Include "%A_ScriptDir%\Modules\Keybindings.ahk"
-
-; Load Automations & Watchdogs
-#Include "%A_ScriptDir%\Modules\FocusEngine.ahk"
+#Include "%A_ScriptDir%\Modules\Router.ahk"
 #Include "%A_ScriptDir%\Modules\BatteryMonitor.ahk"
 #Include "%A_ScriptDir%\Modules\Watchdogs.ahk"
 
-; BOOT SEQUENCE
-Initialize()
+; 4. Load Modules Containing Hotkeys & Hotstrings Last
+#Include "%A_ScriptDir%\Modules\FocusEngine.ahk"
+#Include "%A_ScriptDir%\Modules\Cheatsheet.ahk"
+#Include "%A_ScriptDir%\Modules\Hotstrings.ahk"
+#Include "%A_ScriptDir%\Modules\Keybindings.ahk"
