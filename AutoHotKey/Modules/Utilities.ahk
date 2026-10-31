@@ -47,14 +47,18 @@ GetLeaderInput() {
 PasteAsPlain() {
     savedClip := ClipboardAll() 
     plainText := A_Clipboard
+    if (plainText == "") {
+        A_Clipboard := savedClip
+        return
+    }
     A_Clipboard := ""
     A_Clipboard := plainText
     
-    if ClipWait(1, 1) {
+    if ClipWait(1, 0) {
         Send("^v")
         Sleep(50) 
-        A_Clipboard := savedClip 
     }
+    A_Clipboard := savedClip 
 }
 
 ; ------------------------------------------------------------------------------
@@ -65,20 +69,19 @@ LaunchApp(appName, exePath) {
     prevDetect := A_DetectHiddenWindows
     DetectHiddenWindows(true)
 
-    if not WinExist(appName) {
-        Run(exePath)
-        if not WinWait(appName, , 3) {
-            DetectHiddenWindows(prevDetect)
-            BlockInput("Off")
-            return
+    try {
+        if !WinExist(appName) {
+            Run(exePath)
+            if !WinWait(appName, , 3)
+                return
         }
+        WinActivate(appName)
+        if WinWaitActive(appName, , 2)
+            WinSetAlwaysOnTop(-1, "A")
+    } finally {
+        DetectHiddenWindows(prevDetect)
+        BlockInput("Off") 
     }
-    WinActivate(appName)
-    WinWaitActive(appName, , 2)   
-    WinSetAlwaysOnTop(-1, "A")
-    
-    DetectHiddenWindows(prevDetect)
-    BlockInput("Off") 
 }
 
 FlowSearch(actionKeyword) {

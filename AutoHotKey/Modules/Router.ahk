@@ -330,12 +330,24 @@ InitRouter() {
 ; OS-Level Shell Hook (Tracks Private Windows automatically)
 ; ------------------------------------------------------------------------------
 TrackPrivateWindows(wParam, lParam, msg, hwnd) {
+    global PrivateHwnds, PwaBlacklist, FloatedWindows
     TrackDynamicLayouts(wParam, lParam, msg, hwnd)
+    
+    ; wParam 2 = HSHELL_WINDOWDESTROYED (Clean up closed window handles)
+    if (wParam == 2) {
+        if IsSet(PrivateHwnds) && PrivateHwnds.Has(lParam)
+            PrivateHwnds.Delete(lParam)
+        if IsSet(PwaBlacklist) && PwaBlacklist.Has(lParam)
+            PwaBlacklist.Delete(lParam)
+        if IsSet(FloatedWindows) && FloatedWindows.Has(lParam)
+            FloatedWindows.Delete(lParam)
+        return
+    }
+
     if (wParam == 1 || wParam == 6) {
         try {
             title := WinGetTitle("ahk_id " lParam)
             if InStr(title, "Private") || InStr(title, "Incognito") {
-                global PrivateHwnds
                 PrivateHwnds[lParam] := true
             }
         }
