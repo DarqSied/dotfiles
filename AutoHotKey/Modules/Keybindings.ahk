@@ -26,14 +26,30 @@ $^w::
 }
 #HotIf
 
+#HotIf WinActive("ahk_exe Microsoft.CmdPal.UI.exe")
+$!F4:: {
+    Send("{Escape}")
+    ForceDesktopFocus()
+}
+#HotIf
+
 ; ------------------------------------------------------------------------------
 ; [ HOTKEYS: INSTANT ACTIONS & WINDOW/DESKTOP MANAGEMENT ]
 ; ------------------------------------------------------------------------------
 ; --- Window & Workspace Destruction ---
 #q:: {                                                                         ; Win+Q: Close Current App
     target := WinExist("A")
-    if target
-        try WinClose(target)
+    if !target
+        return
+    try {
+        if (WinGetProcessName(target) = "Microsoft.CmdPal.UI.exe") {
+            Send("{Escape}")
+            ForceDesktopFocus()
+            return
+        }
+        if !(WinGetClass(target) ~= "^(Progman|WorkerW|Shell_TrayWnd|Shell_SecondaryTrayWnd)$")
+            WinClose(target)
+    }
 }
 #+q::KillAllOnCurrentDesktop()                                                 ; Win+Shift+Q: Kill Entire Workspace
 

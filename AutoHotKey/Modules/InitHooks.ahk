@@ -180,7 +180,10 @@ OnForegroundChange(hHook, event, hwnd, idObject, idChild, idEventThread, dwmsEve
         activeExe := WinGetProcessName("ahk_id " hwnd)
         
         if (activeExe = "Microsoft.CmdPal.UI.exe") {
-            SetTimer(ForceDesktopFocus, -50)
+            MouseGetPos(, , &hoverHwnd)
+            if (!hoverHwnd || WinGetProcessName("ahk_id " hoverHwnd) != "Microsoft.CmdPal.UI.exe") {
+                SetTimer(ForceDesktopFocus, -50)
+            }
         }
     }
 }
@@ -194,10 +197,6 @@ ForceDesktopFocus() {
             WinActivate("ahk_class Progman")
             ControlFocus("SysListView321", "ahk_class Progman")
         }
-    }
-    
-    if (WinActive("ahk_exe Microsoft.CmdPal.UI.exe")) {
-        Send("!{Esc}")
     }
 }
 
