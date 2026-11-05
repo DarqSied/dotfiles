@@ -1,0 +1,393 @@
+/* ============================================================================
+   WINUI 3 BORDERLESS FROSTED GLASS PILLS + TRANSPARENT BAR
+   ============================================================================ */
+
+:root {
+    /* Individual Pill Smoked-Glass Tint (Gaps remain 100% transparent)
+       - Lower 0.76 -> 0.65 for more wallpaper bleed-through
+       - Raise 0.76 -> 0.85 for deeper contrast */
+    --glass-bg: rgba(18, 19, 24, 0.76);
+    --glass-bg-hover: rgba(36, 38, 48, 0.88);
+    --glass-popup: rgba(20, 20, 24, 0.75);
+    --glass-divider: rgba(255, 255, 255, 0.14);
+    
+    /* Crisp White Typography */
+    --text-primary: rgba(255, 255, 255, 0.98);
+    --text-secondary: rgba(255, 255, 255, 0.85);
+    --text-muted: rgba(255, 255, 255, 0.35);
+    --pill-active: rgba(255, 255, 255, 0.95);
+    --warning: rgba(255, 190, 85, 0.98);
+    --critical: rgba(255, 105, 105, 0.98);
+}
+
+* {
+    font-family: "Segoe UI Variable Display", "Segoe UI", "Segoe Fluent Icons", "JetBrainsMono Nerd Font Propo", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+}
+
+/* ----------------------------------------------------------------------------
+   1. OUTER BAR (100% Transparent Background - Zero Blur in Empty Gaps)
+   ---------------------------------------------------------------------------- */
+.yasb-bar {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0 6px;
+    margin: 0;
+}
+
+/* ----------------------------------------------------------------------------
+   2. BORDERLESS WINUI 3 FROSTED GLASS PILLS
+   ---------------------------------------------------------------------------- */
+.widget {
+    padding: 0 2px;
+    margin: 0;
+    background-color: transparent;
+}
+
+.home-widget .widget-container,
+.windows-desktops .widget-container,
+.active-window-widget .widget-container,
+.systray .widget-container,
+.update-check-widget .widget-container,
+/* .brightness-widget .widget-container, */
+.cpu-widget .widget-container,
+.memory-widget .widget-container,
+.gpu-widget .widget-container,
+.traffic-widget .widget-container,
+.battery-widget .widget-container,
+.center-pill .container,
+.gpu-pill .container {
+    background-color: var(--glass-bg);
+    border: none;
+    border-radius: 7px;
+    height: 24px;
+    margin: 3px 0;
+    padding: 0 9px;
+}
+
+.home-widget .widget-container:hover,
+.active-window-widget .widget-container:hover,
+.systray .widget-container:hover,
+.brightness-widget .widget-container:hover,
+.cpu-widget .widget-container:hover,
+.memory-widget .widget-container:hover,
+.gpu-widget .widget-container:hover,
+.traffic-widget .widget-container:hover,
+.battery-widget .widget-container:hover,
+.center-pill .container:hover,
+.gpu-pill .container:hover {
+    background-color: var(--glass-bg-hover);
+    border: none;
+}
+
+/* Strip inner fills from widgets nested inside the Center Grouper pill */
+.center-pill .widget .widget-container,
+.gpu-pill .widget .widget-container {
+    background-color: transparent;
+    border: none;
+    margin: 0;
+    padding: 0 4px;
+    height: auto;
+}
+
+.gpu-pill .gpu-widget:first-child {
+    border-right: 1px solid var(--glass-divider);
+    padding-right: 5px;
+    margin-right: 3px;
+}
+
+.widget .label {
+    padding: 0 2px;
+    color: var(--text-primary);
+}
+
+.widget .icon {
+    font-family: "Segoe Fluent Icons", "JetBrainsMono Nerd Font Propo";
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-right: 5px;
+}
+
+/* ----------------------------------------------------------------------------
+   3. LEFT CLUSTER: WINDOWS ICON, WORKSPACE PILLS & ACTIVE WINDOW
+   ---------------------------------------------------------------------------- */
+.home-widget .widget-container {
+    padding: 0 8px;
+}
+
+.home-widget .label span,
+.home-widget .icon {
+    font-family: "JetBrainsMono Nerd Font Propo", "Segoe Fluent Icons";
+    font-size: 14px;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.windows-desktops .widget-container {
+    padding: 0 6px;
+}
+
+.windows-desktops .ws-btn {
+    background-color: var(--text-muted);
+    border: none;
+    border-radius: 4px;
+    min-width: 7px;
+    max-width: 7px;
+    min-height: 7px;
+    max-height: 7px;
+    margin: 0 4px;
+    padding: 0;
+}
+
+.windows-desktops .ws-btn:hover {
+    background-color: var(--text-secondary);
+}
+
+.windows-desktops .ws-btn.active {
+    background-color: var(--pill-active);
+    min-width: 22px;
+    max-width: 22px;
+    min-height: 7px;
+    max-height: 7px;
+    border-radius: 4px;
+}
+
+.active-window-widget .label {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* ----------------------------------------------------------------------------
+   4. CENTER CLUSTER: UNIFIED CLOCK + WEATHER PILL
+   ---------------------------------------------------------------------------- */
+.center-pill .clock-widget {
+    border-right: 1px solid var(--glass-divider);
+    padding-right: 6px;
+    margin-right: 4px;
+}
+
+.weather-widget .icon {
+    font-family: "Segoe Fluent Icons", "JetBrainsMono Nerd Font Propo";
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-right: 5px;
+}
+
+.traffic-widget .dl-icon {
+    font-family: "Segoe Fluent Icons", "JetBrainsMono Nerd Font Propo";
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-left: 6px;
+    margin-right: 5px;
+}
+
+/* ----------------------------------------------------------------------------
+   5. RIGHT CLUSTER: SYSTRAY, BRIGHTNESS, CPU, RAM, GPU, TRAFFIC, BATTERY
+   ---------------------------------------------------------------------------- */
+.systray .widget-container {
+    padding: 0 6px;
+}
+
+.systray .pinned-container,
+.systray .unpinned-container {
+    background: transparent;
+    border: none;
+}
+
+.systray .button {
+    border-radius: 5px;
+    padding: 2px 3px;
+    margin: 0 1px;
+    background: transparent;
+}
+
+.systray .button:hover,
+.systray .unpinned-visibility-btn:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+}
+
+.systray .unpinned-visibility-btn {
+    font-family: "Segoe Fluent Icons", "JetBrainsMono Nerd Font Propo";
+    font-size: 10px;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    padding: 0 4px;
+}
+
+.brightness-widget .widget-container {
+    padding: 0 7px;
+}
+
+.brightness-widget .label span,
+.brightness-widget .icon {
+    font-family: "Segoe Fluent Icons", "JetBrainsMono Nerd Font Propo";
+    font-size: 14px;
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0 3px; /* Prevents Qt6 from clipping the right edge of the sun glyph */
+}
+
+.brightness-widget .label span,
+.brightness-widget .icon {
+    font-family: "JetBrainsMono Nerd Font Propo", "Segoe Fluent Icons";
+    font-size: 14px;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.battery-widget .icon {
+    font-size: 14px;
+    margin-right: 5px;
+    color: var(--text-primary);
+}
+
+.battery-widget .icon.status-low {
+    color: var(--warning);
+}
+
+.battery-widget .icon.status-critical,
+.battery-widget .label.status-critical {
+    color: var(--critical);
+}
+
+/* ----------------------------------------------------------------------------
+   6. WINUI 3 FLYOUT POPUPS (SYSTRAY, BRIGHTNESS, CALENDAR, HOME, WEATHER)
+   ---------------------------------------------------------------------------- */
+.systray-popup,
+.brightness-menu,
+.clock-popup.calendar,
+.home-menu,
+.weather-card,
+.context-menu {
+    background-color: var(--glass-popup);
+    border: none;
+    border-radius: 10px;
+    padding: 6px;
+}
+
+.systray-popup .button {
+    padding: 8px;
+    border-radius: 6px;
+}
+
+.systray-popup .button:hover,
+.home-menu .menu-item:hover,
+.context-menu::item:selected {
+    background-color: rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+}
+
+.home-menu .menu-item {
+    padding: 6px 28px 6px 12px;
+    margin: 2px 4px;
+    border-radius: 6px;
+    color: var(--text-primary);
+}
+
+.home-menu .separator,
+.context-menu::separator {
+    height: 1px;
+    background-color: var(--glass-divider);
+    margin: 4px 8px;
+}
+
+/* ----------------------------------------------------------------------------
+   7. WEATHER CARD & HOURLY FORECAST GRAPH
+   ---------------------------------------------------------------------------- */
+.weather-card-today {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-divider);
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 4px;
+}
+
+.weather-card-today .label.location {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.weather-card-day {
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 6px;
+    margin: 2px;
+}
+
+.weather-card-day:hover {
+    background-color: rgba(255, 255, 255, 0.09);
+}
+
+.weather-card-day.active {
+    background-color: rgba(255, 255, 255, 0.12);
+    border: 1px solid var(--glass-divider);
+}
+
+/* Fixes the chopped hourly forecast section */
+.weather-card .hourly-container {
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-divider);
+    border-radius: 8px;
+    min-height: 150px;
+    margin-top: 4px;
+}
+
+.weather-card .hourly-data {
+    font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* YASB uses background-color here to paint the hourly graph curve */
+.weather-card .hourly-data.temperature {
+    background-color: #E0E0E0;
+}
+
+.weather-card .hourly-data.rain {
+    background-color: #4DD0E1;
+}
+
+.weather-card .hourly-data.snow {
+    background-color: #FFFFFF;
+}
+
+/* Fixes the 3 toggle buttons in the top-left corner */
+.weather-card .hourly-data-buttons {
+    margin-top: 8px;
+    margin-left: 8px;
+}
+
+.weather-card .hourly-data-button {
+    font-family: "JetBrainsMono Nerd Font Propo", "Segoe Fluent Icons";
+    border-radius: 5px;
+    min-width: 24px;
+    max-width: 24px;
+    min-height: 24px;
+    max-height: 24px;
+    font-size: 14px;
+    color: var(--text-muted);
+    background-color: transparent;
+    border: 1px solid transparent;
+}
+
+.weather-card .hourly-data-button:hover {
+    color: var(--text-secondary);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.weather-card .hourly-data-button.active {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.14);
+    border: 1px solid var(--glass-divider);
+}

@@ -31,14 +31,18 @@ IsTileable(hwnd) {
         if (!WinExist(windowId) || !DllCall("IsWindowVisible", "Ptr", hwnd))
             return false
             
-        if (WinGetMinMax(windowId) == -1)
+        minMax := WinGetMinMax(windowId)
+        if (minMax == -1)
             return false
             
-        WinGetPos(&winX, &winY, &winW, &winH, windowId)
-        Loop MonitorGetCount() {
-            MonitorGet(A_Index, &mLeft, &mTop, &mRight, &mBottom)
-            if (winW >= (mRight - mLeft - 2) && winH >= (mBottom - mTop - 2))
-                return false
+        ; Ignore true fullscreen apps (F11 / games), but keep tracking natively maximized windows (minMax == 1)
+        if (minMax != 1) {
+            WinGetPos(&winX, &winY, &winW, &winH, windowId)
+            Loop MonitorGetCount() {
+                MonitorGet(A_Index, &mLeft, &mTop, &mRight, &mBottom)
+                if (winW >= (mRight - mLeft - 2) && winH >= (mBottom - mTop - 2))
+                    return false
+            }
         }
 
         title := WinGetTitle(windowId)
@@ -65,7 +69,7 @@ IsTileable(hwnd) {
             return false
             
         exe := WinGetProcessName(windowId)
-        if (exe ~= "i)^(ShareX\.exe|ScreenClippingHost\.exe|SnippingTool\.exe|PowerToys\.exe|AutoHotkey.*\.exe|StartMenuExperienceHost\.exe|SearchHost\.exe|ShellExperienceHost\.exe|sihost\.exe|CalculatorApp\.exe|calc\.exe|Taskmgr\.exe|sndvol\.exe|Flow\.Launcher\.exe|TextInputHost\.exe)$")
+        if (exe ~= "i)^(yasb\.exe|yasb_themes\.exe|ShareX\.exe|ScreenClippingHost\.exe|SnippingTool\.exe|PowerToys\.exe|AutoHotkey.*\.exe|StartMenuExperienceHost\.exe|SearchHost\.exe|ShellExperienceHost\.exe|sihost\.exe|CalculatorApp\.exe|calc\.exe|Taskmgr\.exe|sndvol\.exe|Flow\.Launcher\.exe|TextInputHost\.exe)$")
             return false
 
         return true
@@ -171,6 +175,25 @@ ProcessDynamicLayout(params*) {
 
 ; --- THE GEOMETRY FILTER ---
 ApplyMathLayout(windows, currentDesk, count) {
+    ; Single-Window Mode: Native Maximize instead of geometry tiling
+    if (count == 1) {
+        hwnd := windows[1]
+        windowId := "ahk_id " . hwnd
+        if (!WinExist(windowId))
+            return
+            
+        try {
+            ; Restore default corner preference (square corners when maximized)
+            cornerPref := Buffer(4, 0)
+            NumPut("Int", 1, cornerPref, 0) ; DWMWCP_DONOTROUND
+            DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", hwnd, "UInt", 33, "Ptr", cornerPref, "UInt", 4)
+            
+            if (WinGetMinMax(windowId) != 1)
+                WinMaximize(windowId)
+        }
+        return
+    }
+
     Left := 0, Top := 0, Right := A_ScreenWidth, Bottom := A_ScreenHeight
     try {
         MonitorGetWorkArea(1, &Left, &Top, &Right, &Bottom)
@@ -192,7 +215,7 @@ ApplyMathLayout(windows, currentDesk, count) {
         if (!WinExist(windowId))
             continue
             
-        ; 2. THE SAFE RESTORE: Swallow errors if the window dies during the animation
+        ; 2. THE SAFE RESTORE: Un-maximize when transitioning from 1 window to 2+ windows
         try {
             if (WinGetMinMax(windowId) == 1) {
                 WinRestore(windowId)
@@ -204,13 +227,7 @@ ApplyMathLayout(windows, currentDesk, count) {
             
         tX := Left, tY := Top, tW := W, tH := H
         
-        if (count == 1) {
-            tX := Left
-            tY := Top
-            tW := W
-            tH := H
-        }
-        else if (count == 2) {
+        if (count == 2) {
             tW := (W // 2) - (g * 3 // 2), tH := H - (g * 2)
             tX := (index == 1) ? Left + g : Left + (W // 2) + (g // 2)
             tY := Top + g
@@ -275,10 +292,10 @@ ApplyMathLayout(windows, currentDesk, count) {
             WinMove(tX + offX, tY + offY, tW + offW, tH + offH, windowId)
             
             cornerPref := Buffer(4, 0)
-            if (count == 1) {
-                NumPut("Int", 1, cornerPref, 0)
+            if (tY <= 32) {
+                NumPut("Int", 1, cornerPref, 0) ; DWMWCP_DONOTROUND
             } else {
-                NumPut("Int", 2, cornerPref, 0)
+                NumPut("Int", 2, cornerPref, 0) ; DWMWCP_ROUND
             }
             DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", hwnd, "UInt", 33, "Ptr", cornerPref, "UInt", 4)
             
@@ -351,7 +368,7 @@ class WindowBorder {
                 return
                 
             exe := StrLower(WinGetProcessName(hwnd))
-            if (exe == "flow.launcher.exe")
+            if (exe == "flow.launcher.exe" || exe == "yasb.exe" || exe == "yasb_themes.exe")
                 return
                 
             WinGetPos(&winX, &winY, &winW, &winH, hwnd)
@@ -446,6 +463,10 @@ ToggleFloatState() {
     } else {
         FloatedWindows[hwnd] := true
         try {
+            if (WinGetMinMax(hwnd) == 1) {
+                WinRestore(hwnd)
+                Sleep(40)
+            }
             WinGetPos(&X, &Y, &W, &H, hwnd)
             WinMove(X + 50, Y + 50, W - 100, H - 100, hwnd)
         }
@@ -481,7 +502,7 @@ CenterActiveWindow() {
     }
 }
 
-SmartMaximize(dockHeight := 60) {
+SmartMaximize(dockHeight := 32) {
     global FloatedWindows, LastWindowList
     activeHwnd := WinExist("A")
     if !activeHwnd

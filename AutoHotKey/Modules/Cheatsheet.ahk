@@ -18,13 +18,17 @@ ShowCheatSheet() {
     }
     
     ; ==============================================================================
-    ; 1. DATA EXTRACTION (The Aesthetic Masterpiece Parser)
+    ; 1. DATA EXTRACTION (Spaced Header Parser)
     ; ==============================================================================
     cheatText := ""
     currentCategory := ""
     currentSubCategory := ""
     
-    filesToParse := [A_ScriptDir "\Modules\Hotstrings.ahk", A_ScriptDir "\Modules\Keybindings.ahk"]
+    filesToParse := [
+        A_ScriptDir "\Modules\Hotstrings.ahk",
+        A_ScriptDir "\Modules\Keybindings.ahk",
+        A_ScriptDir "\Modules\FocusEngine.ahk"
+    ]
     
     for _, currentFile in filesToParse 
     {
@@ -39,11 +43,13 @@ ShowCheatSheet() {
             if (line == "" || InStr(line, "[ FUNCTION LIBRARY ]"))
                 continue
             
-            ; A. Detect Categories
+            ; A. Detect Categories (Adds a blank spacer row before each category)
             if (RegExMatch(line, 'i)^\s*;\s*\[(.*?)\]', &match)) {
                 currentCategory := Trim(match[1])
                 currentSubCategory := ""
-                cheatText .= "►CAT_TOP`n►CAT_TXT:" StrUpper(currentCategory) "`n►CAT_BOT`n"
+                if (cheatText != "")
+                    cheatText .= "►SPACER`n"
+                cheatText .= "►CAT_TXT:" StrUpper(currentCategory) "`n"
                 continue
             }
             ; B. Detect Sub-Categories
@@ -82,7 +88,7 @@ ShowCheatSheet() {
     ; ==============================================================================
     ; 2. BRUTE-FORCE COLUMN BALANCING (Maximum Font Size Algorithm)
     ; ==============================================================================
-    cheatText := Trim(cheatText, "`n`r")
+    cheatText := RTrim(cheatText, "`n`r")
     lines := StrSplit(cheatText, "`n")
     totalLines := lines.Length
     
@@ -92,10 +98,9 @@ ShowCheatSheet() {
             continue
             
         isHeader := (SubStr(line, 1, 5) == "►CAT_" || SubStr(line, 1, 5) == "►SUB_")
-        prev1 := (index > 1) ? (SubStr(lines[index-1], 1, 5) == "►CAT_" || SubStr(lines[index-1], 1, 5) == "►SUB_") : false
-        prev2 := (index > 2) ? (SubStr(lines[index-2], 1, 5) == "►CAT_" || SubStr(lines[index-2], 1, 5) == "►SUB_") : false
+        prev1 := (index > 1) ? (SubStr(lines[index-1], 1, 5) == "►CAT_" || SubStr(lines[index-1], 1, 5) == "►SUB_" || lines[index-1] == "►SPACER") : false
         
-        if !(isHeader || prev1 || prev2)
+        if !(isHeader || prev1)
             safeBreaks.Push(index)
     }
     
@@ -122,9 +127,9 @@ ShowCheatSheet() {
         }
     }
     
-    col1 := [], col2 := [], col3 := []
+    cols := [[], [], []]
+    colMaxLens := [0, 0, 0]
     currentCol := 1
-    maxCol1Len := 0, maxCol2Len := 0, maxCol3Len := 0
     
     For index, line in lines {
         if (index == bestSplit1)
@@ -132,41 +137,32 @@ ShowCheatSheet() {
         else if (index == bestSplit2)
             currentCol := 3
             
+        ; Omit blank spacer if it lands at the very top or bottom of a column
+        if (line == "►SPACER") {
+            if (index == 1 || index == bestSplit1 || index == bestSplit2 || index == bestSplit1 - 1 || index == bestSplit2 - 1)
+                continue
+        }
+            
         actualLen := StrLen(line)
-        if (SubStr(line, 1, 8) == "►CAT_BOT" || SubStr(line, 1, 8) == "►CAT_TOP")
-            actualLen := 0 
+        if (line == "►SPACER")
+            actualLen := 0
         else if (SubStr(line, 1, 9) == "►CAT_TXT:")
-            actualLen := StrLen(SubStr(line, 10)) + 4 
+            actualLen := StrLen(SubStr(line, 10)) + 10 
         else if (SubStr(line, 1, 9) == "►SUB_TXT:")
             actualLen := StrLen(SubStr(line, 10))
             
-        if (currentCol == 1) {
-            col1.Push(line)
-            if (actualLen > maxCol1Len)
-                maxCol1Len := actualLen
-        } else if (currentCol == 2) {
-            col2.Push(line)
-            if (actualLen > maxCol2Len)
-                maxCol2Len := actualLen
-        } else {
-            col3.Push(line)
-            if (actualLen > maxCol3Len)
-                maxCol3Len := actualLen
-        }
+        cols[currentCol].Push(line)
+        if (actualLen > colMaxLens[currentCol])
+            colMaxLens[currentCol] := actualLen
     }
     
-    maxRows := Max(col1.Length, col2.Length, col3.Length)
+    maxRows := Max(cols[1].Length, cols[2].Length, cols[3].Length)
     if (maxRows == 0)
         maxRows := 1
         
     ; ==============================================================================
-    ; 3. THE PERFECT GRID BUILDER
+    ; 3. INDEPENDENT COLUMN LAYER BUILDER (100% Native Consolas Characters)
     ; ==============================================================================
-    gapSize := 3 
-    gapStr := ""
-    Loop gapSize
-        gapStr .= " "
-        
     PadRight(str, len) {
         padLen := len - StrLen(str)
         if (padLen > 0) {
@@ -176,46 +172,68 @@ ShowCheatSheet() {
         return str
     }
     
-    ProcessCell(cellValue, colMax) {
-        if (SubStr(cellValue, 1, 8) == "►CAT_TOP" || SubStr(cellValue, 1, 8) == "►CAT_BOT") {
-            lineStr := ""
-            Loop colMax
-                lineStr .= "="
-            return lineStr
+    FormatCell(cellValue, colMax, &outBase, &outCat, &outSub, &outFull) {
+        blank := PadRight("", colMax)
+        if (cellValue == "" || cellValue == "►SPACER") {
+            outBase := blank, outCat := blank, outSub := blank, outFull := blank
+            return
         }
         if (SubStr(cellValue, 1, 9) == "►CAT_TXT:") {
-            txt := SubStr(cellValue, 10)
-            spaces := (colMax - StrLen(txt)) // 2 
-            padLeft := ""
-            Loop Max(0, spaces)
-                padLeft .= " "
-            return PadRight(padLeft . txt, colMax)
+            ; Uses pure ASCII '=' and '[ ]' so every glyph has identical Consolas cell width
+            txt := "[ " . SubStr(cellValue, 10) . " ]"
+            rem := Max(0, colMax - StrLen(txt))
+            leftBar := rem // 2
+            rightBar := rem - leftBar
+            lStr := "", rStr := ""
+            Loop leftBar
+                lStr .= "="
+            Loop rightBar
+                rStr .= "="
+            outCat  := lStr . txt . rStr
+            outBase := blank
+            outSub  := blank
+            outFull := outCat
+            return
         }
         if (SubStr(cellValue, 1, 9) == "►SUB_TXT:") {
-            return PadRight(SubStr(cellValue, 10), colMax)
+            outSub  := PadRight(SubStr(cellValue, 10), colMax)
+            outBase := blank
+            outCat  := blank
+            outFull := outSub
+            return
         }
-        return PadRight(cellValue, colMax)
+        outBase := PadRight(cellValue, colMax)
+        outCat  := blank
+        outSub  := blank
+        outFull := outBase
     }
     
-    combinedText := "" 
+    colBase := ["", "", ""]
+    colCat  := ["", "", ""]
+    colSub  := ["", "", ""]
+    colFull := ["", "", ""]
     
-    Loop maxRows {
-        left  := (A_Index <= col1.Length) ? col1[A_Index] : ""
-        mid   := (A_Index <= col2.Length) ? col2[A_Index] : ""
-        right := (A_Index <= col3.Length) ? col3[A_Index] : ""
-        
-        l_fmt := ProcessCell(left, maxCol1Len)
-        m_fmt := ProcessCell(mid, maxCol2Len)
-        r_fmt := ProcessCell(right, maxCol3Len)
-        
-        combinedText .= l_fmt . gapStr . m_fmt . gapStr . r_fmt . "`n"
+    Loop 3 {
+        cIdx := A_Index
+        cMax := colMaxLens[cIdx]
+        Loop maxRows {
+            rIdx := A_Index
+            val := (rIdx <= cols[cIdx].Length) ? cols[cIdx][rIdx] : ""
+            b := "", c := "", s := "", f := ""
+            FormatCell(val, cMax, &b, &c, &s, &f)
+            colBase[cIdx] .= b . "`n"
+            colCat[cIdx]  .= c . "`n"
+            colSub[cIdx]  .= s . "`n"
+            colFull[cIdx] .= f . "`n"
+        }
+        colBase[cIdx] := StrReplace(RTrim(colBase[cIdx], "`r`n"), "&", "&&")
+        colCat[cIdx]  := StrReplace(RTrim(colCat[cIdx],  "`r`n"), "&", "&&")
+        colSub[cIdx]  := StrReplace(RTrim(colSub[cIdx],  "`r`n"), "&", "&&")
+        colFull[cIdx] := StrReplace(RTrim(colFull[cIdx], "`r`n"), "&", "&&")
     }
-    
-    combinedText := Trim(combinedText, " `n`r")
-    combinedText := StrReplace(combinedText, "&", "&&")
     
     ; ==============================================================================
-    ; 4. NATIVE OS TEXT MEASUREMENT 
+    ; 4. NATIVE OS TEXT MEASUREMENT (Per-Column Pixel Measurement)
     ; ==============================================================================
     CoordMode("Mouse", "Screen")
     MouseGetPos(&mX, &mY)
@@ -233,22 +251,34 @@ ShowCheatSheet() {
     monWidth := waRight - waLeft
     monHeight := waBottom - waTop
     
-    maxGuiW := Floor(monWidth * 1)
-    maxGuiH := Floor(monHeight * 1) 
+    maxGuiW := Floor(monWidth * 0.98)
+    maxGuiH := Floor(monHeight * 0.98) 
     
     fontSize := 36 
-    textW := 0, textH := 0
+    colW := [0, 0, 0]
+    textH := 0
+    colGapPx := 28
+    marginX := 16
+    marginY := 8
     
     Loop {
         tempGui := Gui("-DPIScale") 
         tempGui.SetFont("s" fontSize " w700", "Consolas")
         
-        tempText := tempGui.Add("Text", "", combinedText)
-        tempText.GetPos(,, &textW, &textH)
+        maxH := 0
+        Loop 3 {
+            tCtrl := tempGui.Add("Text", "", colFull[A_Index])
+            tCtrl.GetPos(,, &w, &h)
+            colW[A_Index] := w
+            if (h > maxH)
+                maxH := h
+        }
         tempGui.Destroy()
         
-        reqGuiW := textW + 40
-        reqGuiH := textH + 40
+        textH := maxH
+        totalTextW := colW[1] + colW[2] + colW[3] + (colGapPx * 2)
+        reqGuiW := totalTextW + (marginX * 2)
+        reqGuiH := textH + (marginY * 2)
         
         if ((reqGuiW <= maxGuiW) && (reqGuiH <= maxGuiH)) || (fontSize <= 8)
             break
@@ -257,17 +287,29 @@ ShowCheatSheet() {
     }
     
     ; ==============================================================================
-    ; 5. UI RENDERING & PERFECT CENTERING
+    ; 5. UI RENDERING & LOCKED 3-COLUMN OVERLAY
     ; ==============================================================================
     cheatGui := Gui("+AlwaysOnTop -Caption -Border -DPIScale", "AHK Master Cheatsheet")
     cheatGui.BackColor := "1E1E1E" 
     cheatGui.SetFont("s" fontSize " w700", "Consolas")  
     
-    cheatGui.MarginX := 20
-    cheatGui.MarginY := 20
+    cheatGui.MarginX := marginX
+    cheatGui.MarginY := marginY
     
-    cheatGui.Add("Text", "w" textW " h" textH " Background1E1E1E cD4D4D4", combinedText)
-    focusTrap := cheatGui.Add("Edit", "xp yp w0 h0 Background1E1E1E -Border")
+    curX := marginX
+    Loop 3 {
+        cIdx := A_Index
+        w := colW[cIdx]
+        
+        ; Render each column at its own locked pixel X-coordinate
+        cheatGui.Add("Text", "x" curX " y" marginY " w" w " h" textH " Background1E1E1E cE0E0E0", colBase[cIdx])
+        cheatGui.Add("Text", "x" curX " y" marginY " w" w " h" textH " BackgroundTrans c4DD0E1", colSub[cIdx])
+        cheatGui.Add("Text", "x" curX " y" marginY " w" w " h" textH " BackgroundTrans cFFCA28", colCat[cIdx])
+        
+        curX += w + colGapPx
+    }
+    
+    focusTrap := cheatGui.Add("Edit", "x0 y0 w0 h0 Background1E1E1E -Border")
     
     cheatGui.OnEvent("Escape", (*) => cheatGui.Hide())
     cheatGui.OnEvent("Close", (*) => cheatGui.Hide())

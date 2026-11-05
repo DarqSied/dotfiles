@@ -78,13 +78,25 @@ ToggleTaskbar() {
     ApplyTaskbarProcesses()
 }
 
+SetTaskbarAppBarState(autoHide := true) {
+    ; ABM_SETSTATE (0x0A): 1 = ABS_AUTOHIDE (collapses reserved space), 0 = ABS_ALWAYSONTOP
+    abd := Buffer(48, 0)
+    NumPut("UInt", 48, abd, 0)
+    if (hTray := DllCall("FindWindow", "Str", "Shell_TrayWnd", "Ptr", 0, "Ptr"))
+        NumPut("Ptr", hTray, abd, A_PtrSize)
+    NumPut("UInt", autoHide ? 1 : 0, abd, 40)
+    DllCall("Shell32\SHAppBarMessage", "UInt", 0x0000000A, "Ptr", abd)
+}
+
 ApplyTaskbarProcesses() {
     global TaskbarShouldBeHidden
     
     if (TaskbarShouldBeHidden) {
         if ProcessExist("translucenttb.exe")
             ProcessClose("translucenttb.exe")
+        SetTaskbarAppBarState(true)
     } else {
+        SetTaskbarAppBarState(false)
         if !ProcessExist("translucenttb.exe") {
             try Run('cmd.exe /c start "" "ttb.exe"', "", "Hide")
         }
@@ -94,34 +106,49 @@ ApplyTaskbarProcesses() {
 }
 
 EnforceTaskbarVisibility() {
-    global TaskbarShouldBeHidden, TASKBAR_WND, SECONDARY_TASKBAR_WND
+    global TaskbarShouldBeHidden
     
     prevDetectTaskbar := A_DetectHiddenWindows
     DetectHiddenWindows(true)
     
-    if (TaskbarShouldBeHidden) {
-        try WinHide(TASKBAR_WND)
-        try WinHide(SECONDARY_TASKBAR_WND)
-    } else {
-        try WinShow(TASKBAR_WND)
-        try WinShow(SECONDARY_TASKBAR_WND)
+    ; Explicitly target explorer.exe so YASB's tray hook is never hit by mistake
+    for hwnd in WinGetList("ahk_class Shell_TrayWnd ahk_exe explorer.exe") {
+        try {
+            if (TaskbarShouldBeHidden)
+                WinHide("ahk_id " hwnd)
+            else
+                WinShow("ahk_id " hwnd)
+        }
+    }
+    
+    for hwnd in WinGetList("ahk_class Shell_SecondaryTrayWnd ahk_exe explorer.exe") {
+        try {
+            if (TaskbarShouldBeHidden)
+                WinHide("ahk_id " hwnd)
+            else
+                WinShow("ahk_id " hwnd)
+        }
     }
     
     DetectHiddenWindows(prevDetectTaskbar)
 }
 
 RestoreTaskbar(ExitReason, ExitCode) {
-    global TASKBAR_WND, SECONDARY_TASKBAR_WND, hMouseHook, hWinEventHook
+    global hMouseHook, hWinEventHook
     
     if (hMouseHook)
         DllCall("UnhookWindowsHookEx", "Ptr", hMouseHook)
     if (hWinEventHook)
         DllCall("UnhookWinEvent", "Ptr", hWinEventHook)
         
+    SetTaskbarAppBarState(false)
+    
     prevDetect := A_DetectHiddenWindows
     DetectHiddenWindows(true)
-    try WinShow(TASKBAR_WND)
-    try WinShow(SECONDARY_TASKBAR_WND)
+    for hwnd in WinGetList("ahk_class Shell_TrayWnd ahk_exe explorer.exe")
+        try WinShow("ahk_id " hwnd)
+    for hwnd in WinGetList("ahk_class Shell_SecondaryTrayWnd ahk_exe explorer.exe")
+        try WinShow("ahk_id " hwnd)
     DetectHiddenWindows(prevDetect)
     
     if !ProcessExist("translucenttb.exe") {
@@ -155,6 +182,10 @@ EnforceTitleBarState(hwnd, forceToggle := false) {
         return
 
     try {
+        exe := StrLower(WinGetProcessName(hwnd))
+        if (exe == "yasb.exe" || exe == "yasb_themes.exe")
+            return
+
         if (WinGetTitle(hwnd) = "" || WinGetClass(hwnd) ~= "^(Progman|WorkerW|Shell_TrayWnd|CabinetWClass|Chrome_WidgetWin_1|Notepad|ApplicationFrameWindow)$")
             return
          
@@ -175,15 +206,6 @@ OnForegroundChange(hHook, event, hwnd, idObject, idChild, idEventThread, dwmsEve
         if (activeClass = "Shell_TrayWnd") {
             SetTimer(ForceDesktopFocus, -50)
             return
-        }
-        
-        activeExe := WinGetProcessName("ahk_id " hwnd)
-        
-        if (activeExe = "Microsoft.CmdPal.UI.exe") {
-            MouseGetPos(, , &hoverHwnd)
-            if (!hoverHwnd || WinGetProcessName("ahk_id " hoverHwnd) != "Microsoft.CmdPal.UI.exe") {
-                SetTimer(ForceDesktopFocus, -50)
-            }
         }
     }
 }

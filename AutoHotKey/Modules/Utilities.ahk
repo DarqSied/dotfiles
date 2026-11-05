@@ -9,11 +9,11 @@ global HideStandardPopups := false
 
 Notify(title, message, isError := false) {
     global HideStandardPopups
-    if (HideStandardPopups) { 
+    if (HideStandardPopups && !isError) { 
         return 
     }
     ToolTip(title ": " message, 10, 10)
-    SetTimer () => ToolTip(), -2000 
+    SetTimer(() => ToolTip(), -2000)
 }
 
 ; ------------------------------------------------------------------------------
@@ -51,6 +51,7 @@ PasteAsPlain() {
         A_Clipboard := savedClip
         return
     }
+    
     A_Clipboard := ""
     A_Clipboard := plainText
     
@@ -76,8 +77,10 @@ LaunchApp(appName, exePath) {
                 return
         }
         WinActivate(appName)
-        if WinWaitActive(appName, , 2)
+        if WinWaitActive(appName, , 2)   
             WinSetAlwaysOnTop(-1, "A")
+    } catch {
+        Notify("Launch Error", "Failed to start " appName, true)
     } finally {
         DetectHiddenWindows(prevDetect)
         BlockInput("Off") 
@@ -99,9 +102,10 @@ FlowSearch(actionKeyword) {
 ; Cross-Device Auto-Sorter (Syncthing)
 ; ------------------------------------------------------------------------------
 SortSyncthingFiles() {
+    global PATH_SYNCTHING
     syncDir := PATH_SYNCTHING
     
-    if not DirExist(syncDir) {
+    if !DirExist(syncDir) {
         return
     }
     
@@ -116,9 +120,10 @@ SortSyncthingFiles() {
 }
 
 ; ------------------------------------------------------------------------------
-; Current Screenshots folder Access
+; Current Screenshots Folder Access
 ; ------------------------------------------------------------------------------
 OpenMonthlyScreenshots(*) {
+    global PATH_SCREENSHOTS
     currentMonth := FormatTime(, "yyyy-MM")
     targetDir := PATH_SCREENSHOTS "\" currentMonth
     

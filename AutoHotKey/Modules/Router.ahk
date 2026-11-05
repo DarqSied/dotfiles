@@ -557,6 +557,10 @@ KillAllOnCurrentDesktop() {
     
     for hwnd in WinGetList() {
         try {
+            exe := StrLower(WinGetProcessName(hwnd))
+            if (exe == "yasb.exe" || exe == "yasb_themes.exe")
+                continue
+
             if (!(WinGetClass(hwnd) ~= "^(Progman|WorkerW|Shell_TrayWnd|Shell_SecondaryTrayWnd)$")) {
                 winDesk := DllCall(VDA_PATH "\GetWindowDesktopNumber", "Ptr", hwnd, "Int")
                 if (winDesk == currentDesk) {

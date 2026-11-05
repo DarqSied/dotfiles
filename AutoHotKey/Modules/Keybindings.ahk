@@ -1,5 +1,5 @@
 ; ==============================================================================
-; [ MODULE: KEYBINDINGS & LEADER KEYS ]
+; MODULE: KEYBINDINGS & LEADER KEYS
 ; ==============================================================================
 
 ; ------------------------------------------------------------------------------
@@ -42,9 +42,8 @@ $!F4:: {
     if !target
         return
     try {
-        if (WinGetProcessName(target) = "Microsoft.CmdPal.UI.exe") {
+        if (StrLower(WinGetProcessName(target)) = "yasb.exe") {
             Send("{Escape}")
-            ForceDesktopFocus()
             return
         }
         if !(WinGetClass(target) ~= "^(Progman|WorkerW|Shell_TrayWnd|Shell_SecondaryTrayWnd)$")
@@ -147,19 +146,30 @@ $!F4:: {
 
 ; --- Status Bar Show Desktop Fix ---
 ~#d:: {                                                                        ; Win+D: Show Desktop Status Bar Fix
-    ; Buffer for the Windows DWM minimize animation
     Sleep(150) 
-    
-    targetWin := "PowerDock ahk_exe Microsoft.CmdPal.UI.exe"
-    
-    if WinExist(targetWin) {
-        WinShow(targetWin)
-        WinSetAlwaysOnTop(1, targetWin)
-        WinSetAlwaysOnTop(0, targetWin)
-        try WinActivate("ahk_class WorkerW")
-        catch
-            try WinActivate("ahk_class Progman")
+
+    ; 1. Focus the desktop surface first
+    try WinActivate("ahk_class WorkerW")
+    catch
+        try WinActivate("ahk_class Progman")
+
+    ; 2. Restore ONLY the YASB bar window above WorkerW without stealing focus
+    prevDetect := A_DetectHiddenWindows
+    DetectHiddenWindows(true)
+    for hwnd in WinGetList("ahk_exe yasb.exe") {
+        try {
+            if (WinGetMinMax(hwnd) == -1)
+                DllCall("ShowWindow", "Ptr", hwnd, "Int", 9) ; SW_RESTORE
+
+            WinGetPos(, , &w, &h, hwnd)
+            if (w >= (A_ScreenWidth // 2) && h > 0 && h <= 80) {
+                WinShow(hwnd)
+                ; -1 = HWND_TOPMOST, 0x0053 = SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_SHOWWINDOW
+                DllCall("SetWindowPos", "Ptr", hwnd, "Ptr", -1, "Int", 0, "Int", 0, "Int", 0, "Int", 0, "UInt", 0x0053)
+            }
+        }
     }
+    DetectHiddenWindows(prevDetect)
 }
 
 ; --- Desktop Creation & Deletion (System Level) ---
@@ -293,11 +303,17 @@ $#s:: {
     KeyWait("RWin")
     
     switch GetLeaderInput() {
-        case "r": Reload()                                                                                 ; R: Reload AHK
+        case "r":                                                                                         ; R: Reload YASB & AHK Engine
+            try {
+                RunWait("taskkill /F /IM yasb.exe", , "Hide")
+                Sleep(200)
+                Run('cmd.exe /c start "" "yasb.exe"')
+            }
+            Reload()
         case "e": Run('"' EnvGet("LOCALAPPDATA") '\Programs\VSCodium\VSCodium.exe" "' A_ScriptDir '"')     ; E: Edit Script Workspace
         case "t": ToggleTaskbar()                                                                          ; T: Toggle Taskbar
         case "b": ToggleAllTitleBars()                                                                     ; B: Toggle Borders
-        case "m": SmartMaximize(30)                                                                        ; M: Maximize active window perfectly
+        case "m": SmartMaximize(32)                                                                        ; M: Maximize active window perfectly
     }
 }
 

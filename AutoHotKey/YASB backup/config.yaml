@@ -1,0 +1,363 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/amnweb/yasb/main/schema.json
+watch_stylesheet: true
+watch_config: true
+debug: false
+
+bars:
+  primary-bar:
+    enabled: true
+    screens: ["*"]
+    class_name: "yasb-bar"
+    alignment:
+      position: "top"
+      center: false
+    blur_effect:
+      enabled: false          # Keeps the gaps between pills 100% clear & unblurred
+      acrylic: false
+      dark_mode: true
+      round_corners: false    # Sticks flush to the top screen edge
+      border_color: "None"
+    window_flags:
+      always_on_top: true     # Prevents Win+D from burying the bar under WorkerW
+      windows_app_bar: true   # Reserves 32px WorkArea for your AHK v2 TWM
+      hide_on_fullscreen: true
+    dimensions:
+      width: "100%"
+      height: 32
+    padding:
+      top: 0
+      left: 0
+      bottom: 0
+      right: 0
+    widgets:
+      left:
+        - "home"
+        - "windows_workspaces"
+        - "active_window"
+      center:
+        - "center_grouper"
+        - "traffic"
+      right:
+        - "systray"
+        #- "brightness"
+        - "update_check"
+        - "cpu"
+        - "memory"
+        - "gpu_grouper"
+        - "battery"
+
+widgets:
+  # ================= LEFT CLUSTER =================
+  home:
+    type: "yasb.home.HomeWidget"
+    options:
+      label: "<span>\uf17a</span>"
+      system_menu: true
+      power_menu: true
+      blur: true
+      round_corners: true
+      round_corners_type: "normal"
+      border_color: "System"
+      alignment: "left"
+      direction: "down"
+      offset_top: 4
+      offset_left: 6
+      menu_labels:
+        about: "About This PC"
+        system: "System Settings"
+        task_manager: "Task Manager"
+        hibernate: "Hibernate"
+        sleep: "Sleep"
+        restart: "Restart"
+        shutdown: "Shut Down"
+        lock: "Lock"
+        logout: "Sign Out"
+
+  windows_workspaces:
+    type: "yasb.windows_desktops.WorkspaceWidget"
+    options:
+      label_workspace_btn: "\u200b"
+      label_workspace_active_btn: "\u200b"
+      btn_shadow:
+        enabled: false
+      callbacks:
+        on_left: "activate_workspace"
+        on_middle: "do_nothing"
+        on_right: "toggle_context_menu"
+
+  active_window:
+    type: "yasb.active_window.ActiveWindowWidget"
+    options:
+      label: "{win[title]}"
+      label_alt: "{win[process][name]}"
+      label_no_window: "Desktop"
+      label_icon: true
+      label_icon_size: 14
+      max_length: 34
+      max_length_ellipsis: "..."
+      monitor_exclusive: false
+
+  # ================= CENTER CLUSTER =================
+  center_grouper:
+    type: "yasb.grouper.GrouperWidget"
+    options:
+      class_name: "center-pill"
+      widgets:
+        - "clock"
+        - "weather"
+
+  clock:
+    type: "yasb.clock.ClockWidget"
+    options:
+      label: "{%H:%M  •  %a %d}"
+      label_alt: "{%A, %d %B %Y  •  %H:%M:%S}"
+      timezones: []
+      calendar:
+        blur: true
+        round_corners: true
+        round_corners_type: "normal"
+        border_color: "System"
+        alignment: "center"
+        direction: "down"
+        offset_top: 4
+
+  weather:
+    type: "yasb.weather.WeatherWidget"
+    options:
+      label: "<span>{icon}</span> {temp}"
+      label_alt: "{location}: {conditions}, {temp} (Feels {feelslike})"
+      api_key: "0c923947d589456c99b185439260111"
+      update_interval: 600
+      hide_decimal: true
+      location: "Jamshedpur"
+      units: "metric"
+      callbacks:
+        on_left: "toggle_card"
+        on_middle: "do_nothing"
+        on_right: "toggle_label"
+      icons:
+        sunnyDay: "\ue706"          # Segoe Fluent Sun
+        clearNight: "\ue708"        # Segoe Fluent Crescent Moon
+        cloudyDay: "\ue753"         # Segoe Fluent Cloud
+        cloudyNight: "\ue753"       # Segoe Fluent Cloud
+        rainyDay: "\ue753"          # Segoe Fluent Cloud
+        rainyNight: "\ue753"        # Segoe Fluent Cloud
+        snowyDay: "\ue753"          # Segoe Fluent Cloud
+        snowyNight: "\ue753"        # Segoe Fluent Cloud
+        blizzardDay: "\ue753"       # Segoe Fluent Cloud
+        blizzardNight: "\ue753"     # Segoe Fluent Cloud
+        foggyDay: "\ue706"          # Maps daytime "Mist/Haze" to Sun instead of storm lines
+        foggyNight: "\ue708"        # Maps nighttime "Mist/Haze" to Moon
+        thunderstormDay: "\ue945"   # Segoe Fluent Lightning Bolt
+        thunderstormNight: "\ue945" # Segoe Fluent Lightning Bolt
+        default: "\ue706"
+      weather_card:
+        blur: true
+        round_corners: true
+        round_corners_type: "normal"
+        border_color: "System"
+        alignment: "right"
+        direction: "down"
+        icon_size: 64
+        show_hourly_forecast: true # Set to False to disable hourly forecast
+        time_format: "24h" # can be 12h or 24h
+        hourly_point_spacing: 76
+        hourly_icon_size: 32 # better to set 16, 32 or 64 for better quality
+        icon_smoothing: true # should be true for smoother icon or false for sharper icon if using 16, 32 or 64 for hourly_icon_size
+        temp_line_width: 2 # can be 0 to hide the temperature line
+        current_line_color: "#8EAEE8"
+        current_line_width: 1 # can be 0 to hide the current hour line
+        current_line_style: "dot"
+        hourly_gradient:
+          enabled: false
+          top_color: "#8EAEE8"
+          bottom_color: "#2A3E68"
+        hourly_forecast_buttons: # Optional hourly forecast data type toggle buttons, default disabled
+          enabled: true # Set to false to hide the buttons
+          default_view: "temperature" # Default view when opening the weather card. Options: "temperature", "rain", "snow"
+          temperature_icon: "\udb81\udd99"
+          rain_icon: "\udb81\udd96"
+          snow_icon: "\udb81\udd98"
+        weather_animation:
+          enabled: false
+          snow_overrides_rain: true
+          temp_line_animation_style: both # can be "rain", "snow", "both", or "none"
+          rain_effect_intensity: 1.0 # 0.01 - 10.0
+          snow_effect_intensity: 1.0 # 0.01 - 10.0
+          scale_with_chance: true
+          enable_debug: false
+
+  # ================= RIGHT CLUSTER =================
+  systray:
+    type: "yasb.systray.SystrayWidget"
+    options:
+      class_name: "systray"
+      label_collapsed: "\ue70d"
+      label_expanded: "\ue70e"
+      label_position: "left"
+      icon_size: 15
+      pin_click_modifier: "alt"   # Alt + Left-Click any tray icon (AHK, Syncthing) to pin it
+      show_unpinned: false
+      show_unpinned_button: true
+      show_in_popup: true
+      icons_per_row: 5
+      show_battery: false
+      show_volume: false
+      show_network: false
+      tooltip: true
+      popup:
+        blur: true
+        round_corners: true
+        round_corners_type: "normal"
+        border_color: "System"
+        alignment: "center"
+        direction: "down"
+        offset_top: 4
+
+  #brightness:
+  #  type: "yasb.brightness.BrightnessWidget"
+  #  options:
+  #    label: "<span>{icon}</span>"
+  #    label_alt: "Brightness {percent}%"
+  #    tooltip: true
+  #    hide_unsupported: true
+  #    brightness_toggle_level: [0, 50, 100]
+  #    auto_light: false
+  #    auto_light_icon: "\udb80\udce1"
+  #    auto_light_night_level: 35
+  #    auto_light_night_start_time: "19:00"
+  #    auto_light_night_end_time: "06:45"
+  #    auto_light_day_level: 75
+  #    brightness_icons: [
+  #      "\ue706",
+  #      "\ue706",
+  #      "\ue706",
+  #      "\ue706"
+  #    ]
+  #    brightness_menu:
+  #      blur: true
+  #      round_corners: true
+  #      round_corners_type: "normal"
+  #      border_color: "System"
+  #      alignment: "right"
+  #      direction: "down"
+  #      brightness_icon: "\ue706"
+  #      contrast_icon: "\ue7a1"
+  #    callbacks:
+  #      on_left: "toggle_brightness_menu"
+  #      on_right: "toggle_label"
+
+  update_check:
+    type: "yasb.update_check.UpdateCheckWidget"
+    options:
+      winget_update:
+        enabled: true
+        label: "<span>\uf019</span> {count}"
+        interval: 10080       # 10080 mins = 7 days
+        exclude: []
+      windows_update:
+        enabled: true
+        label: "<span>\uf17a</span> {count}"
+        interval: 10080       # 10080 mins = 7 days
+        exclude: []
+
+  cpu:
+    type: "yasb.cpu.CpuWidget"
+    options:
+      label: "<span>\ue9d9</span> {info[percent][total]}%"
+      label_alt: "<span>\ue9d9</span> {info[freq][current]} MHz"
+      update_interval: 2000
+      callbacks:
+        on_left: "toggle_label"
+        on_right: "exec cmd.exe /c start taskmgr"
+
+  memory:
+      type: "yasb.memory.MemoryWidget"
+      options:
+        label: "<span>\uefc5</span> {virtual_mem_used}/{virtual_mem_total}"
+        label_alt: "<span>\uefc5</span> {virtual_mem_percent}% ({virtual_mem_free} free)"
+        update_interval: 3000
+        callbacks:
+          on_left: "toggle_label"
+
+  gpu_grouper:
+    type: "yasb.grouper.GrouperWidget"
+    options:
+      class_name: "gpu-pill"
+      widgets:
+        - "igpu"
+        - "dgpu"
+
+  igpu:
+    type: "yasb.gpu.GpuWidget"
+    options:
+      gpu_index: 0              # Swap 0 and 1 if Windows lists your dGPU as index 0
+      label: "<span>\ue950</span> iGPU {info[utilization]}%"
+      label_alt: "<span>\ue950</span> {info[name]} ({info[temp]}°C)"
+      update_interval: 2000
+      menu:
+        enabled: true
+        blur: true
+        round_corners: true
+        border_color: "System"
+        alignment: "right"
+        direction: "down"
+        offset_top: 4
+      callbacks:
+        on_left: "toggle_label"
+        on_right: "toggle_menu"
+
+  dgpu:
+    type: "yasb.gpu.GpuWidget"
+    options:
+      gpu_index: 1
+      label: "dGPU {info[utilization]}%"
+      label_alt: "{info[name]} ({info[temp]}°C | {info[mem_used]}/{info[mem_total]} MB)"
+      update_interval: 2000
+      menu:
+        enabled: true
+        blur: true
+        round_corners: true
+        border_color: "System"
+        alignment: "right"
+        direction: "down"
+        offset_top: 4
+      callbacks:
+        on_left: "toggle_label"
+        on_right: "toggle_menu"
+
+  traffic:
+    type: "yasb.traffic.TrafficWidget"
+    options:
+      label: "<span>\ue74a</span> {upload_speed}  <span class=\"dl-icon\">\ue74b</span> {download_speed}"
+      label_alt: "<span>\ue74a</span> {upload_speed} ({bytes_sent})  <span class=\"dl-icon\">\ue74b</span> {download_speed} ({bytes_recv})"
+      update_interval: 1000
+      callbacks:
+        on_left: "toggle_label"
+        on_right: "exec cmd.exe /c start ms-settings:network-status"
+
+  battery:
+    type: "yasb.battery.BatteryWidget"
+    options:
+      label: "<span>{icon}</span> {percent}%"
+      label_alt: "<span>{icon}</span> {percent}% ({time_remaining})"
+      update_interval: 5000
+      hide_unsupported: false
+      charging_options:
+        icon_format: "{charging_icon}"   # FIXED: Renders only ONE charging battery icon
+        blink_charging_icon: false
+      status_thresholds:
+        critical: 15
+        low: 30
+        medium: 60
+        high: 90
+        full: 100
+      status_icons:
+        icon_charging: "\ue83e"
+        icon_critical: "\ue851"
+        icon_low: "\ue853"
+        icon_medium: "\ue855"
+        icon_high: "\ue858"
+        icon_full: "\ue83f"
+      callbacks:
+        on_left: "toggle_label"
